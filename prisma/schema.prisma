@@ -33,7 +33,9 @@ model User {
   intro     String?    @db.Text
   content   String?    @db.Text
 
-  Tokens Token[]
+  Tokens          Token[]
+  EthAccount      EthAccount?
+  TelegramAccount TelegramAccount?
 
   MindLogs      MindLog[]     @relation(name: "MindLogCreatedBy")
   TasksCreated  Task[]        @relation(name: "TaskCreatedBy")
@@ -54,6 +56,10 @@ model User {
   EXReflexes  EXReflex[]
   EXReactions EXReaction[]
 
+  Balance         Balance?
+  Transactions    Transaction[]
+  EthTransactions EthTransaction[]
+
   @@unique([email])
   @@unique([username])
 }
@@ -66,6 +72,33 @@ model Token {
   User      User?     @relation(fields: [userId], references: [id])
 
   @@index(createdAt)
+}
+
+model EthAccount {
+  id        String   @id @default(cuid()) @db.VarChar(36)
+  createdAt DateTime @default(now()) @db.Date()
+  updatedAt DateTime @default(now()) @updatedAt @db.Date()
+  address   String   @db.VarChar(42)
+  userId    String?  @unique @db.VarChar(36)
+  User      User?    @relation(fields: [userId], references: [id])
+
+  @@unique([address])
+}
+
+model TelegramAccount {
+  id        String   @id @default(cuid()) @db.VarChar(36)
+  createdAt DateTime @default(now()) @db.Date()
+  updatedAt DateTime @default(now()) @updatedAt @db.Date()
+
+  externalKey Int       @unique
+  first_name  String?
+  last_name   String?
+  username    String?
+  photo_url   String?
+  auth_date   DateTime? @db.Timestamp(0)
+
+  userId String @unique @db.VarChar(36)
+  User   User   @relation(fields: [userId], references: [id])
 }
 
 enum MindLogType {
@@ -643,8 +676,8 @@ model EXReflex {
 
   // === AGGREGATED STATISTICS ===
   // Updated after reactions
-  effectiveness  Float? // 0.0 - 1.0, quality of this reflex
-  executionRate  Float? // 0.0 - 1.0, how often this reflex is triggered
+  effectiveness Float? // 0.0 - 1.0, quality of this reflex
+  executionRate Float? // 0.0 - 1.0, how often this reflex is triggered
 
   createdById String @db.VarChar(36)
   CreatedBy   User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
@@ -696,4 +729,70 @@ model EXReaction {
   @@index([reflexId])
   @@index([createdById])
   @@index([relatedToUserId])
+}
+
+model Balance {
+  id        String   @id @default(cuid()) @db.VarChar(36)
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp(3)
+
+  amount Float @default(0)
+
+  userId String @unique @db.VarChar(36)
+  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  Transactions Transaction[]
+}
+
+enum TransactionType {
+  TopUp
+  TransferOut
+  TransferIn
+}
+
+model Transaction {
+  id        String   @id @default(cuid()) @db.VarChar(36)
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp(3)
+
+  userId String @db.VarChar(36)
+  User   User   @relation(fields: [userId], references: [id])
+
+  type   TransactionType
+  amount Float
+
+  title String?
+
+  parentId String?      @db.VarChar(36)
+  Parent   Transaction? @relation(fields: [parentId], references: [id], name: "ParentTransaction")
+
+  Children Transaction[] @relation(name: "ParentTransaction")
+
+  balanceId String  @db.VarChar(36)
+  Balance   Balance @relation(fields: [balanceId], references: [id])
+
+  ethTransactionId String?         @unique @db.VarChar(36)
+  EthTransaction   EthTransaction? @relation(fields: [ethTransactionId], references: [id])
+}
+
+model EthTransaction {
+  id        String   @id @default(cuid()) @db.VarChar(36)
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+
+  userId String @db.VarChar(36)
+  User   User   @relation(fields: [userId], references: [id])
+
+  chainId     Int
+  txHash      String @db.VarChar(66)
+  from        String @db.VarChar(42)
+  to          String @db.VarChar(42)
+  amount      Float
+  blockNumber Int?
+
+  message   String @db.Text
+  signature String @db.Text
+
+  Transaction Transaction?
+
+  @@unique([chainId, txHash])
 }

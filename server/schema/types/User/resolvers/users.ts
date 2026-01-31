@@ -9,9 +9,8 @@ builder.queryField('users', (t) =>
       skip: t.arg.int(),
       take: t.arg.int(),
     },
-    resolve: (query, _root, args, ctx) =>
+    resolve: (_, _root, args, ctx) =>
       ctx.prisma.user.findMany({
-        ...query,
         where: args.where
           ? {
               id: args.where.id ?? undefined,

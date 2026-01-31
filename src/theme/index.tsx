@@ -108,9 +108,9 @@ export const theme = {
     sticky: 200,
     header: 300,
     overlay: 400,
-    modal: 500,
-    popover: 600,
-    tooltip: 700,
+    modal: 1000,
+    popover: 1100,
+    tooltip: 1200,
   },
 }
 

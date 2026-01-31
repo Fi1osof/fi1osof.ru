@@ -1,0 +1,5 @@
+fragment AuthPayload_ on AuthPayload {
+  success
+  message
+  token
+}

@@ -14,6 +14,7 @@ import { TextField } from 'src/ui-kit/controls/TextField'
 import { useAppContext } from 'src/components/AppContext'
 import { useSnackbar } from 'src/ui-kit/Snackbar'
 import { Button } from 'src/ui-kit/Button'
+import { AuthProviders } from '../AuthProviders'
 
 export type { SignInFormData }
 
@@ -127,6 +128,8 @@ export const SignInForm: React.FC<SignInFormProps> = ({
       <FormProvider {...form}>
         <Controller name="username" render={fieldRenderer} />
         <Controller name="password" render={fieldRenderer} />
+
+        <AuthProviders onSuccessHandler={onSuccessHandler} />
 
         <Button type="submit" disabled={loading}>
           {loading ? 'Signing in...' : 'Sign In'}

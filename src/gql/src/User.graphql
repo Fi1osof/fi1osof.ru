@@ -41,6 +41,18 @@ mutation signup($data: UserSignupDataInput!) {
 
 fragment meUser on User {
   ...User_
+
+  EthAccount {
+    ...EthAccountNoNesting
+  }
+
+  TelegramAccount {
+    ...TelegramAccountNoNesting
+  }
+
+  Balance {
+    ...BalanceNoNesting
+  }
 }
 
 fragment User_ on User {

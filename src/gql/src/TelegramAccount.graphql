@@ -1,0 +1,12 @@
+fragment TelegramAccountNoNesting on TelegramAccount {
+  id
+  createdAt
+  photo_url
+  username
+}
+
+mutation authViaTelegram($tgAuthData: TelegramAuthDataInput!) {
+  authViaTelegram(tgAuthData: $tgAuthData) {
+    ...AuthPayload_
+  }
+}

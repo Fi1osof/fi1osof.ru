@@ -14,6 +14,45 @@ builder.prismaObject('User', {
     username: t.exposeString('username', { nullable: true }),
     fullname: t.exposeString('fullname', { nullable: true }),
     createdAt: t.expose('createdAt', { type: 'DateTime' }),
+    EthAccount: t.relation('EthAccount', {
+      async resolve(_query, parent, _args, context) {
+        const { currentUser, prisma } = context
+
+        return parent.id && parent.id === currentUser?.id
+          ? prisma.ethAccount.findUnique({
+              where: {
+                userId: parent.id,
+              },
+            })
+          : null
+      },
+    }),
+    TelegramAccount: t.relation('TelegramAccount', {
+      async resolve(_query, parent, _args, context) {
+        const { currentUser, prisma } = context
+
+        return parent.id && parent.id === currentUser?.id
+          ? prisma.telegramAccount.findUnique({
+              where: {
+                userId: parent.id,
+              },
+            })
+          : null
+      },
+    }),
+    Balance: t.relation('Balance', {
+      async resolve(_query, parent, _args, context) {
+        const { currentUser, prisma } = context
+
+        return parent.id && parent.id === currentUser?.id
+          ? prisma.balance.findUnique({
+              where: {
+                userId: parent.id,
+              },
+            })
+          : null
+      },
+    }),
   }),
 })
 

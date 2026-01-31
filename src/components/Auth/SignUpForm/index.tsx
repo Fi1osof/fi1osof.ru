@@ -14,6 +14,7 @@ import { useSnackbar } from 'src/ui-kit/Snackbar'
 import { FormControl } from 'src/ui-kit/FormControl'
 import { TextField } from 'src/ui-kit/controls/TextField'
 import { Button } from 'src/ui-kit/Button'
+import { AuthProviders } from '../AuthProviders'
 
 export type { SignUpFormData }
 
@@ -137,6 +138,8 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
         <Controller name="email" render={fieldRenderer} />
         <Controller name="username" render={fieldRenderer} />
         <Controller name="password" render={fieldRenderer} />
+
+        <AuthProviders onSuccessHandler={onSuccessHandler} />
 
         <Button type="submit" disabled={loading}>
           {loading ? 'Signing up...' : 'Sign up'}

@@ -6,6 +6,8 @@ import { Button } from 'src/ui-kit/Button'
 import { SignOutButton } from 'src/components/Auth/SignOutButton'
 import { useAppContext } from 'src/components/AppContext'
 import { Markdown } from 'src/components/Markdown'
+import { CurrentUserData } from './CurrentUserData'
+import { SendTransfer } from './SendTransfer'
 
 type UserPageViewProps = {
   user: UserFragment
@@ -38,12 +40,19 @@ export const UserPageView: React.FC<UserPageViewProps> = ({
         <UserEditForm user={user} closeForm={handleCloseForm} />
       ) : null}
 
-      {isCurrentUser && (
-        <UserPageActionsStyled>
-          <Button onClick={handleEditClick}>Edit</Button>
+      {isCurrentUser && currentUser && (
+        <>
+          <CurrentUserData currentUser={currentUser} />
+          <UserPageActionsStyled>
+            <Button onClick={handleEditClick}>Edit</Button>
 
-          <SignOutButton />
-        </UserPageActionsStyled>
+            <SignOutButton />
+          </UserPageActionsStyled>
+        </>
+      )}
+
+      {!isCurrentUser && currentUser && (
+        <SendTransfer currentUser={currentUser} recipient={user} />
       )}
     </UserPageViewStyled>
   )

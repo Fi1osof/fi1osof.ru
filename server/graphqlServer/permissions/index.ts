@@ -1,5 +1,6 @@
 import { shield, type IRules } from 'graphql-shield'
 // import { isAuthenticated } from './rules/isAuthenticated'
+import { isSudo } from './rules/isSudo'
 
 import type { Mutation, Query, User } from 'src/gql/generated/types'
 
@@ -37,7 +38,10 @@ type PermissionsRuleTree = {
 }
 
 const ruleTree = {
-  Query: {},
+  Query: {
+    ethAccount: isSudo,
+    ethAccounts: isSudo,
+  },
   Mutation: {
     // Example: require authentication for specific mutations
     // someProtectedMutation: isAuthenticated,
