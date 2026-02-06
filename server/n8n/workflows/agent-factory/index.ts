@@ -28,6 +28,7 @@ import {
   getWebSearchAgentNodes,
   getWebSearchAgentConnections,
 } from './tools/webSearchAgent'
+import { getUrlReaderNodes, getUrlReaderConnections } from './tools/urlReader'
 
 export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
   const {
@@ -45,6 +46,7 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
       : parseInt(process.env.AGENT_MEMORY_SIZE || '5'),
     canAccessFileSystem = false,
     canExecuteFetch = false,
+    canReadUrls = true,
     authFromToken = false,
     hasGraphqlTool = false,
     hasTools = true,
@@ -264,6 +266,14 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
     ? getWebSearchAgentConnections({ agentId, agentName })
     : {}
 
+  const urlReaderNodes: NodeType[] = canReadUrls
+    ? getUrlReaderNodes({ agentId, agentName })
+    : []
+
+  const urlReaderConnections: ConnectionsType = canReadUrls
+    ? getUrlReaderConnections({ agentId, agentName })
+    : {}
+
   const mindLogNodes =
     hasTools && hasMindLogs
       ? getMindLogNodes({
@@ -333,6 +343,7 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
     ...codeExecutionNodes,
     ...fetchRequestNodes,
     ...graphqlToolNodes,
+    ...urlReaderNodes,
     ...additionalNodes,
   ]
 
@@ -448,6 +459,7 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
     ...codeExecutionConnections,
     ...fetchRequestConnections,
     ...graphqlToolConnections,
+    ...urlReaderConnections,
     ...additionalConnections,
   }
 

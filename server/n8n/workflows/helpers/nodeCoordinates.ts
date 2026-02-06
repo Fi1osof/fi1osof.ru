@@ -36,6 +36,7 @@ const nodeCoordinates = {
   'tool-ex-reaction': [1728, 688],
   'tool-web-search-agent': [2656, 544],
   'tool-fetch': [2432, 544],
+  'tool-url-reader': [2432, 688],
   'tool-read-file': [1568, 512],
   'tool-list-files': [1792, 512],
   'tool-graphql': [224, 512],
