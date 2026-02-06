@@ -32,6 +32,8 @@ export interface AgentFactoryConfig {
   hasTools?: boolean
   hasMindLogs?: boolean
   hasTasks?: boolean
+  hasKBNodes?: boolean
+  hasEXNodes?: boolean
   hasWebSearchAgent?: boolean
   additionalNodes?: NodeType[]
   additionalConnections?: ConnectionsType

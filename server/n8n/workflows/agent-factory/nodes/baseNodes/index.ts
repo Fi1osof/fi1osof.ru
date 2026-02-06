@@ -171,6 +171,14 @@ ${customSystemMessage}`
       typeVersion: 1.2,
       position: getNodeCoordinates('reflection'),
     },
+    {
+      parameters: {},
+      type: 'n8n-nodes-base.merge',
+      typeVersion: 3.2,
+      position: getNodeCoordinates('merge-context'),
+      id: `${agentId}-merge-context`,
+      name: 'Merge Context',
+    },
     ...(hasTools
       ? [
           getFetchMindLogsNode({ agentId, agentName }),
@@ -181,14 +189,6 @@ ${customSystemMessage}`
             position: getNodeCoordinates('merge'),
             id: `${agentId}-merge`,
             name: 'Merge',
-          },
-          {
-            parameters: {},
-            type: 'n8n-nodes-base.merge',
-            typeVersion: 3.2,
-            position: getNodeCoordinates('merge-context'),
-            id: `${agentId}-merge-context`,
-            name: 'Merge Context',
           },
           {
             parameters: {

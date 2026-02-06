@@ -50,6 +50,8 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
     hasTools = true,
     hasMindLogs = true,
     hasTasks = true,
+    hasKBNodes = process.env.N8N_HAS_KNOWLEDGES_BASE_NODES === 'true',
+    hasEXNodes = process.env.HAS_EX_NODES === 'true',
     hasWebSearchAgent = false,
     additionalNodes = [],
     additionalConnections = {},
@@ -76,6 +78,7 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
 
   const reflectionWorkflow = createReflectionWorkflow({
     agentName,
+    hasEXNodes,
   })
 
   const authNodes: NodeType[] = authFromToken
@@ -196,36 +199,38 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
         }
       : {}
 
-  const kbConnections: ConnectionsType = hasTools
-    ? {
-        'KB Concept Tool': {
-          ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-        },
-        'KB Fact Tool': {
-          ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-        },
-        'KB Fact Participation Tool': {
-          ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-        },
-        'KB Fact Projection Tool': {
-          ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-        },
-        'KB Knowledge Space Tool': {
-          ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-        },
-      }
-    : {}
+  const kbConnections: ConnectionsType =
+    hasTools && hasKBNodes
+      ? {
+          'KB Concept Tool': {
+            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+          },
+          'KB Fact Tool': {
+            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+          },
+          'KB Fact Participation Tool': {
+            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+          },
+          'KB Fact Projection Tool': {
+            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+          },
+          'KB Knowledge Space Tool': {
+            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+          },
+        }
+      : {}
 
-  const exConnections: ConnectionsType = hasTools
-    ? {
-        'EX Reflex Tool': {
-          ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-        },
-        'EX Reaction Tool': {
-          ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-        },
-      }
-    : {}
+  const exConnections: ConnectionsType =
+    hasTools && hasEXNodes
+      ? {
+          'EX Reflex Tool': {
+            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+          },
+          'EX Reaction Tool': {
+            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+          },
+        }
+      : {}
 
   const codeExecutionNodes: NodeType[] = canAccessFileSystem
     ? getCodeExecutionNodes({ agentId, agentName })
@@ -283,19 +288,21 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
         })
       : []
 
-  const kbNodes = hasTools
-    ? getKBNodes({
-        agentId,
-        agentName,
-      })
-    : []
+  const kbNodes =
+    hasTools && hasKBNodes
+      ? getKBNodes({
+          agentId,
+          agentName,
+        })
+      : []
 
-  const exNodes = hasTools
-    ? getEXNodes({
-        agentId,
-        agentName,
-      })
-    : []
+  const exNodes =
+    hasTools && hasEXNodes
+      ? getEXNodes({
+          agentId,
+          agentName,
+        })
+      : []
 
   const baseNodes = getBaseNodes({
     agentId,
@@ -407,9 +414,17 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
             main: [[{ node: 'Prepare Context', type: 'main', index: 0 }]],
           },
           'Prepare Context': {
-            main: [[{ node: 'Reflection', type: 'main', index: 0 }]],
+            main: [
+              [
+                { node: 'Reflection', type: 'main', index: 0 },
+                { node: 'Merge Context', type: 'main', index: 0 },
+              ],
+            ],
           },
           Reflection: {
+            main: [[{ node: 'Merge Context', type: 'main', index: 1 }]],
+          },
+          'Merge Context': {
             main: [[{ node: agentName, type: 'main', index: 0 }]],
           },
         }),
