@@ -15,6 +15,7 @@ export default createAgent({
   instanceId: 'narasim-dev-web-search',
   model: 'perplexity/sonar-reasoning-pro',
   hasTools: false,
+  canReadUrls: false,
   memorySize: 0,
   workflowInputs: [
     { name: 'chatInput', type: 'string' },

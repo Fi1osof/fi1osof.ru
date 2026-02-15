@@ -137,6 +137,14 @@ export class AgentOrchestrator implements INodeType {
             description:
               'Array of assistant messages for internal dialogue. Format: [{"role": "assistant", "content": "..."}]',
           },
+          {
+            displayName: 'Has Tools',
+            name: 'hasTools',
+            type: 'boolean',
+            default: true,
+            description:
+              'Whether the model supports tools. If false, no tools will be passed to the LLM even if connected',
+          },
         ],
       },
     ],

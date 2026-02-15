@@ -26,6 +26,7 @@ type getBaseNodesProps = {
   workflowInputs: AgentFactoryConfig['workflowInputs']
   agentDescription: AgentFactoryConfig['agentDescription']
   webhookId: AgentFactoryConfig['webhookId']
+  hasToolsParam?: boolean
 }
 
 export function getBaseNodes({
@@ -43,6 +44,7 @@ export function getBaseNodes({
   agentDescription,
   webhookId,
   workflowInputs = [],
+  hasToolsParam,
 }: getBaseNodesProps) {
   const prepareContextTemplate = fs.readFileSync(
     path.join(__dirname, 'prepareContext.js'),
@@ -227,6 +229,7 @@ ${customSystemMessage}`
           assistantMessages: '={{ $json.assistantMessages }}',
           showToolCalls: true,
           toolChoice: 'auto',
+          hasTools: hasToolsParam ?? hasTools,
         }
 
         agentNode.parameters.options = Object.assign(

@@ -329,6 +329,7 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
     systemMessagePath,
     webhookId,
     workflowInputs,
+    hasToolsParam: hasTools,
   })
 
   const nodes: NodeType[] = [

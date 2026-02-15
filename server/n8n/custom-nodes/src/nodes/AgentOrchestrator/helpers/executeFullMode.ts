@@ -16,6 +16,7 @@ interface AgentOptions {
   showToolCalls?: boolean
   toolChoice?: string
   assistantMessages?: string
+  hasTools?: boolean
 }
 
 interface OpenRouterCredentials {
@@ -42,6 +43,7 @@ export const executeFullMode = async (
   const enableStreaming = options.enableStreaming ?? true
   const showToolCalls = options.showToolCalls ?? true
   const toolChoice = options.toolChoice || 'auto'
+  const hasTools = options.hasTools ?? true
 
   const userInput = (items[0]?.json?.chatInput as string) || ''
   if (!userInput) {
@@ -54,7 +56,8 @@ export const executeFullMode = async (
     | undefined
   const sessionId = (items[0]?.json?.sessionId as string) || ''
 
-  const tools = await getConnectedTools(ctx)
+  const connectedTools = await getConnectedTools(ctx)
+  const tools = hasTools ? connectedTools : []
   const assistantMessages = parseJson<Message[]>(assistantMessagesJson, [])
   const memoryMessages = await getMemoryMessages(ctx)
 
