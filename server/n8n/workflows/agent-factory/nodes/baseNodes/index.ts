@@ -77,6 +77,75 @@ ${customSystemMessage}`
   const baseNodes: NodeType[] = [
     {
       parameters: {
+        workflowInputs: {
+          values: workflowInputs.map((input) => ({
+            name: input.name,
+            type: input.type || 'string',
+            ...(input.default !== undefined && { default: input.default }),
+          })),
+        },
+      },
+      id: `${agentId}-workflow-trigger`,
+      name: 'Execute Workflow Trigger',
+      type: 'n8n-nodes-base.executeWorkflowTrigger',
+      typeVersion: 1.1,
+      position: getNodeCoordinates('workflow-trigger'),
+    },
+    {
+      id: `${agentId}-webhook-trigger`,
+      name: 'Webhook Trigger',
+      type: 'n8n-nodes-base.webhook',
+      typeVersion: 2,
+      position: getNodeCoordinates('webhook-trigger'),
+      webhookId: `${agentId}-message`,
+      parameters: {
+        httpMethod: 'POST',
+        path: `${agentId}-webhook`,
+        responseMode: 'responseNode',
+        options: {
+          rawBody: false,
+        },
+      },
+    },
+    {
+      id: `${agentId}-webhook-prepare-input`,
+      name: 'Webhook Prepare Input',
+      type: 'n8n-nodes-base.code',
+      typeVersion: 2,
+      position: getNodeCoordinates('webhook-prepare-input'),
+      parameters: {
+        jsCode: `const body = $input.first().json.body || {}
+return [{
+  json: {
+    chatInput: body.chatInput || '',
+    sessionId: body.sessionId || '',
+    token: body.token || ''
+  }
+}]`,
+      },
+    },
+    {
+      id: `${agentId}-chat-trigger`,
+      name: 'When chat message received',
+      type: '@n8n/n8n-nodes-langchain.chatTrigger',
+      typeVersion: 1.4,
+      position: getNodeCoordinates('chat-trigger'),
+      webhookId,
+      parameters: {
+        // public: true enables external webhook access (without it returns 404)
+        public: true,
+        // mode: 'webhook' for embedded chat / direct webhook calls (vs 'hostedChat' for n8n-served page)
+        mode: 'webhook',
+        availableInChat: true,
+        agentName,
+        agentDescription,
+        options: {
+          allowFileUploads: true,
+        },
+      },
+    },
+    {
+      parameters: {
         jsCode: 'return $input.all()',
       },
       id: `${agentId}-merge-trigger`,
@@ -227,6 +296,7 @@ ${customSystemMessage}`
         const additionalFields: INodeParameters = {
           systemMessage: `=${systemMessage}`,
           assistantMessages: '={{ $json.assistantMessages }}',
+          enableStreaming: '={{ $json.enableStreaming }}',
           showToolCalls: true,
           toolChoice: 'auto',
           hasTools: hasToolsParam ?? hasTools,
@@ -270,42 +340,6 @@ ${customSystemMessage}`
           },
         ]
       : []),
-    {
-      parameters: {
-        workflowInputs: {
-          values: workflowInputs.map((input) => ({
-            name: input.name,
-            type: input.type || 'string',
-            ...(input.default !== undefined && { default: input.default }),
-          })),
-        },
-      },
-      id: `${agentId}-workflow-trigger`,
-      name: 'Execute Workflow Trigger',
-      type: 'n8n-nodes-base.executeWorkflowTrigger',
-      typeVersion: 1.1,
-      position: getNodeCoordinates('workflow-trigger'),
-    },
-    {
-      parameters: {
-        // public: true enables external webhook access (without it returns 404)
-        public: true,
-        // mode: 'webhook' for embedded chat / direct webhook calls (vs 'hostedChat' for n8n-served page)
-        mode: 'webhook',
-        availableInChat: true,
-        agentName,
-        agentDescription,
-        options: {
-          allowFileUploads: true,
-        },
-      },
-      type: '@n8n/n8n-nodes-langchain.chatTrigger',
-      typeVersion: 1.4,
-      position: getNodeCoordinates('chat-trigger'),
-      id: `${agentId}-chat-trigger`,
-      name: 'When chat message received',
-      webhookId,
-    },
   ]
 
   if (hasMemory) {

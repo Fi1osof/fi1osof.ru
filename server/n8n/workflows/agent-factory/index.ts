@@ -1,3 +1,5 @@
+import * as fs from 'fs'
+import * as path from 'path'
 import { createToolGraphqlRequest } from '../tool-graphql-request/factory'
 import { createReflectionWorkflow } from '../reflection/factory'
 import {
@@ -12,7 +14,7 @@ import { getMindLogNodes } from './nodes/mindLogNodes'
 import { getTaskNodes } from './nodes/taskNodes'
 import { getTaskWorkLogNodes } from './nodes/taskWorkLogNodes'
 import { WorkflowBase } from '../interfaces'
-import { getModel, createTool, createStaticInputs } from '../helpers'
+import { getModel } from '../helpers'
 import { getBaseNodes } from './nodes/baseNodes'
 import { getNodeCoordinates } from '../helpers/nodeCoordinates'
 import {
@@ -85,56 +87,52 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
 
   const authNodes: NodeType[] = authFromToken
     ? [
-        createTool({
-          name: 'get_user_by_token',
-          toolName: 'Get User By Token',
-          description: 'Get user data by authentication token',
-          workflowName: 'Tool: Get User By Token',
-          nodeId: `${agentId}-get-user-by-token`,
-          position: getNodeCoordinates('get-user-by-token'),
-          inputs: createStaticInputs([
-            {
-              name: 'token',
-              value: '={{ $json.token }}',
-              type: 'string',
-            },
-          ]),
-        }),
         {
           parameters: {
-            mode: 'manual',
-            duplicateItem: false,
-            assignments: {
-              assignments: [
+            workflowId: {
+              __rl: true,
+              mode: 'list' as const,
+              value: 'Tool: Get User By Token',
+            },
+            workflowInputs: {
+              mappingMode: 'defineBelow' as const,
+              value: {
+                token: '={{ $json.token }}',
+              },
+              matchingColumns: [],
+              schema: [
                 {
-                  id: 'user',
-                  name: 'user',
-                  value: '={{ $json.user }}',
-                  type: 'object',
-                },
-                {
-                  id: 'chatInput',
-                  name: 'chatInput',
-                  value:
-                    '={{ $("When chat message received").item.json.chatInput }}',
-                  type: 'string',
-                },
-                {
-                  id: 'sessionId',
-                  name: 'sessionId',
-                  value:
-                    '={{ $("When chat message received").item.json.sessionId }}',
+                  id: 'token',
+                  displayName: 'token',
+                  required: false,
+                  defaultMatch: false,
+                  display: true,
+                  canBeUsedToMatch: true,
                   type: 'string',
                 },
               ],
+              attemptToConvertTypes: false,
+              convertFieldsToString: false,
             },
-            options: {},
           },
+          id: `${agentId}-get-user-by-token`,
+          name: 'Get User By Token',
+          type: 'n8n-nodes-base.executeWorkflow',
+          typeVersion: 1.2,
+          position: getNodeCoordinates('get-user-by-token'),
+        },
+        {
           id: `${agentId}-set-auth-context`,
           name: 'Set Auth Context',
-          type: 'n8n-nodes-base.set',
-          typeVersion: 3.4,
+          type: 'n8n-nodes-base.code',
+          typeVersion: 2,
           position: getNodeCoordinates('set-auth-context'),
+          parameters: {
+            jsCode: fs.readFileSync(
+              path.join(__dirname, 'nodes/setAuthContext/index.js'),
+              'utf-8',
+            ),
+          },
         },
       ]
     : []
@@ -369,6 +367,20 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
     }),
     'Execute Workflow Trigger': {
       main: [[{ node: 'Merge Trigger', type: 'main', index: 0 }]],
+    },
+    'Webhook Trigger': {
+      main: [[{ node: 'Webhook Prepare Input', type: 'main', index: 0 }]],
+    },
+    'Webhook Prepare Input': {
+      main: [
+        [
+          {
+            node: authFromToken ? 'Get User By Token' : 'Merge Trigger',
+            type: 'main',
+            index: 0,
+          },
+        ],
+      ],
     },
     'When chat message received': {
       main: [
