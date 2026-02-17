@@ -1,15 +1,11 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import { print } from 'graphql'
-import { MeDocument } from 'src/gql/generated/me'
 import { AgentFactoryConfig, NodeType } from '../../interfaces'
 import type { INodeParameters } from 'n8n-workflow'
 import { getFetchMindLogsNode } from './fetchMindLogsNode'
+import { getAgentDataNode } from './getAgentDataNode'
 import { getNodeCoordinates } from '../../../helpers/nodeCoordinates'
-import { getGraphqlRequestWorkflowName } from '../../../tool-graphql-request/helpers'
 import { getReflectionWorkflowName } from '../../../reflection/helpers'
-
-const meUserQuery = print(MeDocument)
 
 type getBaseNodesProps = {
   agentId: string
@@ -73,6 +69,12 @@ ${customSystemMessage}`
     '$config',
     JSON.stringify({ agentId }, null, 2),
   )
+
+  const agentDataNode = getAgentDataNode({
+    nodeId: `${agentId}-get-agent-data`,
+    agentName,
+    position: getNodeCoordinates('get-agent-data'),
+  })
 
   const baseNodes: NodeType[] = [
     {
@@ -154,40 +156,7 @@ return [{
       typeVersion: 2,
       position: getNodeCoordinates('merge-trigger'),
     },
-    {
-      parameters: {
-        workflowId: {
-          __rl: true,
-          mode: 'list',
-          value: getGraphqlRequestWorkflowName(agentName),
-        },
-        workflowInputs: {
-          mappingMode: 'defineBelow',
-          value: {
-            query: meUserQuery,
-          },
-          matchingColumns: [],
-          schema: [
-            {
-              id: 'query',
-              displayName: 'query',
-              required: true,
-              defaultMatch: false,
-              display: true,
-              canBeUsedToMatch: true,
-              type: 'string',
-            },
-          ],
-          attemptToConvertTypes: false,
-          convertFieldsToString: false,
-        },
-      },
-      id: `${agentId}-get-agent-data`,
-      name: 'Get Agent Data',
-      type: 'n8n-nodes-base.executeWorkflow',
-      typeVersion: 1.2,
-      position: getNodeCoordinates('get-agent-data'),
-    },
+    agentDataNode,
     {
       parameters: {
         jsCode: prepareContextCode,
@@ -425,5 +394,5 @@ return [{
     })
   }
 
-  return baseNodes
+  return { nodes: baseNodes, agentDataNode }
 }

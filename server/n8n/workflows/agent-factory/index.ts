@@ -13,7 +13,7 @@ import { getEXNodes } from './nodes/exNodes'
 import { getMindLogNodes } from './nodes/mindLogNodes'
 import { getTaskNodes } from './nodes/taskNodes'
 import { getTaskWorkLogNodes } from './nodes/taskWorkLogNodes'
-import { WorkflowBase } from '../interfaces'
+import { WorkflowBase, WorkflowFactory, CredentialsMap } from '../interfaces'
 import { getModel } from '../helpers'
 import { getBaseNodes } from './nodes/baseNodes'
 import { getNodeCoordinates } from '../helpers/nodeCoordinates'
@@ -31,6 +31,44 @@ import {
   getWebSearchAgentConnections,
 } from './tools/webSearchAgent'
 import { getUrlReaderNodes, getUrlReaderConnections } from './tools/urlReader'
+import { getSendMailNodes, getSendMailConnections } from './tools/sendMail'
+import { createToolSendMail } from '../tool-send-mail/factory'
+import { AgentCredentials } from 'server/n8n/bootstrap/interfaces'
+
+export abstract class AgentWorkflowFactory extends WorkflowFactory {
+  abstract agentCredentialsKey: string
+  abstract getConfig(agentCredentials: AgentCredentials): AgentFactoryConfig
+
+  async createWorkflow(credentials: CredentialsMap): Promise<WorkflowBase[]> {
+    const agentCreds = credentials[this.agentCredentialsKey] as unknown as
+      | AgentCredentials
+      | undefined
+
+    if (!agentCreds) {
+      throw new Error(
+        `Agent credentials not found for key: ${this.agentCredentialsKey}`,
+      )
+    }
+
+    const config = this.getConfig(agentCreds)
+
+    const { agentName, workflowName } = config
+
+    if (workflowName !== agentName) {
+      throw new Error(
+        `workflowName !== agentName. workflowName: "${workflowName}", agentName: "${agentName}"`,
+      )
+    }
+
+    const smtp = agentCreds.smtp
+
+    return createAgent({
+      ...config,
+      canSendMail: !!smtp,
+      smtp,
+    })
+  }
+}
 
 export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
   const {
@@ -57,6 +95,8 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
     hasKBNodes = process.env.N8N_HAS_KNOWLEDGES_BASE_NODES === 'true',
     hasEXNodes = process.env.HAS_EX_NODES === 'true',
     hasWebSearchAgent = false,
+    canSendMail = false,
+    smtp,
     additionalNodes = [],
     additionalConnections = {},
     systemMessagePath,
@@ -272,6 +312,25 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
     ? getUrlReaderConnections({ agentId, agentName })
     : {}
 
+  const sendMailNodes: NodeType[] = canSendMail
+    ? getSendMailNodes({ agentId, agentName })
+    : []
+
+  const sendMailConnections: ConnectionsType = canSendMail
+    ? getSendMailConnections({ agentId, agentName })
+    : {}
+
+  const sendMailWorkflow =
+    canSendMail && smtp
+      ? createToolSendMail({
+          agentName,
+          credentialId: smtp.credentialId,
+          credentialName: smtp.credentialName,
+          fromEmail: smtp.user,
+          fromPassword: smtp.password,
+        })
+      : null
+
   const mindLogNodes =
     hasTools && hasMindLogs
       ? getMindLogNodes({
@@ -312,7 +371,7 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
         })
       : []
 
-  const baseNodes = getBaseNodes({
+  const { nodes: baseNodes, agentDataNode } = getBaseNodes({
     agentId,
     agentName,
     agentDescription,
@@ -343,6 +402,7 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
     ...fetchRequestNodes,
     ...graphqlToolNodes,
     ...urlReaderNodes,
+    ...sendMailNodes,
     ...additionalNodes,
   ]
 
@@ -398,12 +458,12 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
           'Merge Trigger': {
             main: [
               [
-                { node: 'Get Agent Data', type: 'main', index: 0 },
+                { node: agentDataNode.name, type: 'main', index: 0 },
                 { node: 'Fetch MindLogs', type: 'main', index: 0 },
               ],
             ],
           },
-          'Get Agent Data': {
+          [agentDataNode.name]: {
             main: [[{ node: 'Merge', type: 'main', index: 0 }]],
           },
           'Fetch MindLogs': {
@@ -432,9 +492,9 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
         }
       : {
           'Merge Trigger': {
-            main: [[{ node: 'Get Agent Data', type: 'main', index: 0 }]],
+            main: [[{ node: agentDataNode.name, type: 'main', index: 0 }]],
           },
-          'Get Agent Data': {
+          [agentDataNode.name]: {
             main: [[{ node: 'Prepare Context', type: 'main', index: 0 }]],
           },
           'Prepare Context': {
@@ -473,6 +533,7 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
     ...fetchRequestConnections,
     ...graphqlToolConnections,
     ...urlReaderConnections,
+    ...sendMailConnections,
     ...additionalConnections,
   }
 
@@ -491,5 +552,9 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
     },
   }
 
-  return [toolGraphqlRequest, reflectionWorkflow, agentWorkflow]
+  const workflows = [toolGraphqlRequest, reflectionWorkflow, agentWorkflow]
+  if (sendMailWorkflow) {
+    workflows.push(sendMailWorkflow)
+  }
+  return workflows
 }

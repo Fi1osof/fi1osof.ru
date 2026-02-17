@@ -196,8 +196,9 @@ export async function runBootstrap(): Promise<void> {
     return
   }
 
-  const credentialsMap = await importCredentials(cookies)
-  await importAgentCredentials(cookies)
+  const systemCredentials = await importCredentials(cookies)
+  const agentCredentials = await importAgentCredentials(cookies)
+  const credentialsMap = { ...systemCredentials, ...agentCredentials }
   await importWorkflows(cookies, credentialsMap)
   await cleanupCredentials()
 

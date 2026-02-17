@@ -111,3 +111,45 @@ const schemaDescription = JSON.stringify(createTaskSchema.describe(), null, 2)
 1. Create `server/n8n/workflows/agent-{name}/`
 2. Create `index.ts` with `createAgent()` config
 3. Create `system-message.md`
+
+## Email Integration
+
+Agents can send and receive emails via docker-mailserver.
+
+### Sending Mail
+
+Add `smtp` config to agent credentials file (`credentials/agents/agent-name.json`):
+
+```json
+{
+  "agentName": "Chat Agent",
+  "smtp": {
+    "credentialId": "smtp-agent-chat",
+    "credentialName": "SMTP Agent Chat",
+    "user": "chat@example.com",
+    "password": "mailpass",
+    "host": "mailserver",
+    "port": 587
+  }
+}
+```
+
+`AgentWorkflowFactory` automatically:
+1. Reads `smtp` from agent credentials
+2. Sets `canSendMail: true` if smtp is present
+3. Creates `tool-send-mail` workflow for the agent
+4. Creates mailbox on mailserver via `ensureMailbox()`
+
+### Mailbox Management
+
+Mailboxes are created automatically when agent has `smtp` credentials.
+
+Location: `server/n8n/workflows/tool-send-mail/mailboxManager.ts`
+
+The mailbox config is written to `docker/mailserver/config/postfix-accounts.cf` (mounted as `/app/mailserver-config` in app container).
+
+### Credentials Flow
+
+1. `credentials/agents/agent-name.json` — source credentials with `smtp` config
+2. `importAgentCredentials()` — imports SMTP creds into n8n
+3. `AgentWorkflowFactory.createWorkflow()` → `createAgent()` → `createToolSendMail()` → `ensureMailbox()`

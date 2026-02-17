@@ -6,6 +6,7 @@
 - [Custom Nodes](./custom-nodes/README.md)
 - [Workflows](./workflows/README.md)
 - [Testing](./testing/README.md)
+- [Mail Server](./mailserver/README.md)
 
 ## Architecture
 

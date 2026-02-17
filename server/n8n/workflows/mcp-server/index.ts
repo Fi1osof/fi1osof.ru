@@ -1,5 +1,6 @@
 import { WorkflowBase } from '../interfaces'
 import { getNodeCoordinates } from '../helpers/nodeCoordinates'
+import { ChatAgentWorkflowName } from '../agent-chat/interfaces'
 
 const toolSendMessage: WorkflowBase = {
   name: 'Tool: Send Message (MCP)',
@@ -167,7 +168,7 @@ const toolSendMessage: WorkflowBase = {
         workflowId: {
           __rl: true,
           mode: 'name',
-          value: 'Agent: Chat',
+          value: ChatAgentWorkflowName,
         },
         workflowInputs: {
           mappingMode: 'defineBelow',

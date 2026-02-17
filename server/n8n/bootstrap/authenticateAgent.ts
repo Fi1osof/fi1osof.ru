@@ -5,6 +5,7 @@ import path from 'path'
 import { n8nConfig } from '../config'
 import { n8nApiRequest } from './n8nApiRequest'
 import { internalApiRequest } from './internalApiRequest'
+import { CredentialsMap } from '../workflows/interfaces'
 import {
   SigninDocument,
   SigninMutation,
@@ -13,15 +14,9 @@ import {
   SignupMutation,
   SignupMutationVariables,
 } from 'src/gql/generated'
+import { AgentCredentials } from './interfaces'
 
 const CREDENTIALS_DIR = n8nConfig.credentialsDir
-
-interface AgentCredentials {
-  username: string
-  password: string
-  email?: string
-  fullname?: string
-}
 
 export async function authenticateAgent(
   agentData: AgentCredentials,
@@ -93,10 +88,13 @@ export async function authenticateAgent(
   }
 }
 
-export async function importAgentCredentials(cookies: string): Promise<void> {
+export async function importAgentCredentials(
+  cookies: string,
+): Promise<CredentialsMap> {
+  const credentialsMap: CredentialsMap = {}
   const agentsDir = path.join(CREDENTIALS_DIR, 'agents')
   if (!fs.existsSync(agentsDir)) {
-    return
+    return credentialsMap
   }
 
   const agentFiles = fs
@@ -104,7 +102,7 @@ export async function importAgentCredentials(cookies: string): Promise<void> {
     .filter((f) => f.endsWith('.json'))
 
   if (agentFiles.length === 0) {
-    return
+    return credentialsMap
   }
 
   console.log('[bootstrap] Importing agent credentials...')
@@ -118,11 +116,16 @@ export async function importAgentCredentials(cookies: string): Promise<void> {
         fs.readFileSync(filePath, 'utf-8'),
       ) as AgentCredentials
 
-      if (!agentData.username || !agentData.password) {
-        console.log(
-          `[bootstrap] Skipping ${file}: missing username or password`,
+      if (!agentData.agentName) {
+        throw new Error(
+          `[bootstrap] Agent credentials file ${file} is missing required field 'agentName'`,
         )
-        continue
+      }
+
+      if (!agentData.username || !agentData.password) {
+        throw new Error(
+          `[bootstrap] Agent credentials file ${file} is missing required field 'username' or 'password'`,
+        )
       }
 
       const token = await authenticateAgent(agentData)
@@ -145,6 +148,76 @@ export async function importAgentCredentials(cookies: string): Promise<void> {
 
       await n8nApiRequest('POST', '/rest/credentials', credential, cookies)
       console.log(`[bootstrap] Imported credentials for agent: ${agentName}`)
+
+      credentialsMap[`agents/${agentName}`] = {
+        ...agentData,
+        id: credential.id,
+        type: credential.type,
+        name: credential.name,
+      }
+
+      if (agentData.smtp) {
+        const smtpCredential = {
+          id: agentData.smtp.credentialId,
+          name: agentData.smtp.credentialName,
+          type: 'smtp',
+          data: {
+            user: agentData.smtp.user,
+            password: agentData.smtp.password,
+            host: agentData.smtp.host,
+            port: agentData.smtp.port,
+            secure: agentData.smtp.ssl ?? false,
+            disableStartTls: agentData.smtp.disableStartTls ?? false,
+          },
+          nodesAccess: [
+            {
+              nodeType: 'n8n-nodes-base.emailSend',
+              date: new Date().toISOString(),
+            },
+          ],
+        }
+
+        await n8nApiRequest(
+          'POST',
+          '/rest/credentials',
+          smtpCredential,
+          cookies,
+        )
+        console.log(
+          `[bootstrap] Imported SMTP credentials for agent: ${agentName}`,
+        )
+      }
+
+      if (agentData.imap) {
+        const imapCredential = {
+          id: agentData.imap.credentialId,
+          name: agentData.imap.credentialName,
+          type: 'imap',
+          data: {
+            user: agentData.imap.user,
+            password: agentData.imap.password,
+            host: agentData.imap.host,
+            port: agentData.imap.port,
+            secure: agentData.imap.secure ?? true,
+          },
+          nodesAccess: [
+            {
+              nodeType: 'n8n-nodes-base.emailReadImap',
+              date: new Date().toISOString(),
+            },
+          ],
+        }
+
+        await n8nApiRequest(
+          'POST',
+          '/rest/credentials',
+          imapCredential,
+          cookies,
+        )
+        console.log(
+          `[bootstrap] Imported IMAP credentials for agent: ${agentName}`,
+        )
+      }
     } catch (err) {
       console.error(
         `[bootstrap] Failed to import agent credentials for ${file}:`,
@@ -153,4 +226,6 @@ export async function importAgentCredentials(cookies: string): Promise<void> {
       throw err
     }
   }
+
+  return credentialsMap
 }

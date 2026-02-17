@@ -1,6 +1,7 @@
 import { createAgentTool } from '../../../helpers'
 import { ConnectionsType, NodeType } from '../../interfaces'
 import { getNodeCoordinates } from '../../../helpers/nodeCoordinates'
+import { WebSearchAgentWorkflowName } from 'server/n8n/workflows/agent-web-search/interfaces'
 
 interface WebSearchAgentToolsConfig {
   agentId: string
@@ -18,7 +19,7 @@ export function getWebSearchAgentNodes(
       toolName: 'Web Search Agent Tool',
       description:
         'Delegate web search and research tasks. Use for: internet search, current information, fact-checking, news, fetching web pages. ONLY FOR AUTHENTICATED USERS.',
-      workflowName: 'Agent: Web Search',
+      workflowName: WebSearchAgentWorkflowName,
       nodeId: `${agentId}-tool-web-search-agent`,
       position: getNodeCoordinates('tool-web-search-agent'),
     }),

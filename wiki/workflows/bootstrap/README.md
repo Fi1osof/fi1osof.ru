@@ -111,6 +111,73 @@ function isWorkflowFactoryClass(obj: unknown): obj is new () => WorkflowFactory
 
 See [credentials/README.md](../../../credentials/README.md) for credential format and examples.
 
+## Agent Credentials
+
+Agent credentials are stored in `credentials/agents/` directory. Each agent has a JSON file with the following structure:
+
+```typescript
+// server/n8n/bootstrap/interfaces.ts
+
+interface AgentCredentials {
+  agentName: string      // Required: Display name for the agent
+  username: string       // Required: Login username
+  password: string       // Required: Login password
+  email?: string         // Optional: Agent email
+  fullname?: string      // Optional: Full name
+  smtp?: SmtpConfig      // Optional: SMTP credentials for sending mail
+  imap?: ImapConfig      // Optional: IMAP credentials for checking mail
+}
+
+interface SmtpConfig {
+  credentialId: string
+  credentialName: string
+  user: string
+  password: string
+  host: string
+  port: number
+  ssl?: boolean
+  disableStartTls?: boolean
+}
+
+interface ImapConfig {
+  credentialId: string
+  credentialName: string
+  user: string
+  password: string
+  host: string
+  port: number
+  secure?: boolean
+}
+```
+
+Example agent credentials file (`credentials/agents/agent-chat.json`):
+
+```json
+{
+  "agentName": "Chat Agent",
+  "username": "agent-chat",
+  "password": "secret",
+  "email": "chat@example.com",
+  "smtp": {
+    "credentialId": "smtp-agent-chat",
+    "credentialName": "SMTP Agent Chat",
+    "user": "chat@example.com",
+    "password": "mailpass",
+    "host": "mail.example.com",
+    "port": 587
+  },
+  "imap": {
+    "credentialId": "imap-agent-chat",
+    "credentialName": "IMAP Agent Chat",
+    "user": "chat@example.com",
+    "password": "mailpass",
+    "host": "mail.example.com",
+    "port": 993,
+    "secure": true
+  }
+}
+```
+
 ## How loadWorkflow Works
 
 ```typescript
