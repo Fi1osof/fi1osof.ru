@@ -34,4 +34,11 @@ export const MindLogsPage: Page<MindLogsPageProps> = ({ page }) => {
   )
 }
 
+// TODO
+// Text content did not match. Server: "No mind logs found" Client: "Loading..."
+// See more info here: https://nextjs.org/docs/messages/react-hydration-error
+
+// +           "No mind logs found"
+// -           "Loading..."
+
 MindLogsPage.getInitialProps = mindLogsPageGetInitialProps
