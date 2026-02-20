@@ -41,7 +41,7 @@ const nodeCoordinates = {
   'tool-url-reader': [2432, 792],
   'tool-read-file': [1568, 600],
   'tool-list-files': [1792, 600],
-  'tool-graphql': [224, 512],
+  'tool-graphql': [1248, 448],
   'tool-get-user-by-token-trigger': [-400, 200],
   'tool-get-user-by-token-manual': [-400, 400],
   'tool-get-user-by-token-set-test': [-200, 400],

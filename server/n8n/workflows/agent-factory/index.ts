@@ -88,7 +88,7 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
     canExecuteFetch = false,
     canReadUrls = true,
     authFromToken = false,
-    hasGraphqlTool = false,
+    hasGraphqlTool = true,
     hasTools = true,
     hasMindLogs = true,
     hasTasks = process.env.N8N_HAS_TASKS_NODES === 'true',
@@ -288,13 +288,15 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
     ? getFetchRequestConnections({ agentId, agentName })
     : {}
 
-  const graphqlToolNodes: NodeType[] = hasGraphqlTool
-    ? getGraphqlToolNodes({ agentId, agentName })
-    : []
+  const graphqlToolNodes: NodeType[] =
+    hasGraphqlTool && hasTools
+      ? getGraphqlToolNodes({ agentId, agentName })
+      : []
 
-  const graphqlToolConnections: ConnectionsType = hasGraphqlTool
-    ? getGraphqlToolConnections({ agentId, agentName })
-    : {}
+  const graphqlToolConnections: ConnectionsType =
+    hasGraphqlTool && hasTools
+      ? getGraphqlToolConnections({ agentId, agentName })
+      : {}
 
   const webSearchAgentNodes: NodeType[] = hasWebSearchAgent
     ? getWebSearchAgentNodes({ agentId, agentName })
