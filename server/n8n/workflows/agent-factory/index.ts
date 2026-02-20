@@ -91,7 +91,7 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
     hasGraphqlTool = false,
     hasTools = true,
     hasMindLogs = true,
-    hasTasks = true,
+    hasTasks = process.env.N8N_HAS_TASKS_NODES === 'true',
     hasKBNodes = process.env.N8N_HAS_KNOWLEDGES_BASE_NODES === 'true',
     hasEXNodes = process.env.HAS_EX_NODES === 'true',
     hasWebSearchAgent = false,
