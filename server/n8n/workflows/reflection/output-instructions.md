@@ -1,5 +1,9 @@
 # Reflex Processing Rules
 
+> **CONTEXT**: This is an internal note from the Reflection subsystem addressed to you (the agent).
+> It is NOT a user message and must NOT be included in your response to the user.
+> Use this information silently to guide your behavior.
+
 ## Reflection Results
 
 ${reflectionResult}
