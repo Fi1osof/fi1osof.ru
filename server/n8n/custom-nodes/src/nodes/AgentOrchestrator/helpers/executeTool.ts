@@ -39,6 +39,7 @@ export const executeTool = async (
 
     if (tool.invoke) {
       const result = await tool.invoke(toolCall.arguments)
+      log(`executeTool: ${toolCall.name} returned: ${result}`)
       return result
     }
 
