@@ -102,7 +102,7 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
     systemMessagePath,
     webhookId,
     model = getModel(),
-    maxIterations = 20,
+    maxIterations = parseInt(process.env.N8N_MAX_ITERATIONS || '10'),
     agentNodeType = 'orchestrator',
     enableStreaming = true,
     workflowInputs = [

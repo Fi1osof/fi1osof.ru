@@ -94,8 +94,18 @@ export const executeFullMode = async (
   let finalOutput = ''
   const allToolCalls: ToolCall[] = []
 
-  while (iterations < maxIterations) {
+  while (iterations <= maxIterations) {
     iterations++
+
+    if (iterations > maxIterations) {
+      throw new Error(
+        `Agent exceeded maximum iterations (${maxIterations}). Last tool calls: ${allToolCalls
+          .slice(-3)
+          .map((tc) => tc.name)
+          .join(', ')}`,
+      )
+    }
+
     debugLog(
       ctx,
       isStreamingAvailable,
@@ -162,6 +172,19 @@ export const executeFullMode = async (
       const toolDebugLog = (msg: string) =>
         debugLog(ctx, isStreamingAvailable, msg)
       const toolResult = await executeTool(ctx, tc, toolDebugLog)
+      const toolResultStr =
+        typeof toolResult === 'string' ? toolResult : JSON.stringify(toolResult)
+      const isToolError =
+        toolResultStr.startsWith('Tool error:') ||
+        toolResultStr.startsWith('Tool ') ||
+        toolResultStr.toLowerCase().includes('there was an error')
+      if (isToolError) {
+        debugLog(
+          ctx,
+          isStreamingAvailable,
+          `\u26a0\ufe0f Tool ${tc.name} error: ${toolResultStr}`,
+        )
+      }
       messages.push({
         role: 'tool',
         tool_call_id: tc.id,
@@ -170,6 +193,14 @@ export const executeFullMode = async (
             ? toolResult
             : JSON.stringify(toolResult),
       })
+
+      if (process.env.N8N_DEBUG_AGENT_MESSAGED === 'true') {
+        debugLog(
+          ctx,
+          isStreamingAvailable,
+          `Messages: ${JSON.stringify(messages)}`,
+        )
+      }
     }
   }
 
