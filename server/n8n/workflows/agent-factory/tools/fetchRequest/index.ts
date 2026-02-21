@@ -17,7 +17,7 @@ export function getFetchRequestNodes(
       name: 'fetch_request',
       toolName: 'Fetch Request Tool',
       description:
-        'Execute HTTP request using fetch. Only external URLs allowed (no localhost/internal IPs). Returns status, statusText and body (JSON auto-parsed).',
+        'Execute HTTP request using fetch. Only external URLs allowed (no localhost/internal IPs). Returns status, statusText and body (JSON is auto-parsed when Content-Type is JSON, otherwise returns raw text).',
       workflowName: 'Tool: Fetch Request',
       nodeId: `${agentId}-tool-fetch`,
       position: getNodeCoordinates('tool-fetch'),
