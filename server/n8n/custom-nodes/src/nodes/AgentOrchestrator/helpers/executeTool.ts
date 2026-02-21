@@ -12,7 +12,6 @@ export const executeTool = async (
     }
 
   try {
-    log(`executeTool: Getting connected tools for ${toolCall.name}`)
     const connectedTools = await ctx.getInputConnectionData('ai_tool', 0)
 
     if (!connectedTools) {
@@ -23,10 +22,6 @@ export const executeTool = async (
     const toolsArray = Array.isArray(connectedTools)
       ? connectedTools
       : [connectedTools]
-
-    log(
-      `executeTool: Found ${toolsArray.length} tools: ${toolsArray.map((t: { name?: string }) => t.name).join(', ')}`,
-    )
 
     const tool = toolsArray.find(
       (t: { name?: string }) => t.name === toolCall.name,
@@ -43,13 +38,7 @@ export const executeTool = async (
     }
 
     if (tool.invoke) {
-      log(
-        `executeTool: Invoking ${toolCall.name} with args: ${JSON.stringify(toolCall.arguments)}`,
-      )
       const result = await tool.invoke(toolCall.arguments)
-      log(
-        `executeTool: ${toolCall.name} returned: ${result?.substring(0, 100)}...`,
-      )
       return result
     }
 

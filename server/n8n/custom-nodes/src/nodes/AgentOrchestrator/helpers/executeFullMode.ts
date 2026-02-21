@@ -162,11 +162,6 @@ export const executeFullMode = async (
       const toolDebugLog = (msg: string) =>
         debugLog(ctx, isStreamingAvailable, msg)
       const toolResult = await executeTool(ctx, tc, toolDebugLog)
-      debugLog(
-        ctx,
-        isStreamingAvailable,
-        `Tool ${tc.name} result: ${typeof toolResult === 'string' ? toolResult.substring(0, 200) : JSON.stringify(toolResult).substring(0, 200)}`,
-      )
       messages.push({
         role: 'tool',
         tool_call_id: tc.id,
