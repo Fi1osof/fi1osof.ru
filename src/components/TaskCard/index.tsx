@@ -1,4 +1,4 @@
-import { TaskFragment } from 'src/gql/generated'
+import { TaskFragment, useTaskWorkLogsQuery } from 'src/gql/generated'
 import { FormattedDate } from 'src/ui-kit/format/FormattedDate'
 import {
   TaskCardStyled,
@@ -9,16 +9,35 @@ import {
 } from './styles'
 import { TaskStatusBadge } from '../TaskStatusBadge'
 import Link from 'next/link'
+import { Markdown } from '../Markdown'
+import { WorkLogCard } from '../WorkLogCard'
 
 type TaskCardProps = {
   task: TaskFragment
+  variant?: 'list' | 'full'
 }
 
-export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
+export const TaskCard: React.FC<TaskCardProps> = ({
+  task,
+  variant = 'list',
+}) => {
+  const workLogsResponse = useTaskWorkLogsQuery({
+    variables: {
+      where: {
+        taskId: task.id,
+      },
+    },
+    skip: !task.id || variant !== 'full',
+  })
+
   return (
     <TaskCardStyled>
       <TaskCardTitle>
-        <Link href={`/tasks/${task.id}`}>{task.title}</Link>
+        {variant === 'list' ? (
+          <Link href={`/tasks/${task.id}`}>{task.title}</Link>
+        ) : (
+          task.title
+        )}
       </TaskCardTitle>
 
       <TaskCardStatus>
@@ -35,6 +54,16 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
 
       {task.description && (
         <TaskCardDescription>{task.description}</TaskCardDescription>
+      )}
+
+      {variant === 'full' && (
+        <>
+          {task.content && <Markdown>{task.content}</Markdown>}
+
+          {workLogsResponse.data?.response?.map((n) => (
+            <WorkLogCard key={n.id} workLog={n} variant="list" />
+          ))}
+        </>
       )}
     </TaskCardStyled>
   )

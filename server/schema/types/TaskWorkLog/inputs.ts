@@ -1,4 +1,14 @@
 import { builder } from '../../builder'
+import { SortOrder } from '../common'
+
+export const TaskWorkLogOrderByInput = builder.inputType(
+  'TaskWorkLogOrderByInput',
+  {
+    fields: (t) => ({
+      createdAt: t.field({ type: SortOrder }),
+    }),
+  },
+)
 
 export const TaskWorkLogWhereUniqueInput = builder.inputType(
   'TaskWorkLogWhereUniqueInput',

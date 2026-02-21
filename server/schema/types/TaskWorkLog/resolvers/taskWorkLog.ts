@@ -9,15 +9,10 @@ builder.queryField('taskWorkLog', (t) =>
       where: t.arg({ type: TaskWorkLogWhereUniqueInput, required: true }),
     },
     resolve: async (query, _root, args, ctx) => {
-      if (!ctx.currentUser) {
-        return null
-      }
-
-      return ctx.prisma.taskWorkLog.findFirst({
+      return ctx.prisma.taskWorkLog.findUnique({
         ...query,
         where: {
           id: args.where.id,
-          createdById: ctx.currentUser.id,
         },
       })
     },

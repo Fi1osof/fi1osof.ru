@@ -37,7 +37,7 @@ export const TaskPage: Page<TaskPageProps> = ({ taskId }) => {
     <>
       <SeoHeaders title={task.title || 'Task'} />
       <TaskPageStyled>
-        <TaskCard task={task} />
+        <TaskCard task={task} variant="full" />
       </TaskPageStyled>
     </>
   )
