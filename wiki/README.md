@@ -2,6 +2,7 @@
 
 ## Contents
 
+- [Technical Overview](./technical-overview.md) — stack, architecture, configuration, manual setup
 - [Code Style](./code-style.md)
 - [Custom Nodes](./custom-nodes/README.md)
 - [Workflows](./workflows/README.md)
