@@ -90,7 +90,7 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
     authFromToken = false,
     hasGraphqlTool = true,
     hasTools = true,
-    hasMindLogs = true,
+    hasMindLogs = process.env.N8N_MINDLOGS_NODES === 'true',
     hasTasks = process.env.N8N_HAS_TASKS_NODES === 'true',
     hasKBNodes = process.env.N8N_HAS_KNOWLEDGES_BASE_NODES === 'true',
     hasEXNodes = process.env.HAS_EX_NODES === 'true',

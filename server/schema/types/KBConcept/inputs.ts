@@ -12,8 +12,9 @@ export const KBConceptOrderByInput = builder.inputType(
   },
 )
 
-export const KBConceptWhereInput = builder.inputType('KBConceptWhereInput', {
+export const KBConceptsWhereInput = builder.inputType('KBConceptWhereInput', {
   fields: (t) => ({
+    ids: t.stringList(),
     type: t.string(),
     // TODO Add KBConceptWhereNameInput
     name: t.string(),

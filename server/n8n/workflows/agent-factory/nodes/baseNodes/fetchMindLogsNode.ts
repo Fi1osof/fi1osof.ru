@@ -27,22 +27,7 @@ export function getFetchMindLogsNode({
 
   const variables = `={{ (() => {
     const types = ${typesArray};
-    let userData = null;
-    try {
-      if ($('Set Auth Context').isExecuted) {
-        userData = $('Set Auth Context').first().json.user || null;
-      }
-    } catch {}
-    if (!userData) {
-      if ($('Execute Workflow Trigger').isExecuted) {
-        userData = $('Execute Workflow Trigger').first().json.user || null;
-      } else if ($('When chat message received').isExecuted) {
-        userData = $('When chat message received').first().json.user || null;
-      }
-    }
-    const userId = userData?.id || null;
     const where = { type: { in: types } };
-    if (userId) where.relatedToUserId = userId;
     return JSON.stringify({ where: where, take: ${FETCH_MINDLOGS_TAKE} });
   })() }}`
 

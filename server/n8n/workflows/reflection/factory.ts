@@ -26,13 +26,13 @@ const preparePromptTemplate = fs.readFileSync(
 
 export interface ReflectionWorkflowConfig {
   agentName: string
-  hasEXNodes?: boolean
+  hasEXNodes: boolean
 }
 
 export function createReflectionWorkflow(
   cfg: ReflectionWorkflowConfig,
 ): WorkflowBase {
-  const { agentName, hasEXNodes = process.env.HAS_EX_NODES === 'true' } = cfg
+  const { agentName, hasEXNodes } = cfg
   const agentSlug = agentName.toLowerCase().replace(/\s+/g, '-')
 
   if (!hasEXNodes) {

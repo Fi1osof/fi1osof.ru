@@ -1,4 +1,8 @@
-import { TaskFragment, useTaskWorkLogsQuery } from 'src/gql/generated'
+import {
+  SortOrder,
+  TaskFragment,
+  useTaskWorkLogsQuery,
+} from 'src/gql/generated'
 import { FormattedDate } from 'src/ui-kit/format/FormattedDate'
 import {
   TaskCardStyled,
@@ -25,6 +29,9 @@ export const TaskCard: React.FC<TaskCardProps> = ({
     variables: {
       where: {
         taskId: task.id,
+      },
+      orderBy: {
+        createdAt: SortOrder.ASC,
       },
     },
     skip: !task.id || variant !== 'full',
