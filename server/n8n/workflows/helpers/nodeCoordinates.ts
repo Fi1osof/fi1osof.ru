@@ -121,6 +121,7 @@ const nodeCoordinates = {
   'reflection-process': [200, 300],
   'tool-send-mail': [2656, 792],
   'tool-check-mail': [2656, 984],
+  'tool-memory-recall': [2656, 1128],
 } as const
 
 export type NodeId = keyof typeof nodeCoordinates

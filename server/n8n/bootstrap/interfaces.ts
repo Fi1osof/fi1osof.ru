@@ -27,4 +27,5 @@ export interface AgentCredentials {
   fullname?: string
   smtp?: SmtpConfig
   imap?: ImapConfig
+  hasMemoryRecall?: boolean
 }

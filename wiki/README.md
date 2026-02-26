@@ -28,6 +28,7 @@ Express Server
 
 Located in `server/n8n/custom-nodes/`:
 - **AgentOrchestrator** — AI agent with OpenAI SDK integration
+- **ToolCallsMemory** — In-memory storage for tool execution history
 
 ## Workflow Factory
 

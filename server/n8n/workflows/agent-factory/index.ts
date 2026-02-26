@@ -32,6 +32,10 @@ import {
 } from './tools/webSearchAgent'
 import { getUrlReaderNodes, getUrlReaderConnections } from './tools/urlReader'
 import { getSendMailNodes, getSendMailConnections } from './tools/sendMail'
+import {
+  getMemoryRecallNodes,
+  getMemoryRecallConnections,
+} from './tools/memoryRecall'
 import { createToolSendMail } from '../tool-send-mail/factory'
 import { AgentCredentials } from 'server/n8n/bootstrap/interfaces'
 
@@ -61,11 +65,14 @@ export abstract class AgentWorkflowFactory extends WorkflowFactory {
     }
 
     const smtp = agentCreds.smtp
+    const hasMemoryRecall =
+      config.hasMemoryRecall ?? agentCreds.hasMemoryRecall ?? false
 
     return createAgent({
       ...config,
       canSendMail: !!smtp,
       smtp,
+      hasMemoryRecall,
     })
   }
 }
@@ -95,6 +102,7 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
     hasKBNodes = process.env.N8N_HAS_KNOWLEDGES_BASE_NODES === 'true',
     hasEXNodes = process.env.HAS_EX_NODES === 'true',
     hasWebSearchAgent = false,
+    hasMemoryRecall = false,
     canSendMail = false,
     smtp,
     additionalNodes = [],
@@ -314,6 +322,16 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
     ? getUrlReaderConnections({ agentId, agentName })
     : {}
 
+  const memoryRecallNodes: NodeType[] =
+    hasTools && hasMemoryRecall
+      ? getMemoryRecallNodes({ agentId, agentName })
+      : []
+
+  const memoryRecallConnections: ConnectionsType =
+    hasTools && hasMemoryRecall
+      ? getMemoryRecallConnections({ agentId, agentName })
+      : {}
+
   const sendMailNodes: NodeType[] = canSendMail
     ? getSendMailNodes({ agentId, agentName })
     : []
@@ -405,6 +423,7 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
     ...graphqlToolNodes,
     ...urlReaderNodes,
     ...sendMailNodes,
+    ...memoryRecallNodes,
     ...additionalNodes,
   ]
 
@@ -536,6 +555,7 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
     ...graphqlToolConnections,
     ...urlReaderConnections,
     ...sendMailConnections,
+    ...memoryRecallConnections,
     ...additionalConnections,
   }
 

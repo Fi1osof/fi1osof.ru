@@ -73,6 +73,7 @@ Code-first n8n automation with custom AgentOrchestrator node:
 - **Streaming Responses** — real-time AI responses with debug logs
 - **Tool Execution** — GraphQL, web search, file ops, email
 - **Memory System** — 12-type MindLogs for learning and context
+- **Tool Calls History** — in-memory tracking with semantic search via Memory Recall agent
 - **Email Integration** — agents can send/receive mail
 - **Chat Widget** — ready-to-use React component with SSR
 

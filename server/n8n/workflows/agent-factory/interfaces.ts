@@ -37,6 +37,7 @@ export interface AgentFactoryConfig {
   hasKBNodes?: boolean
   hasEXNodes?: boolean
   hasWebSearchAgent?: boolean
+  hasMemoryRecall?: boolean
   canSendMail?: boolean
   smtp?: SmtpConfig
   additionalNodes?: NodeType[]

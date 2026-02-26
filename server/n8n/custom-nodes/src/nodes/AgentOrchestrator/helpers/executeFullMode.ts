@@ -5,9 +5,10 @@ import { buildMessages } from './buildMessages'
 import { getConnectedTools } from './getConnectedTools'
 import { extractToolCalls } from './extractToolCalls'
 import { callLLM } from './callLLM'
-import { executeTool } from './executeTool'
+import { executeTool, getToolStaticParams } from './executeTool'
 import { getMemoryMessages, saveToMemory } from './getMemoryMessages'
 import { debugLog } from './debugLog'
+import { toolCallsMemory } from '../../ToolCallsMemory/helpers/toolCallsMemory'
 
 interface AgentOptions {
   systemMessage?: string
@@ -185,6 +186,32 @@ export const executeFullMode = async (
           `\u26a0\ufe0f Tool ${tc.name} error: ${toolResultStr}`,
         )
       }
+
+      const agentId = (items[0]?.json?.agentId as string) || 'unknown'
+      const agentName = ctx.getNode().name || 'unknown'
+      const workflowId = ctx.getWorkflow().id || 'unknown'
+
+      // Merge static and dynamic params, preferring dynamic values
+      const staticParams = getToolStaticParams(ctx, tc.name)
+      const skipMemoryRecording =
+        tc.arguments?.skipMemoryRecording !== undefined
+          ? tc.arguments.skipMemoryRecording === true
+          : staticParams?.skipMemoryRecording === true
+
+      if (!skipMemoryRecording) {
+        toolCallsMemory.addToolCall({
+          timestamp: new Date().toISOString(),
+          workflowId,
+          agentId,
+          agentName,
+          sessionId,
+          toolName: tc.name,
+          toolArguments: tc.arguments,
+          toolResult: toolResultStr,
+          userId: user?.id,
+        })
+      }
+
       messages.push({
         role: 'tool',
         tool_call_id: tc.id,

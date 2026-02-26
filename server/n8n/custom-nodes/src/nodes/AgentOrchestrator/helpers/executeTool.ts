@@ -1,5 +1,36 @@
 import { ExecuteContext, ToolCall } from './types'
 
+export const getToolStaticParams = (
+  ctx: ExecuteContext,
+  toolName: string,
+): Record<string, unknown> | undefined => {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const workflowObj = (ctx as any).workflow
+    if (!workflowObj?.nodes) {
+      return undefined
+    }
+
+    const toolNodes = Object.values(workflowObj.nodes).filter(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (n: any) => n.type === '@n8n/n8n-nodes-langchain.toolWorkflow',
+    )
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    for (const node of toolNodes as any[]) {
+      // Match by tool name (derived from node name)
+      const nodeName = node.name?.replace(/\s+/g, '_')
+      if (nodeName === toolName && node.parameters?.workflowInputs?.value) {
+        return node.parameters.workflowInputs.value as Record<string, unknown>
+      }
+    }
+
+    return undefined
+  } catch {
+    return undefined
+  }
+}
+
 export const executeTool = async (
   ctx: ExecuteContext,
   toolCall: ToolCall,

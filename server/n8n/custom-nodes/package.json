@@ -18,7 +18,9 @@
   "n8n": {
     "nodes": [
       "dist/nodes/AgentOrchestrator/AgentOrchestrator.node.js",
-      "dist/nodes/StreamTest/StreamTest.node.js"
+      "dist/nodes/StreamTest/StreamTest.node.js",
+      "dist/nodes/ToolCallsMemory/ToolCallsMemory.node.js",
+      "dist/nodes/MemoryRecallTool/MemoryRecallTool.node.js"
     ]
   }
 }

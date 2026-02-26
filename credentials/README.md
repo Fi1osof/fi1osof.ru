@@ -73,6 +73,7 @@ Required fields:
 Optional:
 - `smtp` — allows agent to send emails
 - `imap` — allows agent to read emails
+- `hasMemoryRecall` — enables Memory Recall Tool (agent can query its own tool calls history)
 
 ```json
 {
