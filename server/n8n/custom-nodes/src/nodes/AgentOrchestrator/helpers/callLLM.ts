@@ -1,6 +1,6 @@
 /* eslint-disable */
 import OpenAI from 'openai'
-import { ExecuteContext, LLMResponse, Message } from './types'
+import { ExecuteContext, LLMResponse, Message, TokenUsage } from './types'
 import {
   ChatCompletionCreateParamsNonStreaming,
   ChatCompletionCreateParamsStreaming,
@@ -71,6 +71,7 @@ export const callLLM = async (
   let content = ''
   const thinking = ''
   let toolCalls: LLMResponse['tool_calls'] = []
+  let usage: TokenUsage | undefined
 
   const requestParams:
     | ChatCompletionCreateParamsStreaming
@@ -88,6 +89,7 @@ export const callLLM = async (
     const stream = await client.chat.completions.create({
       ...requestParams,
       stream: true,
+      stream_options: { include_usage: true },
     })
 
     for await (const chunk of stream) {
@@ -120,6 +122,14 @@ export const callLLM = async (
               toolCalls[tc.index].function!.arguments += tc.function.arguments
             }
           }
+        }
+      }
+
+      if (chunk.usage) {
+        usage = {
+          prompt_tokens: chunk.usage.prompt_tokens,
+          completion_tokens: chunk.usage.completion_tokens,
+          total_tokens: chunk.usage.total_tokens,
         }
       }
     }
@@ -158,11 +168,20 @@ export const callLLM = async (
         }
       })
     }
+
+    if (response.usage) {
+      usage = {
+        prompt_tokens: response.usage.prompt_tokens,
+        completion_tokens: response.usage.completion_tokens,
+        total_tokens: response.usage.total_tokens,
+      }
+    }
   }
 
   return {
     content,
     thinking,
     tool_calls: toolCalls.length > 0 ? toolCalls : undefined,
+    usage,
   }
 }

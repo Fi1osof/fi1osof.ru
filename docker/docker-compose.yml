@@ -12,12 +12,12 @@ services:
         - DATABASE_URL=${DATABASE_URL}
         - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
         - NEXT_PUBLIC_TELEGRAM_BOT_NAME=${NEXT_PUBLIC_TELEGRAM_BOT_NAME}
-        - NEXT_PUBLIC_WORLD3D_WS_URL=${NEXT_PUBLIC_WORLD3D_WS_URL}
         - NEXT_PUBLIC_DEBUG_WORLD3D=${NEXT_PUBLIC_DEBUG_WORLD3D}
     volumes:
       - ../public:/app/public
       - ../shared:/app/shared
       - ../uploads:/app/uploads
+      - ../storage:/app/storage
       - ./mailserver/config:/app/mailserver-config
     environment:
       - ENV_MODE=development
@@ -104,11 +104,15 @@ services:
   world3d:
     build:
       context: ./world3d
+    volumes:
+      - ../storage:/app/storage
     environment:
       - JWT_SECRET=${JWT_SECRET}
       - TURN_SECRET=${TURN_SECRET}
       - TURN_REALM=${TURN_REALM:-localhost}
       - TURN_HOST=${TURN_HOST:-coturn}
+    expose:
+      - "4101"
 
 networks:
   default:

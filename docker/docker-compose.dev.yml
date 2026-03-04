@@ -37,6 +37,8 @@ services:
   world3d:
     volumes:
       - ./world3d/src:/app/src
+      - ./world3d/package.json:/app/package.json
+      - ./world3d/package-lock.json:/app/package-lock.json
     command: 'npm run dev'
     ports:
       - 4100:4100

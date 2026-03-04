@@ -1,5 +1,5 @@
 import { INodeExecutionData } from 'n8n-workflow'
-import { ExecuteContext, Message, ToolCall } from './types'
+import { ExecuteContext, Message, ToolCall, TokenUsage } from './types'
 import { parseJson } from './parseJson'
 import { buildMessages } from './buildMessages'
 import { getConnectedTools } from './getConnectedTools'
@@ -94,6 +94,11 @@ export const executeFullMode = async (
   let iterations = 0
   let finalOutput = ''
   const allToolCalls: ToolCall[] = []
+  const totalUsage: TokenUsage = {
+    prompt_tokens: 0,
+    completion_tokens: 0,
+    total_tokens: 0,
+  }
 
   while (iterations <= maxIterations) {
     iterations++
@@ -123,10 +128,16 @@ export const executeFullMode = async (
       streaming: isStreamingAvailable,
     })
 
+    if (response.usage) {
+      totalUsage.prompt_tokens += response.usage.prompt_tokens
+      totalUsage.completion_tokens += response.usage.completion_tokens
+      totalUsage.total_tokens += response.usage.total_tokens
+    }
+
     debugLog(
       ctx,
       isStreamingAvailable,
-      `LLM response received. Content length: ${response.content?.length || 0}, thinking length: ${response.thinking?.length || 0}, tool_calls: ${response.tool_calls?.length || 0}`,
+      `LLM response received. Content length: ${response.content?.length || 0}, thinking length: ${response.thinking?.length || 0}, tool_calls: ${response.tool_calls?.length || 0}, tokens: ${response.usage?.total_tokens || 0}`,
     )
 
     if (response.thinking) {
@@ -234,10 +245,12 @@ export const executeFullMode = async (
   debugLog(
     ctx,
     isStreamingAvailable,
-    `Agent loop finished. Total iterations: ${iterations}, total tool calls: ${allToolCalls.length}, output length: ${finalOutput.length}`,
+    `Agent loop finished. Total iterations: ${iterations}, total tool calls: ${allToolCalls.length}, output length: ${finalOutput.length}, total tokens: ${totalUsage.total_tokens}`,
   )
 
   if (isStreamingAvailable) {
+    const usageText = `\n\n---\n*Tokens: ${totalUsage.total_tokens} (prompt: ${totalUsage.prompt_tokens}, completion: ${totalUsage.completion_tokens})*`
+    ctx.sendChunk('item', 0, usageText)
     ctx.sendChunk('end', 0)
   }
 
@@ -251,6 +264,7 @@ export const executeFullMode = async (
         toolCalls: allToolCalls,
         iterations,
         mode: 'full',
+        usage: totalUsage,
       },
     })),
   ]

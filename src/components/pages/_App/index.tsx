@@ -26,7 +26,7 @@ export const App: MainApp<AppProps> = ({ Component, pageProps }) => {
 
   const apolloClient = useApollo(pageProps.initialApolloState, withWs)
 
-  const { data } = useMeQuery({
+  const { data, loading: userLoading } = useMeQuery({
     client: apolloClient,
     ssr: false,
   })
@@ -74,7 +74,7 @@ export const App: MainApp<AppProps> = ({ Component, pageProps }) => {
         <GlobalStyle />
         <SnackbarProvider>
           <ApolloProvider client={apolloClient}>
-            <AppContextProvider user={user}>
+            <AppContextProvider user={user} userLoading={userLoading}>
               <ChatProvider>
                 <Layout>{content}</Layout>
               </ChatProvider>

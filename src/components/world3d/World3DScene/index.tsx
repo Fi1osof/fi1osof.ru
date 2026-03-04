@@ -3,13 +3,20 @@
 import { Canvas } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
 import { KeyboardControls, Stats } from '@react-three/drei'
-import { Suspense, useCallback, useMemo, useRef, useState } from 'react'
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { Ground } from '../Ground'
 import { Player } from '../Player'
-import { RemotePlayer } from '../RemotePlayer'
 import { Lighting } from '../Lighting'
-import { Building } from '../Building'
-import { SpatialAudioSource } from '../SpatialAudioSource'
+import { WorldObject } from '../WorldObject'
+import { useWorldStore } from '../hooks/useWorldStore'
+// import { SpatialAudioSource } from '../SpatialAudioSource'
 import { MuteButton } from '../MuteButton'
 import { MuteWorldButton } from '../MuteWorldButton'
 import { ConnectionOverlay } from '../ConnectionOverlay'
@@ -23,6 +30,7 @@ import { useMultiplayer } from '../hooks/useMultiplayer'
 import { useVoiceChat } from '../hooks/useVoiceChat'
 import { useAppContext } from 'src/components/AppContext'
 import type { AudioListener } from 'three'
+import type { WorldObject3d } from '../hooks/useWorldStore'
 
 const debug = process.env.NEXT_PUBLIC_DEBUG_WORLD3D === 'true'
 const debugPhysics = process.env.NEXT_PUBLIC_DEBUG_WORLD3D_PHYSICS === 'true'
@@ -36,29 +44,113 @@ const keyboardMap = [
   { name: 'jump', keys: ['Space'] },
 ]
 
-export const World3DScene: React.FC = () => {
-  const { user } = useAppContext()
+function getObjectKind(object: WorldObject3d): string {
+  const userData = object.userData as { type?: unknown } | undefined
+  return typeof userData?.type === 'string'
+    ? userData.type
+    : typeof object.type === 'string'
+      ? object.type
+      : 'Object3D'
+}
 
-  // Multiplayer WS connection — enabled only for authenticated users
+function getObjectId(object: WorldObject3d): string | null {
+  const userData = object.userData as { id?: unknown } | undefined
+  if (typeof userData?.id === 'string' && userData.id) {
+    return userData.id
+  }
+  if (typeof object.name === 'string' && object.name) {
+    return object.name
+  }
+  if (typeof object.uuid === 'string' && object.uuid) {
+    return object.uuid
+  }
+  return null
+}
+
+function collectPlayers(root: WorldObject3d | null): WorldObject3d[] {
+  if (!root) {
+    return []
+  }
+
+  const result: WorldObject3d[] = []
+  const queue: WorldObject3d[] = [root]
+
+  while (queue.length > 0) {
+    const current = queue.shift()
+    if (!current) {
+      continue
+    }
+
+    if (getObjectKind(current) === 'player') {
+      result.push(current)
+    }
+
+    if (Array.isArray(current.children)) {
+      queue.push(...current.children)
+    }
+  }
+
+  return result
+}
+
+export const World3DScene: React.FC = () => {
+  const { user, userLoading } = useAppContext()
+  const {
+    root: worldRoot,
+    localPlayerObject,
+    updateObject,
+    refetchWorld,
+  } = useWorldStore()
+
+  const [storedToken, setStoredToken] = useState<string | null>(null)
+
+  useEffect(() => {
+    const currentToken = localStorage?.getItem('token') ?? null
+    setStoredToken(currentToken)
+
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'token') {
+        setStoredToken(e.newValue)
+      }
+    }
+    window.addEventListener('storage', handleStorage)
+    return () => window.removeEventListener('storage', handleStorage)
+  }, [])
+
+  useEffect(() => {
+    const currentToken = localStorage?.getItem('token') ?? null
+    setStoredToken(currentToken)
+  }, [user])
+
+  const token = user?.id ? storedToken : null
+
+  // Multiplayer WS connection — always enabled, token determines auth mode
   const {
     wsRef,
-    remotePlayers,
+    pendingSelfState,
+    clearPendingSelfState,
     sendPlayerState,
     onSignalingMessageRef,
     turnCredentialsRef,
     connectionStatus,
     reconnect,
-  } = useMultiplayer({ enabled: !!user })
+  } = useMultiplayer({
+    enabled: !userLoading,
+    authUserId: user?.id ?? null,
+    token,
+    onObjectUpdate: updateObject,
+    onWorldChanged: refetchWorld,
+  })
 
-  const remotePlayersRef = useRef(remotePlayers)
+  // Debug: count players from world store
+  const worldRootPlayers = useMemo(() => collectPlayers(worldRoot), [worldRoot])
 
-  remotePlayersRef.current = remotePlayers
-
-  // Remote player IDs list (stable reference for useVoiceChat dependency)
-  const remotePlayerIds = useMemo(
-    () => [...remotePlayersRef.current.keys()],
-    [],
-  )
+  // Remote player IDs from world store (for voice chat)
+  const remotePlayerIds = useMemo(() => {
+    return worldRootPlayers
+      .map((player) => getObjectId(player))
+      .filter((playerId): playerId is string => typeof playerId === 'string')
+  }, [worldRootPlayers])
 
   // Voice chat — WebRTC P2P mesh with spatial audio
   const { remoteStreams, isMuted, toggleMute, peersRef, localStreamRef } =
@@ -75,6 +167,12 @@ export const World3DScene: React.FC = () => {
   const audioListenerRef = useRef<AudioListener | null>(null)
   // World mute state — controls AudioListener gain (mutes all 3D sounds)
   const [isWorldMuted, setIsWorldMuted] = useState(false)
+  // Ground ready state — Player renders only after ground collider is initialized
+  const [isGroundReady, setIsGroundReady] = useState(false)
+
+  const handleGroundReady = useCallback(() => {
+    setIsGroundReady(true)
+  }, [])
 
   const toggleWorldMute = useCallback(() => {
     const listener = audioListenerRef.current
@@ -97,39 +195,36 @@ export const World3DScene: React.FC = () => {
               <Physics gravity={[0, -9.81, 0]} debug={debug && debugPhysics}>
                 {debug && <axesHelper args={[10]} />}
                 <Lighting />
-                <Ground />
-                <Building
-                  url="/assets/gltf/buildings/gildenhaus/scene.gltf"
-                  position={[0, 0.1, 20]}
-                  rotation={[0, 1.6, 0]}
-                  scale={2.2}
-                />
-                <Player
-                  debug={debug}
-                  sendPlayerState={sendPlayerState}
-                  audioListenerRef={audioListenerRef}
-                />
-                {/* Remote players — rendered from server state */}
-                {[...remotePlayers.values()].map((player) => (
-                  <RemotePlayer
-                    key={player.playerId}
-                    data={player}
-                    voiceStream={remoteStreams.get(player.playerId)}
-                  />
-                ))}
-                {/* Test spatial audio source - positioned near the building */}
-                <SpatialAudioSource
-                  url="/assets/sounds/test.mp3"
-                  position={[0, 2, 0]}
-                  rotation={[0, 0, 0]}
-                  refDistance={0.1}
-                  maxDistance={4}
-                  rolloffFactor={1}
-                  coneInnerAngle={30}
-                  coneOuterAngle={90}
-                  coneOuterGain={0.1}
-                  debug={debug}
-                />
+                <Ground onReady={handleGroundReady} />
+                {/* All physics objects render only after ground collider is ready */}
+                {isGroundReady && (
+                  <>
+                    {worldRoot && <WorldObject object={worldRoot} />}
+                    <Player
+                      key={user?.id}
+                      debug={debug}
+                      sendPlayerState={sendPlayerState}
+                      audioListenerRef={audioListenerRef}
+                      pendingSelfState={pendingSelfState}
+                      clearPendingSelfState={clearPendingSelfState}
+                      initialObject={localPlayerObject}
+                    />
+                    {/* Remote players are now rendered via WorldObject from world store */}
+                    {/* Test spatial audio source - positioned near the building */}
+                    {/* <SpatialAudioSource
+                      url="/assets/sounds/test.mp3"
+                      position={[0, 2, 0]}
+                      rotation={[0, 0, 0]}
+                      refDistance={0.1}
+                      maxDistance={4}
+                      rolloffFactor={1}
+                      coneInnerAngle={30}
+                      coneOuterAngle={90}
+                      coneOuterGain={0.1}
+                      debug={debug}
+                    /> */}
+                  </>
+                )}
               </Physics>
             </Suspense>
           </Canvas>

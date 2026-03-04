@@ -15,6 +15,15 @@ export interface ToolCall {
  * Standardized LLM response structure with optional tool calls.
  * Supports both OpenAI-style (function.name/arguments) and simplified (name/args) formats.
  */
+/**
+ * Token usage statistics from LLM response.
+ */
+export interface TokenUsage {
+  prompt_tokens: number
+  completion_tokens: number
+  total_tokens: number
+}
+
 export interface LLMResponse {
   content: string
   thinking?: string
@@ -27,6 +36,7 @@ export interface LLMResponse {
       arguments: string
     }
   }>
+  usage?: TokenUsage
 }
 
 /**

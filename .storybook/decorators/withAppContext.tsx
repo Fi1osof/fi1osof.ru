@@ -19,6 +19,7 @@ export const withAppContext: Decorator = (Story, context) => {
     isLoginFormOpen: false,
     openLoginForm: () => undefined,
     closeLoginForm: () => undefined,
+    userLoading: false,
   }
 
   return (

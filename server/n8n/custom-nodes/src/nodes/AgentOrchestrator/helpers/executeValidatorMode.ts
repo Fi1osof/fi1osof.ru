@@ -55,6 +55,7 @@ export const executeValidatorMode = async (
         toolCalls,
         rawResponse: response,
         mode: 'validator',
+        usage: response.usage,
       },
     })),
   ]

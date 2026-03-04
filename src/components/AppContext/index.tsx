@@ -8,6 +8,7 @@ import { AuthModal } from 'src/components/Auth/AuthModal'
 
 export type AppContextValue = {
   user: MeQuery['me']
+  userLoading: boolean
 
   onAuth: ((token: string) => Promise<void>) | undefined
   onSignOut: (() => Promise<void>) | undefined
@@ -21,10 +22,12 @@ export const Context = React.createContext<AppContextValue | null>(null)
 
 type AppContextProviderProps = React.PropsWithChildren<{
   user: AppContextValue['user']
+  userLoading: boolean
 }>
 
 export const AppContextProvider: React.FC<AppContextProviderProps> = ({
   user,
+  userLoading,
   children,
 }) => {
   const router = useRouter()
@@ -64,13 +67,22 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({
   const context = useMemo<AppContextValue>(() => {
     return {
       user,
+      userLoading,
       onAuth,
       onSignOut,
       isLoginFormOpen,
       openLoginForm,
       closeLoginForm,
     }
-  }, [onAuth, onSignOut, user, isLoginFormOpen, openLoginForm, closeLoginForm])
+  }, [
+    onAuth,
+    onSignOut,
+    user,
+    userLoading,
+    isLoginFormOpen,
+    openLoginForm,
+    closeLoginForm,
+  ])
 
   return (
     <Context.Provider value={context}>

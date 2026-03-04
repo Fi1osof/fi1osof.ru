@@ -1,5 +1,4 @@
 import React from 'react'
-import Link from 'next/link'
 import { MindLogFragment } from 'src/gql/generated'
 import { Pagination } from 'src/components/Pagination'
 import { MindLogCard } from 'src/components/MindLogCard'
@@ -27,10 +26,8 @@ export const MindLogsView: React.FC<MindLogsViewProps> = ({
       ) : mindLogs.length > 0 ? (
         <>
           <MindLogsViewListStyled>
-            {mindLogs.map((log) => (
-              <Link key={log.id} href={`/mind-logs/${log.id}`}>
-                <MindLogCard mindLog={log} />
-              </Link>
+            {mindLogs.map((n) => (
+              <MindLogCard key={n.id} mindLog={n} />
             ))}
           </MindLogsViewListStyled>
 

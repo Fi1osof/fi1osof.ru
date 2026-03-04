@@ -8,6 +8,7 @@
 - [Workflows](./workflows/README.md)
 - [Testing](./testing/README.md)
 - [Mail Server](./mailserver/README.md)
+- [World3D](./world3d/README.md) — multiplayer 3D environment
 
 ## Architecture
 

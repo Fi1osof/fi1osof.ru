@@ -1,9 +1,13 @@
-/* eslint-disable no-console */
 import { useEffect, useRef, useCallback, useReducer, useState } from 'react'
 import { multiplayerReducer, initialMultiplayerState } from './reducer'
 import type { LocalPlayerState } from './interfaces'
+import type { WorldObject3d } from '../useWorldStore'
 
-export type { RemotePlayerData, LocalPlayerState } from './interfaces'
+export type {
+  RemotePlayerData,
+  LocalPlayerState,
+  SelfStateData,
+} from './interfaces'
 
 export type ConnectionStatus =
   | 'idle'
@@ -22,16 +26,19 @@ export type ConnectionStatus =
 const S2C_PING = 'ping'
 const S2C_PLAYER_JOINED = 'player_joined'
 const S2C_PLAYER_LEFT = 'player_left'
-const S2C_WORLD_STATE = 'world_state'
+const S2C_OBJECT_CREATED = 'object_created'
+const S2C_OBJECT_UPDATE = 'object_update'
+const S2C_OBJECT_DELETED = 'object_deleted'
 const S2C_ERROR = 'error'
 const S2C_OFFER = 'offer'
 const S2C_ANSWER = 'answer'
 const S2C_ICE_CANDIDATE = 'ice_candidate'
 const S2C_TURN_CREDENTIALS = 'turn_credentials'
+const S2C_SELF_STATE = 'self_state'
 const C2S_PONG = 'pong'
 const C2S_PLAYER_STATE = 'player_state'
 
-const WS_URL = process.env.NEXT_PUBLIC_WORLD3D_WS_URL || 'ws://localhost:4100'
+const WS_PATH = '/world3d-service'
 const RECONNECT_DELAY = 3000
 const WS_CLOSE_SESSION_REPLACED = 4009
 
@@ -56,23 +63,52 @@ export type SignalingMessage =
   | { type: 'answer'; fromPlayerId: string; sdp: string }
   | { type: 'ice_candidate'; fromPlayerId: string; candidate: string }
 
+/** Object update received from server */
+export interface ObjectUpdate {
+  id: string
+  object: WorldObject3d
+}
+
 interface UseMultiplayerOptions {
   /** Whether multiplayer connection is enabled */
   enabled: boolean
+  /** Resolved current user id for authenticated connections */
+  authUserId: string | null
+  /** JWT token for authenticated connection (optional) */
+  token: string | null
+  /** Callback for object updates from WebSocket */
+  onObjectUpdate?: (update: ObjectUpdate) => void
+  /** Callback when object is created or deleted (triggers refetch) */
+  onWorldChanged?: () => void
 }
 
 /**
  * Hook for multiplayer WebSocket connection to world3d server.
- * Automatically connects when enabled and user has a JWT token.
+ * Connects without token (read-only) or with token (full access).
  * Handles heartbeat, reconnection, remote players state, and adaptive state sending.
  */
-export function useMultiplayer({ enabled }: UseMultiplayerOptions) {
+export function useMultiplayer({
+  enabled,
+  authUserId,
+  token,
+  onObjectUpdate,
+  onWorldChanged,
+}: UseMultiplayerOptions) {
   const wsRef = useRef<WebSocket | null>(null)
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [connectionStatus, setConnectionStatus] =
     useState<ConnectionStatus>('idle')
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const enabledRef = useRef(enabled)
   enabledRef.current = enabled
+  const authUserIdRef = useRef(authUserId)
+  authUserIdRef.current = authUserId
+  const tokenRef = useRef(token)
+  tokenRef.current = token
+  const onObjectUpdateRef = useRef(onObjectUpdate)
+  onObjectUpdateRef.current = onObjectUpdate
+  const onWorldChangedRef = useRef(onWorldChanged)
+  onWorldChangedRef.current = onWorldChanged
 
   // Callback ref for signaling messages — set by useVoiceChat
   const onSignalingMessageRef = useRef<
@@ -100,6 +136,7 @@ export function useMultiplayer({ enabled }: UseMultiplayerOptions) {
       wsRef.current = null
     }
     dispatch({ type: 'RESET' })
+    setIsAuthenticated(false)
   }, [])
 
   const connect = useCallback(() => {
@@ -107,13 +144,7 @@ export function useMultiplayer({ enabled }: UseMultiplayerOptions) {
       return
     }
 
-    const token =
-      typeof globalThis !== 'undefined' && 'localStorage' in globalThis
-        ? globalThis.localStorage?.getItem('token')
-        : null
-
-    if (!token) {
-      // No token — not authenticated, skip connection
+    if (typeof window === 'undefined') {
       return
     }
 
@@ -121,12 +152,19 @@ export function useMultiplayer({ enabled }: UseMultiplayerOptions) {
 
     setConnectionStatus('connecting')
 
-    const ws = new WebSocket(`${WS_URL}?token=${token}`)
+    const currentAuthUserId = authUserIdRef.current
+    const currentToken = currentAuthUserId ? tokenRef.current : null
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+    const wsBaseUrl = `${wsProtocol}//${window.location.host}${WS_PATH}`
+    const wsUrl = currentToken
+      ? `${wsBaseUrl}?token=${currentToken}`
+      : wsBaseUrl
+    const ws = new WebSocket(wsUrl)
     wsRef.current = ws
 
     ws.onopen = () => {
-      console.log('[multiplayer] Connected to world3d server')
       setConnectionStatus('connected')
+      setIsAuthenticated(!!currentToken)
     }
 
     ws.onmessage = (event) => {
@@ -143,19 +181,32 @@ export function useMultiplayer({ enabled }: UseMultiplayerOptions) {
             break
 
           case S2C_PLAYER_JOINED:
-            console.log(
-              `[multiplayer] Player joined: ${msg.playerId}`,
-              msg.username,
-            )
             break
 
           case S2C_PLAYER_LEFT:
-            console.log(`[multiplayer] Player left: ${msg.playerId}`)
             dispatch({ type: 'PLAYER_LEFT', playerId: msg.playerId })
             break
 
-          case S2C_WORLD_STATE:
-            dispatch({ type: 'WORLD_STATE', players: msg.players })
+          case S2C_OBJECT_CREATED:
+            if (onWorldChangedRef.current) {
+              onWorldChangedRef.current()
+            }
+            break
+
+          case S2C_OBJECT_UPDATE:
+            // Forward object update to world store
+            if (onObjectUpdateRef.current && msg.object) {
+              onObjectUpdateRef.current({
+                id: msg.id,
+                object: msg.object as WorldObject3d,
+              })
+            }
+            break
+
+          case S2C_OBJECT_DELETED:
+            if (onWorldChangedRef.current) {
+              onWorldChangedRef.current()
+            }
             break
 
           case S2C_ERROR:
@@ -170,7 +221,20 @@ export function useMultiplayer({ enabled }: UseMultiplayerOptions) {
               ttl: msg.ttl,
             }
 
-            console.log('[multiplayer] Received TURN credentials')
+            break
+
+          case S2C_SELF_STATE:
+            dispatch({
+              type: 'SELF_STATE',
+              data: {
+                playerId: msg.playerId,
+                username: msg.username,
+                position: msg.position,
+                rotation: msg.rotation,
+                animation: msg.animation,
+                isNew: msg.isNew,
+              },
+            })
             break
 
           case S2C_OFFER:
@@ -188,7 +252,7 @@ export function useMultiplayer({ enabled }: UseMultiplayerOptions) {
     }
 
     ws.onclose = (event) => {
-      console.log(
+      console.warn(
         `[multiplayer] Disconnected (code: ${event.code}, reason: ${event.reason})`,
       )
       wsRef.current = null
@@ -217,30 +281,44 @@ export function useMultiplayer({ enabled }: UseMultiplayerOptions) {
    * - Skips send if state hasn't changed at all
    */
   const sendPlayerState = useCallback((playerState: LocalPlayerState) => {
-    const ws = wsRef.current
-    if (!ws || ws.readyState !== WebSocket.OPEN) {
-      return
-    }
-
     const now = Date.now()
     const last = lastSentStateRef.current
     const elapsed = now - lastSendTimeRef.current
 
+    // Extract position from matrix (indices 12, 14 in column-major 4x4, skip Y)
+    const posX = playerState.matrix[12]
+    const posZ = playerState.matrix[14]
+
+    // Skip initial state — don't send until player actually moves
+    if (!last) {
+      lastSentStateRef.current = {
+        ...playerState,
+        matrix: [...playerState.matrix],
+      }
+      lastSendTimeRef.current = now
+      return
+    }
+
     // Determine if position changed significantly
     const positionChanged =
-      !last ||
-      Math.abs(playerState.position.x - last.position.x) >
+      Math.abs(posX - last.matrix[12]) > POSITION_CHANGE_THRESHOLD ||
+      Math.abs(posZ - last.matrix[14]) > POSITION_CHANGE_THRESHOLD
+
+    // Determine if rotation changed (compare first column of rotation matrix: indices 0, 2)
+    const rotationChanged =
+      Math.abs(playerState.matrix[0] - last.matrix[0]) >
         POSITION_CHANGE_THRESHOLD ||
-      Math.abs(playerState.position.y - last.position.y) >
-        POSITION_CHANGE_THRESHOLD ||
-      Math.abs(playerState.position.z - last.position.z) >
+      Math.abs(playerState.matrix[2] - last.matrix[2]) >
         POSITION_CHANGE_THRESHOLD
 
     // Determine if animation changed
-    const animationChanged = !last || playerState.animation !== last.animation
+    const animationChanged = playerState.animation !== last.animation
 
-    // Adaptive interval: active movement → faster, idle → slower
-    const interval = positionChanged ? SEND_INTERVAL_ACTIVE : SEND_INTERVAL_IDLE
+    // Adaptive interval: active movement or rotation → faster, idle → slower
+    const interval =
+      positionChanged || rotationChanged
+        ? SEND_INTERVAL_ACTIVE
+        : SEND_INTERVAL_IDLE
 
     // Skip if not enough time elapsed and nothing important changed
     if (elapsed < interval && !animationChanged) {
@@ -248,23 +326,38 @@ export function useMultiplayer({ enabled }: UseMultiplayerOptions) {
     }
 
     // Skip if absolutely nothing changed and we already sent at least once
-    if (last && !positionChanged && !animationChanged) {
+    if (last && !positionChanged && !rotationChanged && !animationChanged) {
+      return
+    }
+
+    lastSentStateRef.current = {
+      ...playerState,
+      matrix: [...playerState.matrix],
+    }
+    lastSendTimeRef.current = now
+
+    const ws = wsRef.current
+
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
+      console.warn(
+        '[sendPlayerState] SKIP: ws=%s, readyState=%s',
+        ws ? 'exists' : 'null',
+        ws?.readyState ?? 'N/A',
+      )
       return
     }
 
     ws.send(
       JSON.stringify({
         type: C2S_PLAYER_STATE,
-        position: playerState.position,
-        rotation: playerState.rotation,
+        matrix: playerState.matrix,
         animation: playerState.animation,
       }),
     )
-
-    lastSentStateRef.current = { ...playerState }
-    lastSendTimeRef.current = now
   }, [])
 
+  // Single effect for connection management
+  // Connects when enabled, reconnects when auth identity or token changes
   useEffect(() => {
     if (enabled) {
       connect()
@@ -273,15 +366,22 @@ export function useMultiplayer({ enabled }: UseMultiplayerOptions) {
     }
 
     return cleanup
-  }, [enabled, connect, cleanup])
+  }, [enabled, authUserId, token, connect, cleanup])
+
+  const clearPendingSelfState = useCallback(() => {
+    dispatch({ type: 'CLEAR_SELF_STATE' })
+  }, [])
 
   return {
     wsRef,
     remotePlayers: state.remotePlayers,
+    pendingSelfState: state.pendingSelfState,
+    clearPendingSelfState,
     sendPlayerState,
     onSignalingMessageRef,
     turnCredentialsRef,
     connectionStatus,
+    isAuthenticated,
     reconnect: connect,
   }
 }

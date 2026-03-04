@@ -1,3 +1,4 @@
+import { MindLogCardStyled } from 'src/components/MindLogCard/styles'
 import styled from 'styled-components'
 
 export const MindLogsViewStyled = styled.div`
@@ -8,4 +9,9 @@ export const MindLogsViewListStyled = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.md};
+
+  ${MindLogCardStyled} {
+    max-height: 500px;
+    overflow: auto;
+  }
 `

@@ -339,6 +339,12 @@ return [{
               value: '={{ $json.output }}',
               type: 'string',
             },
+            {
+              id: 'usage',
+              name: 'usage',
+              value: '={{ $json.usage }}',
+              type: 'object',
+            },
           ],
         },
         options: {},

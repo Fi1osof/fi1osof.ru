@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -54,27 +53,6 @@ export const VoiceAudioSource: React.FC<VoiceAudioSourceProps> = ({
 
     const audioContext = listener.context
 
-    console.log(
-      '[VoiceAudioSource] AudioListener found. AudioContext state:',
-      audioContext.state,
-      'sampleRate:',
-      audioContext.sampleRate,
-    )
-
-    console.log(
-      '[VoiceAudioSource] Stream:',
-      stream.id,
-      'active:',
-      stream.active,
-      'audioTracks:',
-      stream.getAudioTracks().map((t) => ({
-        readyState: t.readyState,
-        enabled: t.enabled,
-        muted: t.muted,
-        label: t.label,
-      })),
-    )
-
     // Create PositionalAudio and connect the MediaStream
     const positionalAudio = new THREE.PositionalAudio(listener)
     positionalAudio.setRefDistance(refDistance)
@@ -82,6 +60,7 @@ export const VoiceAudioSource: React.FC<VoiceAudioSourceProps> = ({
     positionalAudio.setRolloffFactor(rolloffFactor)
     positionalAudio.setDistanceModel('inverse')
 
+    // TODO Recheck and remove
     // DEBUG: test raw stream playback via hidden <audio> element
     // This bypasses Three.js entirely — if you hear sound, the stream is fine
     const debugAudio = document.createElement('audio')
@@ -90,38 +69,14 @@ export const VoiceAudioSource: React.FC<VoiceAudioSourceProps> = ({
     debugAudio.volume = 1.0
     document.body.appendChild(debugAudio)
 
-    debugAudio.onplay = () =>
-      console.log('[VoiceAudioSource] DEBUG <audio> element started playing')
-
-    debugAudio.onerror = (e) =>
+    debugAudio.onerror = (e) => {
       console.error('[VoiceAudioSource] DEBUG <audio> element error:', e)
+    }
 
     // Connect MediaStream as audio source via Web Audio API
     const source = audioContext.createMediaStreamSource(stream)
     // @ts-expect-error — Three.js PositionalAudio.setNodeSource accepts AudioNode
     positionalAudio.setNodeSource(source)
-
-    console.log(
-      '[VoiceAudioSource] PositionalAudio created. isPlaying:',
-      positionalAudio.isPlaying,
-      'gain:',
-      positionalAudio.getVolume(),
-      'panner distanceModel:',
-      positionalAudio.panner.distanceModel,
-      'refDistance:',
-      positionalAudio.panner.refDistance,
-      'maxDistance:',
-      positionalAudio.panner.maxDistance,
-    )
-
-    // Log AudioContext state changes
-    const onStateChange = () => {
-      console.log(
-        '[VoiceAudioSource] AudioContext state changed to:',
-        audioContext.state,
-      )
-    }
-    audioContext.addEventListener('statechange', onStateChange)
 
     setAudio(positionalAudio)
 
@@ -130,8 +85,6 @@ export const VoiceAudioSource: React.FC<VoiceAudioSourceProps> = ({
       debugAudio.pause()
       debugAudio.srcObject = null
       debugAudio.remove()
-      // Cleanup: disconnect source and remove audio from scene
-      audioContext.removeEventListener('statechange', onStateChange)
       source.disconnect()
       if (positionalAudio.parent) {
         positionalAudio.parent.remove(positionalAudio)

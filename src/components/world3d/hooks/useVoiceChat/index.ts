@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { useEffect, useRef, useCallback, useState } from 'react'
 import type { SignalingMessage, TurnCredentials } from '../useMultiplayer'
 
@@ -165,26 +164,7 @@ export function useVoiceChat({
 
       // Handle incoming remote audio track
       pc.ontrack = (event) => {
-        console.log(
-          `[voice][ontrack] Received track from ${playerId}:`,
-          'kind:',
-          event.track.kind,
-          'readyState:',
-          event.track.readyState,
-          'enabled:',
-          event.track.enabled,
-          'muted:',
-          event.track.muted,
-          'streams:',
-          event.streams.length,
-        )
         if (event.streams[0]) {
-          console.log(
-            `[voice][ontrack] Adding remote stream for ${playerId}, stream id:`,
-            event.streams[0].id,
-            'audioTracks:',
-            event.streams[0].getAudioTracks().length,
-          )
           addRemoteStream(playerId, event.streams[0])
         } else {
           console.warn(
@@ -196,26 +176,17 @@ export function useVoiceChat({
       // Send ICE candidates to remote peer via signaling server
       pc.onicecandidate = (event) => {
         if (event.candidate) {
-          console.log(
-            `[voice][ice] Sending ICE candidate to ${playerId}:`,
-            event.candidate.type,
-            event.candidate.protocol,
-            event.candidate.address,
-          )
           sendSignaling({
             type: C2S_ICE_CANDIDATE,
             targetPlayerId: playerId,
             candidate: JSON.stringify(event.candidate),
           })
         } else {
-          console.log(`[voice][ice] ICE gathering complete for ${playerId}`)
+          console.warn(`[voice][ice] ICE gathering complete for ${playerId}`)
         }
       }
 
       pc.onconnectionstatechange = () => {
-        console.log(
-          `[voice][state] Connection state with ${playerId}: ${pc.connectionState}, ICE: ${pc.iceConnectionState}, signaling: ${pc.signalingState}`,
-        )
         if (
           pc.connectionState === 'failed' ||
           pc.connectionState === 'closed'
@@ -249,10 +220,6 @@ export function useVoiceChat({
       const pc = createPeerConnection(playerId, true)
 
       try {
-        console.log(
-          `[voice][connect] Creating offer for ${playerId}, localStream tracks:`,
-          localStreamRef.current?.getAudioTracks().length ?? 0,
-        )
         const offer = await pc.createOffer()
         await pc.setLocalDescription(offer)
 
@@ -261,11 +228,6 @@ export function useVoiceChat({
           targetPlayerId: playerId,
           sdp: JSON.stringify(pc.localDescription),
         })
-
-        console.log(
-          `[voice][connect] Sent offer to ${playerId}, signalingState:`,
-          pc.signalingState,
-        )
       } catch (err) {
         console.error(`[voice] Failed to create offer for ${playerId}:`, err)
         removePeer(playerId)
@@ -284,11 +246,6 @@ export function useVoiceChat({
       switch (msg.type) {
         case 'offer': {
           // Remote peer wants to connect — create answer
-
-          console.log(
-            `[voice][signal] Received offer from ${fromPlayerId}, existing peer:`,
-            peersRef.current.has(fromPlayerId),
-          )
 
           // If we already have a connection, close it first
           if (peersRef.current.has(fromPlayerId)) {
@@ -309,11 +266,6 @@ export function useVoiceChat({
               targetPlayerId: fromPlayerId,
               sdp: JSON.stringify(pc.localDescription),
             })
-
-            console.log(
-              `[voice][signal] Sent answer to ${fromPlayerId}, signalingState:`,
-              pc.signalingState,
-            )
           } catch (err) {
             console.error(
               `[voice] Failed to handle offer from ${fromPlayerId}:`,
@@ -326,11 +278,6 @@ export function useVoiceChat({
 
         case 'answer': {
           // Remote peer accepted our offer
-
-          console.log(
-            `[voice][signal] Received answer from ${fromPlayerId}, peer exists:`,
-            peersRef.current.has(fromPlayerId),
-          )
 
           const peer = peersRef.current.get(fromPlayerId)
           if (!peer) {
@@ -397,7 +344,6 @@ export function useVoiceChat({
       })
       localStreamRef.current = stream
 
-      console.log('[voice] Microphone captured')
       return stream
     } catch (err) {
       console.error('[voice] Failed to capture microphone:', err)
@@ -423,14 +369,13 @@ export function useVoiceChat({
    * Called when microphone is acquired after peers are already connected.
    */
   const addTracksToPeers = useCallback((stream: MediaStream) => {
-    for (const [playerId, peer] of peersRef.current) {
+    for (const [, peer] of peersRef.current) {
       const senders = peer.pc.getSenders()
       const hasAudio = senders.some((s) => s.track?.kind === 'audio')
       if (!hasAudio) {
         for (const track of stream.getAudioTracks()) {
           peer.pc.addTrack(track, stream)
         }
-        console.log(`[voice] Added audio track to existing peer ${playerId}`)
       }
     }
   }, [])
@@ -500,37 +445,12 @@ export function useVoiceChat({
       cleanupAll()
       return
     }
-
-    // Microphone is NOT started here — it will be acquired lazily
-    // when the user clicks unmute (toggleMute).
-    // We only set up signaling subscription above.
-    console.log(
-      '[voice][init] Main effect started (mic off by default), enabled:',
-      enabled,
-      'remotePlayerIds:',
-      remotePlayerIds,
-    )
-
-    return () => {
-      console.log('[voice][init] Main effect cleanup')
-    }
-  }, [cleanupAll, enabled, remotePlayerIds])
+  }, [cleanupAll, enabled])
 
   // React to remote player list changes — connect to new players, disconnect from gone ones
   useEffect(() => {
-    console.log(
-      '[voice][reactive] Remote players changed. enabled:',
-      enabled,
-      'localStream:',
-      !!localStreamRef.current,
-      'remotePlayerIds:',
-      remotePlayerIds,
-      'currentPeers:',
-      [...peersRef.current.keys()],
-    )
-
     if (!enabled || !localStreamRef.current) {
-      console.log(
+      console.warn(
         '[voice][reactive] Skipping — enabled:',
         enabled,
         'localStream:',
@@ -545,7 +465,7 @@ export function useVoiceChat({
     // Connect to new players
     for (const playerId of remotePlayerIds) {
       if (!currentPeerIds.has(playerId)) {
-        console.log('[voice][reactive] Connecting to NEW player:', playerId)
+        console.warn('[voice][reactive] Connecting to NEW player:', playerId)
         connectToPeer(playerId)
       }
     }
@@ -553,7 +473,7 @@ export function useVoiceChat({
     // Remove peers that are no longer in the remote players list
     for (const peerId of currentPeerIds) {
       if (!newPlayerIds.has(peerId)) {
-        console.log('[voice][reactive] Removing GONE player:', peerId)
+        console.warn('[voice][reactive] Removing GONE player:', peerId)
         removePeer(peerId)
       }
     }

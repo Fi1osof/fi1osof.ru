@@ -1,19 +1,21 @@
 'use client'
 
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useState, useMemo } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { RigidBody, CapsuleCollider } from '@react-three/rapier'
 import { useKeyboardControls } from '@react-three/drei'
-import { Vector3, Quaternion, Group, AudioListener } from 'three'
+import { Vector3, Quaternion, Group, AudioListener, Matrix4 } from 'three'
+import type { WorldObject3d } from '../hooks/useWorldStore'
 import type { RapierRigidBody } from '@react-three/rapier'
 import { ThirdPersonCamera } from '../ThirdPersonCamera'
 import { Avatar } from '../Avatar'
 import { usePlayerReducer } from './hooks/usePlayerReducer'
 import { AnimationName } from './interfaces'
-import type { LocalPlayerState } from '../hooks/useMultiplayer'
+import type { LocalPlayerState, SelfStateData } from '../hooks/useMultiplayer'
 import { DebugCapsuleGeometry } from '../components/debug/DebugCapsuleGeometry'
 import { DebugAvatarGeometry } from '../components/debug/DebugAvatarGeometry'
 import { DebugOverlay } from '../components/debug/DebugOverlay'
+import { useAppContext } from 'src/components/AppContext'
 
 const TURN_SPEED = 2.5 // Скорость поворота (радиан/сек)
 const MOUSE_SENSITIVITY = 0.005
@@ -25,12 +27,39 @@ const WALK_SPEED = 3.5248
 const RUN_SPEED = 11.6508
 const JUMP_FORCE = 5
 
+/** Default spawn position for unauthenticated users */
+const DEFAULT_SPAWN_POSITION: [number, number, number] = [0, 2, -10]
+const DEFAULT_SPAWN_ROTATION: [number, number, number] = [0, 0, 0]
+
+/** Extract position from 4x4 matrix (column-major) */
+function extractPositionFromMatrix(matrix: number[]): [number, number, number] {
+  return [matrix[12], matrix[13], matrix[14]]
+}
+
+/** Extract Y rotation (yaw) from 4x4 matrix (column-major) */
+function extractYawFromMatrix(matrix: number[]): number {
+  const m = new Matrix4()
+  m.fromArray(matrix)
+  const q = new Quaternion()
+  q.setFromRotationMatrix(m)
+  return Math.atan2(
+    2 * (q.w * q.y + q.x * q.z),
+    1 - 2 * (q.y * q.y + q.z * q.z),
+  )
+}
+
 type PlayerProps = {
   debug: boolean
   /** Callback to send local player state to multiplayer server (called every frame, internally throttled) */
   sendPlayerState?: (state: LocalPlayerState) => void
   /** Ref to expose the AudioListener instance for external control (e.g. world mute) */
   audioListenerRef: React.MutableRefObject<AudioListener | null>
+  /** Pending self state from server — position to sync to */
+  pendingSelfState?: SelfStateData | null
+  /** Callback to clear pending self state after applying */
+  clearPendingSelfState?: () => void
+  /** Initial object from world data (for authenticated users) */
+  initialObject?: WorldObject3d | null
 }
 
 /**
@@ -42,7 +71,29 @@ export const Player: React.FC<PlayerProps> = ({
   debug,
   sendPlayerState,
   audioListenerRef,
+  pendingSelfState,
+  clearPendingSelfState,
+  initialObject,
 }) => {
+  const { user } = useAppContext()
+
+  // Compute initial position and rotation from world data or use defaults
+  const { initialPosition, initialYaw } = useMemo(() => {
+    const matrix = initialObject?.matrix
+    if (matrix && Array.isArray(matrix)) {
+      const pos = extractPositionFromMatrix(matrix)
+      const yaw = extractYawFromMatrix(matrix)
+      return {
+        initialPosition: pos,
+        initialYaw: yaw,
+      }
+    }
+    return {
+      initialPosition: DEFAULT_SPAWN_POSITION,
+      initialYaw: 0,
+    }
+  }, [initialObject?.matrix])
+
   // === Refs ===
   // rigidBodyRef — ссылка на физическое тело Rapier для управления скоростью и позицией
   const rigidBodyRef = useRef<RapierRigidBody>(null)
@@ -57,7 +108,7 @@ export const Player: React.FC<PlayerProps> = ({
   // Централизованное состояние игрока через reducer (анимация, debug позиция)
   const [state, dispatch] = usePlayerReducer()
   // Угол поворота персонажа (в ref для мгновенного обновления в useFrame)
-  const rotationRef = useRef(0)
+  const rotationRef = useRef(initialYaw)
   // Флаг для однократного разворота на 180° при нажатии S
   const wasBackwardRef = useRef(false)
   // Вертикальный угол камеры (pitch) — управляется мышкой
@@ -115,6 +166,51 @@ export const Player: React.FC<PlayerProps> = ({
     }
   }, [gl])
 
+  // Apply pending self state from server when RigidBody is ready
+  useEffect(() => {
+    if (!pendingSelfState) {
+      return
+    }
+
+    const rb = rigidBodyRef.current
+
+    if (!rb) {
+      // RigidBody not ready yet — will retry on next render when it's available
+
+      console.warn('[Player] RigidBody not ready, waiting...')
+      return
+    }
+
+    // Teleport player to server position
+    rb.setTranslation(
+      {
+        x: pendingSelfState.position.x,
+        y: pendingSelfState.position.y,
+        z: pendingSelfState.position.z,
+      },
+      true,
+    )
+    // Reset velocity to prevent drift
+    rb.setLinvel({ x: 0, y: 0, z: 0 }, true)
+
+    // Apply rotation from quaternion
+    const q = new Quaternion(
+      pendingSelfState.rotation.x,
+      pendingSelfState.rotation.y,
+      pendingSelfState.rotation.z,
+      pendingSelfState.rotation.w,
+    )
+    // Extract yaw from quaternion
+    const yaw = Math.atan2(
+      2 * (q.w * q.y + q.x * q.z),
+      1 - 2 * (q.y * q.y + q.z * q.z),
+    )
+    rotationRef.current = yaw
+
+    // Clear pending state
+    clearPendingSelfState?.()
+  }, [pendingSelfState, clearPendingSelfState, user?.id])
+
   // AudioListener attached to head group for spatial audio
   useEffect(() => {
     const head = headRef.current
@@ -166,6 +262,20 @@ export const Player: React.FC<PlayerProps> = ({
     // --- Получение текущего состояния физики ---
     const velocity = rigidBodyRef.current.linvel()
     const position = rigidBodyRef.current.translation()
+
+    // --- Respawn if fallen below world ---
+    if (position.y < -50) {
+      rigidBodyRef.current.setTranslation(
+        {
+          x: DEFAULT_SPAWN_POSITION[0],
+          y: DEFAULT_SPAWN_POSITION[1],
+          z: DEFAULT_SPAWN_POSITION[2],
+        },
+        true,
+      )
+      rigidBodyRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true)
+      return
+    }
 
     // --- Расчёт скорости ---
     const speed = run ? RUN_SPEED : WALK_SPEED
@@ -243,15 +353,25 @@ export const Player: React.FC<PlayerProps> = ({
     }
 
     // --- Отправка состояния на сервер мультиплеера ---
-    if (sendPlayerState) {
-      // Convert yaw angle to quaternion for server protocol
+    const canSendPlayerState = !!sendPlayerState && !!user?.id
+
+    if (canSendPlayerState) {
+      // Build 4x4 transformation matrix from position and rotation
+      const m = new Matrix4()
       const q = new Quaternion()
       q.setFromAxisAngle(new Vector3(0, 1, 0), rotationRef.current)
-      sendPlayerState({
-        position: { x: position.x, y: position.y, z: position.z },
-        rotation: { x: q.x, y: q.y, z: q.z, w: q.w },
+      m.compose(
+        new Vector3(position.x, position.y, position.z),
+        q,
+        new Vector3(1, 1, 1),
+      )
+
+      const outgoingState = {
+        matrix: m.toArray(),
         animation: newAnimation,
-      })
+      }
+
+      sendPlayerState(outgoingState)
     }
   })
 
@@ -263,8 +383,8 @@ export const Player: React.FC<PlayerProps> = ({
         colliders={false}
         mass={1}
         type="dynamic"
-        position={[0, 2, -10]}
-        rotation={[0, 0, 0]}
+        position={initialPosition}
+        rotation={DEFAULT_SPAWN_ROTATION}
         enabledRotations={[false, false, false]}
         linearDamping={0.5}
       >

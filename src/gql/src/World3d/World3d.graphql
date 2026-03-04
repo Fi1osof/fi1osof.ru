@@ -1,0 +1,15 @@
+query world3dStats {
+  response: world3dStats {
+    ...World3dObjectStats_
+  }
+}
+
+fragment World3dObjectStats_ on World3dObjectStats {
+  worldName
+  nodeCount
+  snapshotCount
+}
+
+query world3dScene {
+  response: world3dScene
+}

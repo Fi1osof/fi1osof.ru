@@ -1,0 +1,22 @@
+query world3dObjectsMap(
+  $uuid: String = "root"
+) {
+  response: world3dObjectsMap(
+    uuid: $uuid
+  )
+}
+
+mutation world3dObjectCreate($data: World3dObjectCreateInput!) {
+  response: world3dObjectCreate(data: $data)
+}
+
+mutation world3dObjectUpdate(
+  $where: World3dObjectWhereUniqueInput!
+  $data: World3dObjectUpdateInput!
+) {
+  response: world3dObjectUpdate(where: $where, data: $data)
+}
+
+mutation world3dObjectDelete($uuid: String!, $cascade: Boolean = false) {
+  response: world3dObjectDelete(uuid: $uuid, cascade: $cascade)
+}

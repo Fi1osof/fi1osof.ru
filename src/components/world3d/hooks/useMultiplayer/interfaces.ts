@@ -28,7 +28,17 @@ export interface RemotePlayerData {
 
 /** Local player state to send to server */
 export interface LocalPlayerState {
+  /** 4x4 transformation matrix (column-major, 16 elements) */
+  matrix: number[]
+  animation: AnimationName
+}
+
+/** Self state data received from server on connect */
+export interface SelfStateData {
+  playerId: string
+  username: string | null
   position: Vec3
   rotation: Quaternion
   animation: AnimationName
+  isNew: boolean
 }
