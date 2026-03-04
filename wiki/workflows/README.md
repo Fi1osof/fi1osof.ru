@@ -7,6 +7,7 @@ n8n workflow definitions in TypeScript.
 - [Bootstrap](./bootstrap/README.md) — how workflows are loaded and imported
 - [Helpers](./helpers/README.md) — helper functions for creating tool nodes
 - [Loop Runner](./loop-runner.md) — infinite loop pattern
+- [Memory Recall](./memory-recall.md) — tool calls history tracking and search
 
 ## Location
 
@@ -17,6 +18,7 @@ server/n8n/workflows/
 ├── agent-factory/           # Core agent factory logic
 ├── agent-chat/              # Chat Agent
 ├── agent-web-search/        # Web Search Agent (Perplexity)
+├── memory-recall/           # Memory Recall Agent (tool calls history search)
 ├── telegram-handler/        # Telegram bot handler (WorkflowFactory)
 ├── mcp-server/              # MCP server handler
 ├── loop-runner/             # Infinite loop runner
@@ -33,6 +35,7 @@ server/n8n/workflows/
 - `agentNodeType` — `'orchestrator'` for custom AgentOrchestrator node
 - `memorySize` — conversation memory size, `0` to disable
 - `authFromToken` — authenticate users from JWT token
+- `hasMemoryRecall` — enable Memory Recall tool for searching tool execution history
 
 ## Best Practices
 
@@ -60,11 +63,11 @@ const method = item.method || 'GET'
 
 ## Tool Node Variables
 
-При создании tool nodes для GraphQL запросов используем **yup схемы** для типизации и описания параметров.
+When creating tool nodes for GraphQL requests, use **yup schemas** for typing and parameter descriptions.
 
-### Структура
+### Structure
 
-Каждая нода имеет отдельный `schema.ts` файл:
+Each node has its own `schema.ts` file:
 
 ```typescript
 // schema.ts
@@ -90,24 +93,66 @@ import { createTaskSchema } from './schema'
 
 const schemaDescription = JSON.stringify(createTaskSchema.describe(), null, 2)
 
-// В workflowInputs.value
+// In workflowInputs.value
 {
   query: createTaskQuery,
   variables: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('variables', \`${schemaDescription}\`, 'json') }}`,
 }
 ```
 
-### Правила
+### Rules
 
-- Создавать `schema.ts` в папке каждой ноды
-- Типизировать схему через `*QueryVariables` / `*MutationVariables` из `src/gql/generated/`
-- Использовать `.label()` для описания полей — это попадает в `describe()` output
-- Использовать `.required()` для обязательных полей
-- Для enum полей использовать `.oneOf(values).label(\`Field name (${values.join(', ')})\`)`
-- `description` ноды должен быть кратким — детали параметров в схеме
+- Create `schema.ts` in each node folder
+- Type schemas using `*QueryVariables` / `*MutationVariables` from `src/gql/generated/`
+- Use `.label()` to describe fields — this ends up in the `describe()` output
+- Use `.required()` for required fields
+- For enum fields, use `.oneOf(values).label(\`Field name (${values.join(', ')})\`)`
+- Keep the node `description` brief — put parameter details in the schema
 
 ## Creating a New Agent
 
 1. Create `server/n8n/workflows/agent-{name}/`
 2. Create `index.ts` with `createAgent()` config
 3. Create `system-message.md`
+
+## Email Integration
+
+Agents can send and receive emails via docker-mailserver.
+
+### Sending Mail
+
+Add `smtp` config to agent credentials file (`credentials/agents/agent-name.json`):
+
+```json
+{
+  "agentName": "Chat Agent",
+  "smtp": {
+    "credentialId": "smtp-agent-chat",
+    "credentialName": "SMTP Agent Chat",
+    "user": "chat@example.com",
+    "password": "mailpass",
+    "host": "mailserver",
+    "port": 587
+  }
+}
+```
+
+`AgentWorkflowFactory` automatically:
+1. Reads `smtp` from agent credentials
+2. Sets `canSendMail: true` if smtp is present
+3. Creates `tool-send-mail` workflow for the agent
+4. Creates mailbox on mailserver via `ensureMailbox()`
+
+### Mailbox Management
+
+Mailboxes are created automatically when agent has `smtp` credentials.
+
+Location: `server/n8n/workflows/tool-send-mail/mailboxManager.ts`
+
+The mailbox config is written to `docker/mailserver/config/postfix-accounts.cf` (mounted as `/app/mailserver-config` in app container).
+
+### Credentials Flow
+
+1. `credentials/agents/agent-name.json` — source credentials with `smtp` config
+2. `importAgentCredentials()` — imports SMTP creds into n8n
+3. `AgentWorkflowFactory.createWorkflow()` → `createAgent()` → `createToolSendMail()` → `ensureMailbox()`

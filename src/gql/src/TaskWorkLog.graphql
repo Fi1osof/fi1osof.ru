@@ -1,7 +1,32 @@
-query taskWorkLogList($where: TaskWorkLogWhereInput, $skip: Int, $take: Int) {
-  response: taskWorkLogList(where: $where, skip: $skip, take: $take) {
+query taskWorkLogs(
+  $where: TaskWorkLogWhereInput
+  $skip: Int
+  $take: Int
+  $orderBy: TaskWorkLogOrderByInput
+) {
+  response: taskWorkLogs(
+    where: $where
+    skip: $skip
+    take: $take
+    orderBy: $orderBy
+  ) {
     ...TaskWorkLog_
   }
+}
+
+query taskWorkLogCount($where: TaskWorkLogWhereInput) {
+  response: taskWorkLogCount(where: $where)
+}
+
+query taskWorkLogsWithCount(
+  $where: TaskWorkLogWhereInput
+  $skip: Int
+  $take: Int
+) {
+  taskWorkLogs(where: $where, skip: $skip, take: $take) {
+    ...TaskWorkLog_
+  }
+  taskWorkLogCount(where: $where)
 }
 
 query taskWorkLog($where: TaskWorkLogWhereUniqueInput!) {
@@ -33,4 +58,3 @@ fragment TaskWorkLogNoNesting on TaskWorkLog {
   taskId
   createdById
 }
-

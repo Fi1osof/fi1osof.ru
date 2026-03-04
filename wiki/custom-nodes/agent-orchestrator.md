@@ -44,8 +44,9 @@ AgentOrchestrator replaces the standard n8n Agent node with direct OpenAI SDK in
    c. Extract tool calls from response
    d. If no tool calls → break loop
    e. Execute each tool
-   f. Add tool results to messages
-   g. Continue loop
+   f. Record tool call in ToolCallsMemory (unless skipMemoryRecording is set)
+   g. Add tool results to messages
+   h. Continue loop
 5. Save to memory
 6. Return final output
 ```

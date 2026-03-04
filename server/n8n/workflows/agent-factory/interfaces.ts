@@ -1,3 +1,4 @@
+import { SmtpConfig } from 'server/n8n/bootstrap/interfaces'
 import { WorkflowBase } from '../interfaces'
 
 export type NodeType = WorkflowBase['nodes'][number]
@@ -27,12 +28,18 @@ export interface AgentFactoryConfig {
   memorySize?: number | false
   canAccessFileSystem?: boolean
   canExecuteFetch?: boolean
+  canReadUrls?: boolean
   authFromToken?: boolean
   hasGraphqlTool?: boolean
   hasTools?: boolean
   hasMindLogs?: boolean
   hasTasks?: boolean
+  hasKBNodes?: boolean
+  hasEXNodes?: boolean
   hasWebSearchAgent?: boolean
+  hasMemoryRecall?: boolean
+  canSendMail?: boolean
+  smtp?: SmtpConfig
   additionalNodes?: NodeType[]
   additionalConnections?: ConnectionsType
   agentNodeType?: 'default' | 'orchestrator'

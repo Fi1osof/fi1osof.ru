@@ -30,7 +30,8 @@ async function loadWorkflow(
 
       if (isWorkflowFactoryClass(exported)) {
         const factory = new exported()
-        return [await factory.createWorkflow(credentialsMap)]
+        const result = await factory.createWorkflow(credentialsMap)
+        return Array.isArray(result) ? result : [result]
       }
 
       if (Array.isArray(exported)) {
@@ -72,6 +73,8 @@ async function resolveWorkflowDependencies(
 ): Promise<void> {
   console.log('[bootstrap] Resolving workflow dependencies...')
 
+  const unresolvedRefs: { workflow: string; node: string; ref: string }[] = []
+
   for (const [name, id] of Object.entries(idMap)) {
     const { data } = await n8nApiRequest(
       'GET',
@@ -90,10 +93,30 @@ async function resolveWorkflowDependencies(
       if (
         workflowId?.__rl === true &&
         (workflowId.mode === 'list' || workflowId.mode === 'name') &&
-        workflowId.value &&
-        idMap[workflowId.value]
+        workflowId.value
       ) {
+        const resolvedId = idMap[workflowId.value]
         hasChanges = true
+
+        if (!resolvedId) {
+          unresolvedRefs.push({
+            workflow: name,
+            node: (node as { name?: string }).name || 'unknown',
+            ref: workflowId.value,
+          })
+          return {
+            ...node,
+            parameters: {
+              ...node.parameters,
+              workflowId: {
+                ...workflowId,
+                mode: 'id',
+                value: '',
+              },
+            },
+          }
+        }
+
         return {
           ...node,
           parameters: {
@@ -101,7 +124,7 @@ async function resolveWorkflowDependencies(
             workflowId: {
               ...workflowId,
               mode: 'id',
-              value: idMap[workflowId.value],
+              value: resolvedId,
             },
           },
         }
@@ -125,6 +148,15 @@ async function resolveWorkflowDependencies(
         console.log(`[bootstrap] '${name}' patch response:`, patchData)
       }
     }
+  }
+
+  if (unresolvedRefs.length > 0) {
+    const details = unresolvedRefs
+      .map((r) => `  - Workflow "${r.workflow}", node "${r.node}": "${r.ref}"`)
+      .join('\n')
+    throw new Error(
+      `[bootstrap] Unresolved workflow references (workflows not found):\n${details}`,
+    )
   }
 }
 

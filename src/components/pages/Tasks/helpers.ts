@@ -2,6 +2,7 @@ import {
   TasksWithCountQueryVariables,
   TaskQueryVariables,
   TaskStatusEnum,
+  SortOrder,
 } from 'src/gql/generated'
 
 export function getTasksWithCountQueryVariables(
@@ -16,6 +17,9 @@ export function getTasksWithCountQueryVariables(
     },
     skip: (page - 1) * pageSize,
     take: pageSize,
+    orderBy: {
+      createdAt: SortOrder.DESC,
+    },
   }
 }
 

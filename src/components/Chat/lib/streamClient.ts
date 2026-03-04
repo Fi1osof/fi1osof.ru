@@ -1,14 +1,15 @@
 const CHAT_WEBHOOK_URL = '/webhook/agent-chat-webhook/chat'
 
 type StreamChunk = {
-  type: 'begin' | 'item' | 'end'
+  type: 'begin' | 'item' | 'end' | 'error'
   content?: string
   metadata?: {
     nodeId: string
     nodeName: string
     itemIndex: number
     runIndex: number
-    timestamp: number
+    timestamp?: number
+    message?: string
   }
 }
 
@@ -77,6 +78,12 @@ export async function sendMessageStream(
           for (const chunk of chunks) {
             if (chunk.type === 'item' && chunk.content) {
               onChunk(chunk.content)
+            } else if (chunk.type === 'error') {
+              const msg =
+                chunk.metadata?.message ||
+                `Error in ${chunk.metadata?.nodeName || 'agent'}`
+              onError(new Error(msg))
+              return
             }
           }
         }
@@ -95,6 +102,12 @@ export async function sendMessageStream(
         for (const chunk of chunks) {
           if (chunk.type === 'item' && chunk.content) {
             onChunk(chunk.content)
+          } else if (chunk.type === 'error') {
+            const msg =
+              chunk.metadata?.message ||
+              `Error in ${chunk.metadata?.nodeName || 'agent'}`
+            onError(new Error(msg))
+            return
           }
         }
       }

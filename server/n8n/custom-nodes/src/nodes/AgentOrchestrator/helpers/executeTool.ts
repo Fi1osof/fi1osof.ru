@@ -1,5 +1,36 @@
 import { ExecuteContext, ToolCall } from './types'
 
+export const getToolStaticParams = (
+  ctx: ExecuteContext,
+  toolName: string,
+): Record<string, unknown> | undefined => {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const workflowObj = (ctx as any).workflow
+    if (!workflowObj?.nodes) {
+      return undefined
+    }
+
+    const toolNodes = Object.values(workflowObj.nodes).filter(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (n: any) => n.type === '@n8n/n8n-nodes-langchain.toolWorkflow',
+    )
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    for (const node of toolNodes as any[]) {
+      // Match by tool name (derived from node name)
+      const nodeName = node.name?.replace(/\s+/g, '_')
+      if (nodeName === toolName && node.parameters?.workflowInputs?.value) {
+        return node.parameters.workflowInputs.value as Record<string, unknown>
+      }
+    }
+
+    return undefined
+  } catch {
+    return undefined
+  }
+}
+
 export const executeTool = async (
   ctx: ExecuteContext,
   toolCall: ToolCall,
@@ -12,7 +43,6 @@ export const executeTool = async (
     }
 
   try {
-    log(`executeTool: Getting connected tools for ${toolCall.name}`)
     const connectedTools = await ctx.getInputConnectionData('ai_tool', 0)
 
     if (!connectedTools) {
@@ -23,10 +53,6 @@ export const executeTool = async (
     const toolsArray = Array.isArray(connectedTools)
       ? connectedTools
       : [connectedTools]
-
-    log(
-      `executeTool: Found ${toolsArray.length} tools: ${toolsArray.map((t: { name?: string }) => t.name).join(', ')}`,
-    )
 
     const tool = toolsArray.find(
       (t: { name?: string }) => t.name === toolCall.name,
@@ -43,13 +69,8 @@ export const executeTool = async (
     }
 
     if (tool.invoke) {
-      log(
-        `executeTool: Invoking ${toolCall.name} with args: ${JSON.stringify(toolCall.arguments)}`,
-      )
       const result = await tool.invoke(toolCall.arguments)
-      log(
-        `executeTool: ${toolCall.name} returned: ${result?.substring(0, 100)}...`,
-      )
+      log(`executeTool: ${toolCall.name} returned: ${result}`)
       return result
     }
 

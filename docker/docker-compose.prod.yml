@@ -21,7 +21,14 @@ services:
 
   supabase:
     restart: unless-stopped
-
+  mailserver:
+    restart: unless-stopped
+    ports:
+      - 25:25
+      - 465:465
+      - 587:587
+      - 143:143
+      - 993:993
   coturn:
     restart: unless-stopped
 

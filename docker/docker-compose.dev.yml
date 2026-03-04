@@ -23,6 +23,16 @@ services:
   supabase:
     ports:
       - 5432:5432
+  mailserver:
+    ports:
+      - 1025:25
+      - 1465:465
+      - 1587:587
+      - 1143:143
+
+  mailhog:
+    ports:
+      - 8025:8025
 
   world3d:
     volumes:

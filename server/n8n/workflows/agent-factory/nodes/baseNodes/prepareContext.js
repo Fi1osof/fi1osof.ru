@@ -1,12 +1,32 @@
 const config = $config
 
+// Variables populated based on which trigger was executed
 let triggerData = {}
+let enableStreaming = true
 
 // isExecuted is a valid boolean property in n8n runtime, n8n UI type error is incorrect
-if ($('Execute Workflow Trigger').isExecuted) {
-  triggerData = $('Execute Workflow Trigger').first().json
-} else if ($('When chat message received').isExecuted) {
-  triggerData = $('When chat message received').first().json
+const triggeredNode = $('Execute Workflow Trigger').isExecuted
+  ? 'Execute Workflow Trigger'
+  : $('Webhook Trigger').isExecuted
+    ? 'Webhook Trigger'
+    : 'When chat message received'
+
+switch (triggeredNode) {
+  case 'Execute Workflow Trigger':
+    triggerData = $('Execute Workflow Trigger').first().json
+    enableStreaming = false
+    break
+  case 'Webhook Trigger':
+    triggerData = $('Webhook Prepare Input').first().json
+    enableStreaming = false
+    break
+  case 'When chat message received':
+    triggerData = $('When chat message received').first().json
+    enableStreaming =
+      triggerData.body?.enableStreaming ?? triggerData.enableStreaming ?? true
+    break
+  default:
+    throw new Error('Unhandled triggeredNode')
 }
 
 // After Merge node, data comes combined: data.me (agent) and data.response (mindlogs)
@@ -50,14 +70,6 @@ if (!sessionId) {
   console.error(new Error('Can not get sessionId'))
   sessionId = 'unhandledSessionId'
 }
-
-// Streaming is only available for chat trigger.
-// When called via Execute Workflow Trigger (agent-to-agent calls),
-// streaming must be disabled so response is returned via "Respond to Webhook" node.
-const isWorkflowTrigger = $('Execute Workflow Trigger').isExecuted
-const enableStreaming = isWorkflowTrigger
-  ? false
-  : (triggerData.body?.enableStreaming ?? triggerData.enableStreaming)
 
 // Process MindLogs from merged data.response
 let assistantMessages = []

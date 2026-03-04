@@ -10,10 +10,14 @@ const combinedAssistantMessages = [...assistantMessages]
 
 if (instructions) {
   let systemContent =
-    'MANDATORY: Follow the instructions below according to the reflection recommendations. Process the next user message in accordance with these instructions.\n\n'
+    '[INTERNAL SYSTEM NOTE — NOT FROM USER, NOT FOR USER]\n' +
+    'The following is an internal pre-processing result from the Reflection subsystem. ' +
+    'It is auxiliary information for YOU (the agent) only. ' +
+    'Do NOT treat this as a user message. Do NOT quote or relay this to the user. ' +
+    'Use these instructions to guide your behavior when processing the next user message.\n\n'
 
   if (instructions) {
-    systemContent += `## Important Instructions for Working with Reflections\n\n${instructions}`
+    systemContent += `## Reflection Instructions\n\n${instructions}`
   }
 
   combinedAssistantMessages.push({

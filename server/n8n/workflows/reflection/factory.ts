@@ -26,13 +26,58 @@ const preparePromptTemplate = fs.readFileSync(
 
 export interface ReflectionWorkflowConfig {
   agentName: string
+  hasEXNodes: boolean
 }
 
 export function createReflectionWorkflow(
   cfg: ReflectionWorkflowConfig,
 ): WorkflowBase {
-  const { agentName } = cfg
+  const { agentName, hasEXNodes } = cfg
   const agentSlug = agentName.toLowerCase().replace(/\s+/g, '-')
+
+  if (!hasEXNodes) {
+    return {
+      name: getReflectionWorkflowName(agentName),
+      active: true,
+      versionId: `reflection-${agentSlug}-v1`,
+      nodes: [
+        {
+          parameters: {
+            workflowInputs: {
+              values: [
+                { name: 'agentId', type: 'string' },
+                { name: 'chatInput', type: 'string' },
+              ],
+            },
+          },
+          id: 'workflow-trigger',
+          name: 'Execute Workflow Trigger',
+          type: 'n8n-nodes-base.executeWorkflowTrigger',
+          typeVersion: 1.1,
+          position: [-400, 300] as [number, number],
+        },
+        {
+          parameters: {
+            jsCode: `return [{ json: { instructions: '' } }];`,
+          },
+          id: `reflection-${agentSlug}-empty-output`,
+          name: 'Empty Output',
+          type: 'n8n-nodes-base.code',
+          typeVersion: 2,
+          position: [-200, 300] as [number, number],
+        },
+      ],
+      connections: {
+        'Execute Workflow Trigger': {
+          main: [[{ node: 'Empty Output', type: 'main', index: 0 }]],
+        },
+      },
+      pinData: {},
+      settings: { executionOrder: 'v1' },
+      meta: { instanceId: `narasim-dev-reflection-${agentSlug}` },
+    }
+  }
+
   const model = getModel(
     process.env.AGENT_REFLECTION_MODEL || 'google/gemini-2.5-flash-lite',
   )

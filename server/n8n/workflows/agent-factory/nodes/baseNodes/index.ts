@@ -1,15 +1,11 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import { print } from 'graphql'
-import { MeDocument } from 'src/gql/generated/me'
 import { AgentFactoryConfig, NodeType } from '../../interfaces'
 import type { INodeParameters } from 'n8n-workflow'
 import { getFetchMindLogsNode } from './fetchMindLogsNode'
+import { getAgentDataNode } from './getAgentDataNode'
 import { getNodeCoordinates } from '../../../helpers/nodeCoordinates'
-import { getGraphqlRequestWorkflowName } from '../../../tool-graphql-request/helpers'
 import { getReflectionWorkflowName } from '../../../reflection/helpers'
-
-const meUserQuery = print(MeDocument)
 
 type getBaseNodesProps = {
   agentId: string
@@ -26,6 +22,7 @@ type getBaseNodesProps = {
   workflowInputs: AgentFactoryConfig['workflowInputs']
   agentDescription: AgentFactoryConfig['agentDescription']
   webhookId: AgentFactoryConfig['webhookId']
+  hasToolsParam?: boolean
 }
 
 export function getBaseNodes({
@@ -43,6 +40,7 @@ export function getBaseNodes({
   agentDescription,
   webhookId,
   workflowInputs = [],
+  hasToolsParam,
 }: getBaseNodesProps) {
   const prepareContextTemplate = fs.readFileSync(
     path.join(__dirname, 'prepareContext.js'),
@@ -72,7 +70,82 @@ ${customSystemMessage}`
     JSON.stringify({ agentId }, null, 2),
   )
 
+  const agentDataNode = getAgentDataNode({
+    nodeId: `${agentId}-get-agent-data`,
+    agentName,
+    position: getNodeCoordinates('get-agent-data'),
+  })
+
   const baseNodes: NodeType[] = [
+    {
+      parameters: {
+        workflowInputs: {
+          values: workflowInputs.map((input) => ({
+            name: input.name,
+            type: input.type || 'string',
+            ...(input.default !== undefined && { default: input.default }),
+          })),
+        },
+      },
+      id: `${agentId}-workflow-trigger`,
+      name: 'Execute Workflow Trigger',
+      type: 'n8n-nodes-base.executeWorkflowTrigger',
+      typeVersion: 1.1,
+      position: getNodeCoordinates('workflow-trigger'),
+    },
+    {
+      id: `${agentId}-webhook-trigger`,
+      name: 'Webhook Trigger',
+      type: 'n8n-nodes-base.webhook',
+      typeVersion: 2,
+      position: getNodeCoordinates('webhook-trigger'),
+      webhookId: `${agentId}-message`,
+      parameters: {
+        httpMethod: 'POST',
+        path: `${agentId}-webhook`,
+        responseMode: 'responseNode',
+        options: {
+          rawBody: false,
+        },
+      },
+    },
+    {
+      id: `${agentId}-webhook-prepare-input`,
+      name: 'Webhook Prepare Input',
+      type: 'n8n-nodes-base.code',
+      typeVersion: 2,
+      position: getNodeCoordinates('webhook-prepare-input'),
+      parameters: {
+        jsCode: `const body = $input.first().json.body || {}
+return [{
+  json: {
+    chatInput: body.chatInput || '',
+    sessionId: body.sessionId || '',
+    token: body.token || ''
+  }
+}]`,
+      },
+    },
+    {
+      id: `${agentId}-chat-trigger`,
+      name: 'When chat message received',
+      type: '@n8n/n8n-nodes-langchain.chatTrigger',
+      typeVersion: 1.4,
+      position: getNodeCoordinates('chat-trigger'),
+      webhookId,
+      parameters: {
+        // public: true enables external webhook access (without it returns 404)
+        public: true,
+        // mode: 'webhook' for embedded chat / direct webhook calls (vs 'hostedChat' for n8n-served page)
+        mode: 'webhook',
+        availableInChat: true,
+        agentName,
+        agentDescription,
+        options: {
+          allowFileUploads: true,
+        },
+      },
+    },
     {
       parameters: {
         jsCode: 'return $input.all()',
@@ -83,40 +156,7 @@ ${customSystemMessage}`
       typeVersion: 2,
       position: getNodeCoordinates('merge-trigger'),
     },
-    {
-      parameters: {
-        workflowId: {
-          __rl: true,
-          mode: 'list',
-          value: getGraphqlRequestWorkflowName(agentName),
-        },
-        workflowInputs: {
-          mappingMode: 'defineBelow',
-          value: {
-            query: meUserQuery,
-          },
-          matchingColumns: [],
-          schema: [
-            {
-              id: 'query',
-              displayName: 'query',
-              required: true,
-              defaultMatch: false,
-              display: true,
-              canBeUsedToMatch: true,
-              type: 'string',
-            },
-          ],
-          attemptToConvertTypes: false,
-          convertFieldsToString: false,
-        },
-      },
-      id: `${agentId}-get-agent-data`,
-      name: 'Get Agent Data',
-      type: 'n8n-nodes-base.executeWorkflow',
-      typeVersion: 1.2,
-      position: getNodeCoordinates('get-agent-data'),
-    },
+    agentDataNode,
     {
       parameters: {
         jsCode: prepareContextCode,
@@ -171,6 +211,14 @@ ${customSystemMessage}`
       typeVersion: 1.2,
       position: getNodeCoordinates('reflection'),
     },
+    {
+      parameters: {},
+      type: 'n8n-nodes-base.merge',
+      typeVersion: 3.2,
+      position: getNodeCoordinates('merge-context'),
+      id: `${agentId}-merge-context`,
+      name: 'Merge Context',
+    },
     ...(hasTools
       ? [
           getFetchMindLogsNode({ agentId, agentName }),
@@ -181,14 +229,6 @@ ${customSystemMessage}`
             position: getNodeCoordinates('merge'),
             id: `${agentId}-merge`,
             name: 'Merge',
-          },
-          {
-            parameters: {},
-            type: 'n8n-nodes-base.merge',
-            typeVersion: 3.2,
-            position: getNodeCoordinates('merge-context'),
-            id: `${agentId}-merge-context`,
-            name: 'Merge Context',
           },
           {
             parameters: {
@@ -225,8 +265,10 @@ ${customSystemMessage}`
         const additionalFields: INodeParameters = {
           systemMessage: `=${systemMessage}`,
           assistantMessages: '={{ $json.assistantMessages }}',
+          enableStreaming: '={{ $json.enableStreaming }}',
           showToolCalls: true,
           toolChoice: 'auto',
+          hasTools: hasToolsParam ?? hasTools,
         }
 
         agentNode.parameters.options = Object.assign(
@@ -267,42 +309,6 @@ ${customSystemMessage}`
           },
         ]
       : []),
-    {
-      parameters: {
-        workflowInputs: {
-          values: workflowInputs.map((input) => ({
-            name: input.name,
-            type: input.type || 'string',
-            ...(input.default !== undefined && { default: input.default }),
-          })),
-        },
-      },
-      id: `${agentId}-workflow-trigger`,
-      name: 'Execute Workflow Trigger',
-      type: 'n8n-nodes-base.executeWorkflowTrigger',
-      typeVersion: 1.1,
-      position: getNodeCoordinates('workflow-trigger'),
-    },
-    {
-      parameters: {
-        // public: true enables external webhook access (without it returns 404)
-        public: true,
-        // mode: 'webhook' for embedded chat / direct webhook calls (vs 'hostedChat' for n8n-served page)
-        mode: 'webhook',
-        availableInChat: true,
-        agentName,
-        agentDescription,
-        options: {
-          allowFileUploads: true,
-        },
-      },
-      type: '@n8n/n8n-nodes-langchain.chatTrigger',
-      typeVersion: 1.4,
-      position: getNodeCoordinates('chat-trigger'),
-      id: `${agentId}-chat-trigger`,
-      name: 'When chat message received',
-      webhookId,
-    },
   ]
 
   if (hasMemory) {
@@ -388,5 +394,5 @@ ${customSystemMessage}`
     })
   }
 
-  return baseNodes
+  return { nodes: baseNodes, agentDataNode }
 }

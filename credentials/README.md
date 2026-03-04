@@ -64,18 +64,50 @@ To use a different Telegram bot, create a new workflow class with a different `c
 
 ## agents/
 
-Agent auth credentials:
+Agent credentials for Internal API authentication.
+
+Required fields:
+- `agentName` — display name of the agent
+- `username`, `password` — for Internal API auth
+
+Optional:
+- `smtp` — allows agent to send emails
+- `imap` — allows agent to read emails
+- `hasMemoryRecall` — enables Memory Recall Tool (agent can query its own tool calls history)
 
 ```json
 {
+  "agentName": "Agent Display Name",
   "username": "agent-name",
   "password": "password",
   "email": "agent@example.com",
-  "fullname": "Agent Name"
+  "fullname": "Agent Name",
+  "smtp": {
+    "credentialId": "internal-agent-name-smtp",
+    "credentialName": "SMTP - agent-name",
+    "user": "agent@mail.example.com",
+    "password": "smtp-password",
+    "host": "mailserver",
+    "port": 587,
+    "ssl": false,
+    "disableStartTls": false
+  },
+  "imap": {
+    "credentialId": "agent-name-imap",
+    "credentialName": "IMAP - agent-name",
+    "user": "agent@mail.example.com",
+    "password": "imap-password",
+    "host": "mailserver",
+    "port": 993,
+    "secure": true
+  }
 }
 ```
 
-Bootstrap creates `httpHeaderAuth` credential with JWT token.
+Bootstrap creates:
+- `httpHeaderAuth` credential with JWT token for Internal API
+- `smtp` credential if `smtp` config is present (for Send Mail tool)
+- `imap` credential if `imap` config is present (for Check Mail tool)
 
 ## bootstrap.env
 

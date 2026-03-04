@@ -2,6 +2,7 @@ import type { INode } from 'n8n-workflow'
 
 import { WorkflowBase, WorkflowFactory, CredentialsMap } from '../interfaces'
 import { getNodeCoordinates } from '../helpers/nodeCoordinates'
+import { ChatAgentWorkflowName } from '../agent-chat/interfaces'
 
 class TelegramHandlerWorkflow extends WorkflowFactory {
   credentialId = 'telegram-main-bot'
@@ -76,7 +77,7 @@ class TelegramHandlerWorkflow extends WorkflowFactory {
           parameters: {
             workflowId: {
               __rl: true,
-              value: 'Agent: Chat',
+              value: ChatAgentWorkflowName,
               mode: 'list',
             },
             workflowInputs: {

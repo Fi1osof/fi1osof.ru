@@ -96,16 +96,16 @@ export interface ToolInputDef {
 
 export interface StaticInputDef {
   name: string
-  value: string
+  value: string | boolean
   type: InputType
   required?: boolean
 }
 
 export function createStaticInputs(inputs: StaticInputDef[]): {
-  value: Record<string, string>
+  value: Record<string, string | boolean>
   schema: SchemaItem[]
 } {
-  const value: Record<string, string> = {}
+  const value: Record<string, string | boolean> = {}
   const schema: SchemaItem[] = []
 
   for (const input of inputs) {
@@ -156,7 +156,7 @@ export interface CreateToolConfig {
   nodeId: string
   position: [number, number]
   inputs?: {
-    value: Record<string, string>
+    value: Record<string, string | boolean>
     schema: SchemaItem[]
   }
 }

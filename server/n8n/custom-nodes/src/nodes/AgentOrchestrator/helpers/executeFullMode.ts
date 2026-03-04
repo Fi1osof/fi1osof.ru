@@ -5,9 +5,10 @@ import { buildMessages } from './buildMessages'
 import { getConnectedTools } from './getConnectedTools'
 import { extractToolCalls } from './extractToolCalls'
 import { callLLM } from './callLLM'
-import { executeTool } from './executeTool'
+import { executeTool, getToolStaticParams } from './executeTool'
 import { getMemoryMessages, saveToMemory } from './getMemoryMessages'
 import { debugLog } from './debugLog'
+import { toolCallsMemory } from '../../ToolCallsMemory/helpers/toolCallsMemory'
 
 interface AgentOptions {
   systemMessage?: string
@@ -16,6 +17,7 @@ interface AgentOptions {
   showToolCalls?: boolean
   toolChoice?: string
   assistantMessages?: string
+  hasTools?: boolean
 }
 
 interface OpenRouterCredentials {
@@ -42,6 +44,7 @@ export const executeFullMode = async (
   const enableStreaming = options.enableStreaming ?? true
   const showToolCalls = options.showToolCalls ?? true
   const toolChoice = options.toolChoice || 'auto'
+  const hasTools = options.hasTools ?? true
 
   const userInput = (items[0]?.json?.chatInput as string) || ''
   if (!userInput) {
@@ -54,7 +57,8 @@ export const executeFullMode = async (
     | undefined
   const sessionId = (items[0]?.json?.sessionId as string) || ''
 
-  const tools = await getConnectedTools(ctx)
+  const connectedTools = await getConnectedTools(ctx)
+  const tools = hasTools ? connectedTools : []
   const assistantMessages = parseJson<Message[]>(assistantMessagesJson, [])
   const memoryMessages = await getMemoryMessages(ctx)
 
@@ -91,8 +95,18 @@ export const executeFullMode = async (
   let finalOutput = ''
   const allToolCalls: ToolCall[] = []
 
-  while (iterations < maxIterations) {
+  while (iterations <= maxIterations) {
     iterations++
+
+    if (iterations > maxIterations) {
+      throw new Error(
+        `Agent exceeded maximum iterations (${maxIterations}). Last tool calls: ${allToolCalls
+          .slice(-3)
+          .map((tc) => tc.name)
+          .join(', ')}`,
+      )
+    }
+
     debugLog(
       ctx,
       isStreamingAvailable,
@@ -159,11 +173,45 @@ export const executeFullMode = async (
       const toolDebugLog = (msg: string) =>
         debugLog(ctx, isStreamingAvailable, msg)
       const toolResult = await executeTool(ctx, tc, toolDebugLog)
-      debugLog(
-        ctx,
-        isStreamingAvailable,
-        `Tool ${tc.name} result: ${typeof toolResult === 'string' ? toolResult.substring(0, 200) : JSON.stringify(toolResult).substring(0, 200)}`,
-      )
+      const toolResultStr =
+        typeof toolResult === 'string' ? toolResult : JSON.stringify(toolResult)
+      const isToolError =
+        toolResultStr.startsWith('Tool error:') ||
+        toolResultStr.startsWith('Tool ') ||
+        toolResultStr.toLowerCase().includes('there was an error')
+      if (isToolError) {
+        debugLog(
+          ctx,
+          isStreamingAvailable,
+          `\u26a0\ufe0f Tool ${tc.name} error: ${toolResultStr}`,
+        )
+      }
+
+      const agentId = (items[0]?.json?.agentId as string) || 'unknown'
+      const agentName = ctx.getNode().name || 'unknown'
+      const workflowId = ctx.getWorkflow().id || 'unknown'
+
+      // Merge static and dynamic params, preferring dynamic values
+      const staticParams = getToolStaticParams(ctx, tc.name)
+      const skipMemoryRecording =
+        tc.arguments?.skipMemoryRecording !== undefined
+          ? tc.arguments.skipMemoryRecording === true
+          : staticParams?.skipMemoryRecording === true
+
+      if (!skipMemoryRecording) {
+        toolCallsMemory.addToolCall({
+          timestamp: new Date().toISOString(),
+          workflowId,
+          agentId,
+          agentName,
+          sessionId,
+          toolName: tc.name,
+          toolArguments: tc.arguments,
+          toolResult: toolResultStr,
+          userId: user?.id,
+        })
+      }
+
       messages.push({
         role: 'tool',
         tool_call_id: tc.id,
@@ -172,6 +220,14 @@ export const executeFullMode = async (
             ? toolResult
             : JSON.stringify(toolResult),
       })
+
+      if (process.env.N8N_DEBUG_AGENT_MESSAGED === 'true') {
+        debugLog(
+          ctx,
+          isStreamingAvailable,
+          `Messages: ${JSON.stringify(messages)}`,
+        )
+      }
     }
   }
 

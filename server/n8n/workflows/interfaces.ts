@@ -16,7 +16,9 @@ export type CredentialsMap = Record<
 
 export abstract class WorkflowFactory {
   credentialId: string | undefined
-  abstract createWorkflow(credentials: CredentialsMap): Promise<WorkflowBase>
+  abstract createWorkflow(
+    credentials: CredentialsMap,
+  ): Promise<WorkflowBase | WorkflowBase[]>
 }
 
 export function isWorkflowFactoryClass(

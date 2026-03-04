@@ -1,11 +1,11 @@
 import { print } from 'graphql'
-import { TaskWorkLogListDocument } from 'src/gql/generated/taskWorkLogList'
+import { TaskWorkLogsDocument } from 'src/gql/generated'
 import { createTool, createStaticInputs } from '../../../../helpers'
 import { NodeType } from '../../../interfaces'
 import { searchTaskWorkLogSchema } from './schema'
 import { getNodeCoordinates } from '../../../../helpers/nodeCoordinates'
 
-const searchTaskWorkLogQuery = print(TaskWorkLogListDocument)
+const searchTaskWorkLogQuery = print(TaskWorkLogsDocument)
 
 const schemaDescription = JSON.stringify(
   searchTaskWorkLogSchema.describe(),

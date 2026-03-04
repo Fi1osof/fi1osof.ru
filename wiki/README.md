@@ -2,10 +2,12 @@
 
 ## Contents
 
+- [Technical Overview](./technical-overview.md) — stack, architecture, configuration, manual setup
 - [Code Style](./code-style.md)
 - [Custom Nodes](./custom-nodes/README.md)
 - [Workflows](./workflows/README.md)
 - [Testing](./testing/README.md)
+- [Mail Server](./mailserver/README.md)
 
 ## Architecture
 
@@ -26,6 +28,7 @@ Express Server
 
 Located in `server/n8n/custom-nodes/`:
 - **AgentOrchestrator** — AI agent with OpenAI SDK integration
+- **ToolCallsMemory** — In-memory storage for tool execution history
 
 ## Workflow Factory
 

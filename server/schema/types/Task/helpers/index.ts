@@ -18,7 +18,7 @@ export function buildTaskWhere(
   options?: BuildTaskWhereOptions,
   ctx?: PrismaContext,
 ): Prisma.TaskWhereInput {
-  const incompletedOnly = args?.incompletedOnly ?? true
+  const incompletedOnly = args?.incompletedOnly ?? false
 
   const where: Prisma.TaskWhereInput = {
     status:

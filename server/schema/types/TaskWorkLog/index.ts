@@ -18,6 +18,7 @@ import './inputs'
 
 // Import resolvers
 import './resolvers/taskWorkLog'
-import './resolvers/taskWorkLogList'
+import './resolvers/taskWorkLogs'
+import './resolvers/taskWorkLogsCount'
 import './resolvers/createTaskWorkLog'
 import './resolvers/deleteTaskWorkLog'
