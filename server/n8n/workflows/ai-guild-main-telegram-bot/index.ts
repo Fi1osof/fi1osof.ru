@@ -2,6 +2,7 @@ import { INode } from 'n8n-workflow'
 import { CredentialsMap, WorkflowBase } from '../interfaces'
 import TelegramHandlerWorkflow from '../telegram-handler'
 import { getNodeCoordinates } from '../helpers/nodeCoordinates'
+import { ChatAgentWorkflowName } from '../agent-chat/interfaces'
 
 const workflowName = 'AI-Guild Telegram handler'
 
@@ -78,7 +79,7 @@ export class AiGuildMainTelegramHandlerWorkflow extends TelegramHandlerWorkflow 
           parameters: {
             workflowId: {
               __rl: true,
-              value: 'Agent: Chat',
+              value: ChatAgentWorkflowName,
               mode: 'list',
             },
             workflowInputs: {
