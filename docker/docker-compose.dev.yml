@@ -23,3 +23,10 @@ services:
   supabase:
     ports:
       - 5432:5432
+
+  world3d:
+    volumes:
+      - ./world3d/src:/app/src
+    command: 'npm run dev'
+    ports:
+      - 4100:4100

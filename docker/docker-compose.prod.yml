@@ -21,3 +21,9 @@ services:
 
   supabase:
     restart: unless-stopped
+
+  coturn:
+    restart: unless-stopped
+
+  world3d:
+    restart: unless-stopped
