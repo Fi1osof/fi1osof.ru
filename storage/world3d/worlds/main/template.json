@@ -1,0 +1,46 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "name": "main",
+    "description": "Main world - primary ontological space for agents",
+    "createdAt": null
+  },
+  "scene": {
+    "metadata": {
+      "version": 4.6,
+      "type": "Object",
+      "generator": "Object3D.toJSON"
+    },
+    "object": {
+      "uuid": "root",
+      "type": "Scene",
+      "name": "root",
+      "layers": 1,
+      "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+      "up": [0, 1, 0],
+      "userData": {
+        "id": "root",
+        "type": "root",
+        "properties": {}
+      },
+      "children": [
+        {
+          "uuid": "user_agent_chat",
+          "type": "Object3D",
+          "name": "user_agent_chat",
+          "layers": 1,
+          "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+          "up": [0, 1, 0],
+          "userData": {
+            "id": "user_agent_chat",
+            "type": "player",
+            "properties": {
+              "username": "agent-chat",
+              "animation": "idle"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
