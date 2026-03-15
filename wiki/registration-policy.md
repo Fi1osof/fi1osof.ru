@@ -40,6 +40,28 @@ New users receive the status defined by `USER_DEFAULT_STATUS`:
 - If not set: `active` (full access)
 - Recommended: `newbie` (limited access until manually promoted)
 
+## First Run Configuration
+
+**Current Issue:** By default, registration requires a referral token, which prevents automatic registration of system agents (e.g., `agent-chat`, `agent-web-search`).
+
+**Temporary Solution:** On first startup, pass these environment variables to the Docker command:
+
+```bash
+NEXT_PUBLIC_SITE_SIGNUP_STRATEGY=ANY USER_DEFAULT_STATUS=active docker compose ...
+```
+
+This allows:
+- Registration without referral token (`NEXT_PUBLIC_SITE_SIGNUP_STRATEGY=ANY`)
+- Immediate full access for new users (`USER_DEFAULT_STATUS=active`)
+
+**Optional Admin User:** To automatically create an admin user with sudo privileges:
+
+```bash
+SUDO_PASSWORD="your_password" NEXT_PUBLIC_SITE_SIGNUP_STRATEGY=ANY USER_DEFAULT_STATUS=active docker compose ...
+```
+
+> **Note:** This is a temporary workaround. A permanent solution for system agent registration is being evaluated.
+
 ## Environment Variables
 
 ```env
@@ -52,6 +74,9 @@ New users receive the status defined by `USER_DEFAULT_STATUS`:
 
 # Referral token expiration (default: 1H)
 # REFERRER_TOKEN_TTL=1H
+
+# Auto-create admin user with sudo privileges (first run only)
+# SUDO_PASSWORD=your_secure_password
 ```
 
 ## GraphQL API

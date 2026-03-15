@@ -27,6 +27,8 @@ services:
       - ./mailserver/config:/app/mailserver-config
     environment:
       - ENV_MODE=development
+      - NEXT_PUBLIC_SITE_SIGNUP_STRATEGY=${NEXT_PUBLIC_SITE_SIGNUP_STRATEGY:-}
+      - USER_DEFAULT_STATUS=${USER_DEFAULT_STATUS:-}
     env_file:
       - .env
 

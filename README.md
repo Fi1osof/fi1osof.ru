@@ -322,8 +322,19 @@ GRAPHQL_ENDPOINT=http://localhost:4000/api
 
 ```bash
 cd docker
-DOCKER_BUILDKIT=0 docker compose -f docker-compose.yml -f docker-compose.prod.yml up supabase app --build -d
+DOCKER_BUILDKIT=0 NEXT_PUBLIC_SITE_SIGNUP_STRATEGY=ANY USER_DEFAULT_STATUS=active docker compose -f docker-compose.yml -f docker-compose.prod.yml up supabase app --build -d
 ```
+
+**Important for first run:**
+
+By default, registration requires a referral token, which prevents automatic registration of system agents. Until a permanent solution is implemented, you must pass these environment variables on first startup:
+
+- `NEXT_PUBLIC_SITE_SIGNUP_STRATEGY=ANY` — allows registration without referral token
+- `USER_DEFAULT_STATUS=active` — gives new users full access immediately
+
+**Optional:** To automatically create an admin user with sudo privileges, add:
+
+- `SUDO_PASSWORD="your_password"` — creates admin user with sudo rights
 
 On first run this builds the Docker image: installs dependencies, runs DB migrations, generates types, and builds the app. Takes a few minutes.
 
