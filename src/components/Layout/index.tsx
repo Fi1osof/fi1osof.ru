@@ -9,21 +9,8 @@ import {
   LayoutInnerContainer,
 } from './styles'
 import { SidebarMemo } from './Sidebar'
-import { useChatContext } from 'src/components/Chat/ChatWidget/context'
 import { ChatContent } from 'src/components/Chat/ChatWidget/ChatContent'
-import {
-  ChatWidgetContainer,
-  ChatButton,
-} from 'src/components/Chat/ChatWidget/styles'
-import dynamic from 'next/dynamic'
-
-const ChatModal = dynamic(
-  () =>
-    import('src/components/Chat/ChatWidget/ChatModal').then((r) => r.ChatModal),
-  {
-    ssr: false,
-  },
-)
+import { ChatWidget } from '../Chat/ChatWidget'
 
 type LayoutProps = React.PropsWithChildren
 
@@ -36,33 +23,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, ...other }) => {
     setSidebarOpen((prev) => !prev)
   }, [])
 
-  const chat = useChatContext()
-
   const chatContent = <ChatContent />
-
-  const chatWidget = (
-    <ChatWidgetContainer>
-      {chat.isOpen && (
-        <ChatModal
-          isExpanded={chat.isExpanded}
-          onClose={chat.handleClose}
-          onExpand={chat.handleExpand}
-        >
-          {chatContent}
-        </ChatModal>
-      )}
-
-      <ChatButton
-        onClick={chat.handleToggle}
-        $isOpen={chat.isOpen}
-        type="button"
-      >
-        <svg viewBox="0 0 24 24">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        </svg>
-      </ChatButton>
-    </ChatWidgetContainer>
-  )
 
   return (
     <LayoutStyled {...other}>
@@ -90,7 +51,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, ...other }) => {
         </LayoutContentStyled>
       </LayoutMain>
 
-      {!isHomePage && chatWidget}
+      {!isHomePage && <ChatWidget />}
     </LayoutStyled>
   )
 }

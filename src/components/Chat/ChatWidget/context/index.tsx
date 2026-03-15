@@ -26,6 +26,8 @@ type ChatContextValue = {
   welcomeTitle: string
   welcomeText: string
   placeholder: string
+  initialMessage: string
+  initialMessageSetter: React.Dispatch<React.SetStateAction<string>>
 }
 
 const ChatContext = createContext<ChatContextValue | null>(null)
@@ -57,6 +59,8 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [showTypingIndicator, setShowTypingIndicator] = useState(false)
+  const [initialMessage, initialMessageSetter] = useState('')
+
   const sessionIdRef = useRef<string | null>(null)
 
   const getSessionId = useCallback(() => {
@@ -253,6 +257,8 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
       welcomeTitle,
       welcomeText,
       placeholder,
+      initialMessage,
+      initialMessageSetter,
     }),
     [
       messages,
@@ -268,6 +274,8 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
       welcomeTitle,
       welcomeText,
       placeholder,
+      initialMessage,
+      initialMessageSetter,
     ],
   )
 

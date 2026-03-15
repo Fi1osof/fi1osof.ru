@@ -3,10 +3,33 @@ import { ChatForm, ChatTextarea, SendButton, StopButton } from '../styles'
 import { useChatContext } from '../context'
 
 export const ChatInputForm: React.FC = () => {
-  const { placeholder, isLoading, submitMessage, stopStreaming } =
-    useChatContext()
+  const {
+    placeholder,
+    isLoading,
+    submitMessage,
+    stopStreaming,
+    initialMessage,
+    initialMessageSetter,
+  } = useChatContext()
   const [inputValue, setInputValue] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    if (initialMessage) {
+      setInputValue((prev) => {
+        let result = prev
+        if (initialMessage) {
+          if (result !== initialMessage) {
+            result = initialMessage
+          }
+
+          initialMessageSetter('')
+        }
+
+        return result
+      })
+    }
+  }, [initialMessage, initialMessageSetter])
 
   const adjustTextareaHeight = useCallback(() => {
     const textarea = textareaRef.current
