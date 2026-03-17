@@ -1,7 +1,7 @@
 import * as yup from 'yup'
 import { SignUpFormData } from './interfaces'
 
-let referrerToken = yup.string()
+let referrerToken = yup.string().nullable()
 
 if (process.env.NEXT_PUBLIC_SITE_SIGNUP_STRATEGY !== 'ANY') {
   referrerToken = referrerToken.required()
