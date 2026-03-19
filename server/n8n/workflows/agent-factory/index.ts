@@ -131,6 +131,8 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
   const reflectionWorkflow = createReflectionWorkflow({
     agentName,
     hasEXNodes,
+    webhookId,
+    agentDescription,
   })
 
   const authNodes: NodeType[] = authFromToken
