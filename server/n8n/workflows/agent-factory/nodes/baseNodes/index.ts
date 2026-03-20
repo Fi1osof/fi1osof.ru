@@ -266,7 +266,7 @@ return [{
           systemMessage: `=${systemMessage}`,
           assistantMessages: '={{ $json.assistantMessages }}',
           enableStreaming: '={{ $json.enableStreaming }}',
-          showToolCalls: true,
+          streamTechnicalInfo: process.env.STREAM_TECHNICAL_INFO !== 'false',
           toolChoice: 'auto',
           hasTools: hasToolsParam ?? hasTools,
         }

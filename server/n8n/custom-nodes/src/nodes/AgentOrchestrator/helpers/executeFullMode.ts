@@ -14,7 +14,7 @@ interface AgentOptions {
   systemMessage?: string
   maxIterations?: number
   enableStreaming?: boolean
-  showToolCalls?: boolean
+  streamTechnicalInfo?: boolean
   toolChoice?: string
   assistantMessages?: string
   hasTools?: boolean
@@ -42,7 +42,7 @@ export const executeFullMode = async (
   const assistantMessagesJson = options.assistantMessages || '[]'
   const maxIterations = options.maxIterations ?? 10
   const enableStreaming = options.enableStreaming ?? true
-  const showToolCalls = options.showToolCalls ?? true
+  const streamTechnicalInfo = options.streamTechnicalInfo ?? true
   const toolChoice = options.toolChoice || 'auto'
   const hasTools = options.hasTools ?? true
 
@@ -162,7 +162,7 @@ export const executeFullMode = async (
 
     allToolCalls.push(...toolCalls)
 
-    if (isStreamingAvailable && showToolCalls) {
+    if (isStreamingAvailable && streamTechnicalInfo) {
       for (const tc of toolCalls) {
         const toolDisplayName = tc.name.replace(/_/g, ' ').replace(/ Tool$/, '')
         ctx.sendChunk('item', 0, `\n\n⏳ *Calling ${toolDisplayName}...*\n\n`)
@@ -248,7 +248,7 @@ export const executeFullMode = async (
     `Agent loop finished. Total iterations: ${iterations}, total tool calls: ${allToolCalls.length}, output length: ${finalOutput.length}, total tokens: ${totalUsage.total_tokens}`,
   )
 
-  if (isStreamingAvailable) {
+  if (isStreamingAvailable && streamTechnicalInfo) {
     const usageText = `\n\n---\n*Tokens: ${totalUsage.total_tokens} (prompt: ${totalUsage.prompt_tokens}, completion: ${totalUsage.completion_tokens})*`
     ctx.sendChunk('item', 0, usageText)
     ctx.sendChunk('end', 0)

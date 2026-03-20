@@ -113,7 +113,7 @@ export class AgentOrchestrator implements INodeType {
           },
           {
             displayName: 'Show Tool Calls',
-            name: 'showToolCalls',
+            name: 'streamTechnicalInfo',
             type: 'boolean',
             default: true,
             description: 'Stream tool call notifications to user',
