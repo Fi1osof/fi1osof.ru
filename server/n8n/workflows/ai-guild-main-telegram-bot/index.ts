@@ -1,15 +1,15 @@
 import { INode } from 'n8n-workflow'
-import { CredentialsMap, WorkflowBase } from '../interfaces'
-import TelegramHandlerWorkflow from '../telegram-handler'
+import { TelegramHandlerWorkflow } from '../telegram-handler'
 import { getNodeCoordinates } from '../helpers/nodeCoordinates'
-import { ChatAgentWorkflowName } from '../agent-chat/interfaces'
+import { ChatAgentV1WorkflowName } from '../agent-chat/interfaces'
 
 const workflowName = 'AI-Guild Telegram handler'
 
 export class AiGuildMainTelegramHandlerWorkflow extends TelegramHandlerWorkflow {
   credentialId = 'telegram-ai-guild-main-bot'
 
-  async createWorkflow(credentials: CredentialsMap): Promise<WorkflowBase> {
+  async buildWorkflow(): Promise<void> {
+    const credentials = this.registry.getCredentialsMap()
     let credId: string | undefined
     let botUsername: string | undefined
     let credName: string | undefined
@@ -54,7 +54,7 @@ export class AiGuildMainTelegramHandlerWorkflow extends TelegramHandlerWorkflow 
           }
         : undefined
 
-    return {
+    this.builtWorkflow = {
       name: workflowName,
       // TODO: Investigate why workflow is active after deploy but doesn't process messages.
       // Manual republish fixes the issue. Check bootstrap initialization logic - something
@@ -79,7 +79,7 @@ export class AiGuildMainTelegramHandlerWorkflow extends TelegramHandlerWorkflow 
           parameters: {
             workflowId: {
               __rl: true,
-              value: ChatAgentWorkflowName,
+              value: ChatAgentV1WorkflowName,
               mode: 'list',
             },
             workflowInputs: {

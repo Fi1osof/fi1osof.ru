@@ -6,8 +6,6 @@ const nodeCoordinates = {
   'fetch-mindlogs': [-1344, 400],
   merge: [-992, 288],
   'merge-context': [-224, 304],
-  'prepare-agent-input': [-48, 304],
-  agent: [112, 304],
   'workflow-trigger': [-1920, 0],
   'webhook-trigger': [-2656, 0],
   'webhook-prepare-input': [-2368, 0],

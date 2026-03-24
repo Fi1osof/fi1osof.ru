@@ -7,6 +7,7 @@
 - [Code Style](./code-style.md)
 - [Custom Nodes](./custom-nodes/README.md)
 - [Workflows](./workflows/README.md)
+- [Agent World](./agent-world/README.md) — agent knowledge graph
 - [Testing](./testing/README.md)
 - [Mail Server](./mailserver/README.md)
 - [World3D](./world3d/README.md) — multiplayer 3D environment
@@ -31,6 +32,7 @@ Express Server
 Located in `server/n8n/custom-nodes/`:
 - **AgentOrchestrator** — AI agent with OpenAI SDK integration
 - **ToolCallsMemory** — In-memory storage for tool execution history
+- **AgentWorld** — Agent knowledge graph management
 
 ## Workflow Factory
 

@@ -108,7 +108,8 @@ async function startServer() {
   })
 }
 
-startServer().catch((err) => {
+startServer().catch(async (err) => {
   console.error('Failed to start server:', err)
+  await stopN8n()
   process.exit(1)
 })

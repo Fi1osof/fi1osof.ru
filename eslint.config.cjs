@@ -34,7 +34,7 @@ module.exports = [
   ...tseslint.configs.recommended,
   ...storybook.configs['flat/recommended'],
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ['**/*.{ts,tsx,js}'],
     plugins: {
       react,
       'react-hooks': reactHooks,
@@ -59,6 +59,7 @@ module.exports = [
         'error',
         {
           argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
         },
       ],
       '@typescript-eslint/no-extra-semi': 'off',
@@ -93,6 +94,7 @@ module.exports = [
     languageOptions: {
       parserOptions: {
         sourceType: 'commonjs',
+        projectService: false,
       },
       globals: {
         module: 'readonly',
@@ -108,6 +110,9 @@ module.exports = [
         URL: 'readonly',
         fetch: 'readonly',
       },
+    },
+    rules: {
+      '@typescript-eslint/no-deprecated': 'off',
     },
   },
 ]

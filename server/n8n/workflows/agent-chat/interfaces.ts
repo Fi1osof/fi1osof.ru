@@ -1,2 +1,2 @@
 // TODO Get flow name from credentials
-export const ChatAgentWorkflowName = 'Chat Agent'
+export const ChatAgentV1WorkflowName = 'Chat Agent'

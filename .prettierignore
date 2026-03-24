@@ -16,3 +16,4 @@ next-env.d.ts
 generated
 
 .n8n
+docker/supabase/data

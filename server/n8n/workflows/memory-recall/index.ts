@@ -1,6 +1,7 @@
-import { WorkflowFactory, CredentialsMap, WorkflowBase } from '../interfaces'
+import { WorkflowBase } from '../interfaces'
 
 import { getModel } from '../helpers'
+import { WorkflowFactory } from 'server/n8n/WorkflowFactory'
 
 const systemMessage = `You are Memory Recall Agent - specialized in searching through tool calls history.
 
@@ -234,7 +235,7 @@ export function createMemoryRecallWorkflow(): WorkflowBase {
 }
 
 export default class MemoryRecallWorkflowFactory extends WorkflowFactory {
-  async createWorkflow(_credentials: CredentialsMap): Promise<WorkflowBase> {
-    return createMemoryRecallWorkflow()
+  async buildWorkflow(): Promise<void> {
+    this.builtWorkflow = createMemoryRecallWorkflow()
   }
 }

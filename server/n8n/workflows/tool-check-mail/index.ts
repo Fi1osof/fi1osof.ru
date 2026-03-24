@@ -1,4 +1,4 @@
-import { WorkflowBase, WorkflowFactory, CredentialsMap } from '../interfaces'
+import { WorkflowFactory } from 'server/n8n/WorkflowFactory'
 import { createToolCheckMail } from './factory'
 
 interface AgentCreds {
@@ -10,8 +10,8 @@ interface AgentCreds {
 }
 
 class CheckMailWorkflow extends WorkflowFactory {
-  async createWorkflow(credentials: CredentialsMap): Promise<WorkflowBase[]> {
-    const workflows: WorkflowBase[] = []
+  async buildWorkflow(): Promise<void> {
+    const credentials = this.registry.getCredentialsMap()
 
     for (const [key, creds] of Object.entries(credentials)) {
       if (!key.startsWith('agents/')) {
@@ -26,17 +26,20 @@ class CheckMailWorkflow extends WorkflowFactory {
       const agentName = agentCreds.agentName
       const agentWorkflowName = agentName
 
-      workflows.push(
-        createToolCheckMail({
-          agentName,
-          agentWorkflowName,
-          imapCredentialId: agentCreds.imap.credentialId,
-          imapCredentialName: agentCreds.imap.credentialName,
-        }),
-      )
-    }
+      const workflow = createToolCheckMail({
+        agentName,
+        agentWorkflowName,
+        imapCredentialId: agentCreds.imap.credentialId,
+        imapCredentialName: agentCreds.imap.credentialName,
+      })
 
-    return workflows
+      // First workflow is the main one, rest are registered as nested
+      if (!this.builtWorkflow) {
+        this.builtWorkflow = workflow
+      } else {
+        this.registry.addFlow(workflow.name, workflow)
+      }
+    }
   }
 }
 

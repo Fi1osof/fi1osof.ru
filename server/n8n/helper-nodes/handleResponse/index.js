@@ -2,15 +2,15 @@ const response = $input.first().json
 
 // Escape curly braces to prevent n8n template parsing. Replaced with utf symbols
 function escapeForN8n(str) {
-  if (!str) return ''
-  return str
-    .replace(/\{/g, '⦃')
-    .replace(/\}/g, '⦄')
-    .replace(/:/g, '꞉')
+  if (!str) {return ''}
+  return str.replace(/\{/g, '⦃').replace(/\}/g, '⦄').replace(/:/g, '꞉')
 }
 
 // Format 1: Direct error object (name: NodeApiError, message, description)
-if (response.name === 'NodeApiError' || response.name === 'NodeOperationError') {
+if (
+  response.name === 'NodeApiError' ||
+  response.name === 'NodeOperationError'
+) {
   const msg = escapeForN8n(response.message) || 'Unknown error'
   const details = escapeForN8n(response.description)
   throw new Error(details ? msg + ' - ' + details : msg)

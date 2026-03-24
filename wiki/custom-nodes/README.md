@@ -6,7 +6,8 @@
 server/n8n/custom-nodes/
 ├── src/nodes/
 │   ├── AgentOrchestrator/    # Main AI agent node
-│   └── ToolCallsMemory/       # Tool calls history storage
+│   ├── ToolCallsMemory/      # Tool calls history storage
+│   └── AgentWorld/           # Agent knowledge graph
 ├── package.json
 └── tsconfig.json
 ```
@@ -30,6 +31,14 @@ In-memory storage for tool execution history with query capabilities.
 - **Isolation:** Each workflow sees only its own tool call history
 
 See [Memory Recall documentation](../workflows/memory-recall.md) for details.
+
+## AgentWorld
+
+Agent knowledge graph management. See [detailed documentation](../agent-world/README.md).
+
+- **Operations:** read, addNode, updateNode, deleteNode, moveNode, expandNode
+- **Storage:** In-memory WorldsStore
+- **Features:** Auto-generated node IDs, attention mechanics, cycle protection
 
 ## Development
 

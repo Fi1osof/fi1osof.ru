@@ -66,14 +66,22 @@ To use a different Telegram bot, create a new workflow class with a different `c
 
 Agent credentials for Internal API authentication.
 
-Required fields:
+### Required Fields
+
 - `agentName` — display name of the agent
 - `username`, `password` — for Internal API auth
+- `email`, `fullname` — agent user profile
 
-Optional:
+### Optional Fields
+
 - `smtp` — allows agent to send emails
 - `imap` — allows agent to read emails
-- `hasMemoryRecall` — enables Memory Recall Tool (agent can query its own tool calls history)
+
+### AgentFactoryConfig Parameters
+
+Agent credentials can include any parameter from `AgentFactoryConfig` — see `server/n8n/workflows/agent-factory/interfaces.ts` for the full list with descriptions.
+
+### Example
 
 ```json
 {
@@ -82,6 +90,9 @@ Optional:
   "password": "password",
   "email": "agent@example.com",
   "fullname": "Agent Name",
+  "model": "anthropic/claude-sonnet-4",
+  "hasMemoryRecall": true,
+  "hasWebSearchAgent": true,
   "smtp": {
     "credentialId": "internal-agent-name-smtp",
     "credentialName": "SMTP - agent-name",
@@ -104,7 +115,8 @@ Optional:
 }
 ```
 
-Bootstrap creates:
+### Bootstrap Creates
+
 - `httpHeaderAuth` credential with JWT token for Internal API
 - `smtp` credential if `smtp` config is present (for Send Mail tool)
 - `imap` credential if `imap` config is present (for Check Mail tool)

@@ -1,3 +1,7 @@
-export function getReflectionWorkflowName(agentName: string): string {
-  return `Reflection (${agentName})`
+import type { WorkflowName } from '../interfaces'
+
+export function getReflectionWorkflowName(
+  agentName: string,
+): `Reflection (${string})` {
+  return `Reflection (${agentName})` satisfies WorkflowName
 }

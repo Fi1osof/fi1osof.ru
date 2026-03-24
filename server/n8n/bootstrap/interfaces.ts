@@ -1,3 +1,5 @@
+import { WorkflowName } from '../workflows/interfaces'
+
 export interface SmtpConfig {
   credentialId: string
   credentialName: string
@@ -19,8 +21,8 @@ export interface ImapConfig {
   secure?: boolean
 }
 
-export interface AgentCredentials {
-  agentName: string
+export type AgentCredentials = {
+  agentName: WorkflowName
   username: string
   password: string
   email?: string
@@ -28,4 +30,5 @@ export interface AgentCredentials {
   smtp?: SmtpConfig
   imap?: ImapConfig
   hasMemoryRecall?: boolean
-}
+  model?: string
+} & Record<string, unknown>

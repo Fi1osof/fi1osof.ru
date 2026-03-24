@@ -13,9 +13,8 @@ import { getEXNodes } from './nodes/exNodes'
 import { getMindLogNodes } from './nodes/mindLogNodes'
 import { getTaskNodes } from './nodes/taskNodes'
 import { getTaskWorkLogNodes } from './nodes/taskWorkLogNodes'
-import { WorkflowBase, WorkflowFactory, CredentialsMap } from '../interfaces'
-import { getModel } from '../helpers'
-import { getBaseNodes } from './nodes/baseNodes'
+import { WorkflowBase } from '../interfaces'
+import { createAgentNode } from './nodes/createAgentNode'
 import { getNodeCoordinates } from '../helpers/nodeCoordinates'
 import {
   getCodeExecutionNodes,
@@ -25,7 +24,7 @@ import {
   getFetchRequestNodes,
   getFetchRequestConnections,
 } from './tools/fetchRequest'
-import { getGraphqlToolNodes, getGraphqlToolConnections } from './tools/graphql'
+import { getGraphqlToolNodes } from './tools/graphql'
 import {
   getWebSearchAgentNodes,
   getWebSearchAgentConnections,
@@ -38,25 +37,55 @@ import {
 } from './tools/memoryRecall'
 import { createToolSendMail } from '../tool-send-mail/factory'
 import { AgentCredentials } from 'server/n8n/bootstrap/interfaces'
+import { WorkflowFactory } from 'server/n8n/WorkflowFactory'
+import { getAgentDataNode } from './nodes/baseNodes/getAgentDataNode'
+import { getReflectionWorkflowName } from '../reflection/helpers'
+import { getFetchMindLogsNode } from './nodes/baseNodes/fetchMindLogsNode'
+import { WorkflowFactoryProps } from 'server/n8n/WorkflowFactory/interfaces'
 
 export abstract class AgentWorkflowFactory extends WorkflowFactory {
-  abstract agentCredentialsKey: string
+  // abstract agentCredentialsKey: string
   abstract getConfig(agentCredentials: AgentCredentials): AgentFactoryConfig
 
-  async createWorkflow(credentials: CredentialsMap): Promise<WorkflowBase[]> {
-    const agentCreds = credentials[this.agentCredentialsKey] as unknown as
-      | AgentCredentials
-      | undefined
+  protected graphqlToolNode: NodeType | null = null
 
-    if (!agentCreds) {
-      throw new Error(
-        `Agent credentials not found for key: ${this.agentCredentialsKey}`,
-      )
-    }
+  protected config: AgentFactoryConfig
+  protected agentCreds: AgentCredentials
 
-    const config = this.getConfig(agentCreds)
+  constructor(props: WorkflowFactoryProps) {
+    super(props)
 
-    const { agentName, workflowName } = config
+    this.agentCreds = this.getCredentials()
+
+    this.config = this.getConfig(this.agentCreds)
+  }
+
+  abstract getCredentialsKey(): string
+
+  getCredentials() {
+    const agentCredentialsKey = this.getCredentialsKey()
+
+    return super.getCredentials(agentCredentialsKey)
+  }
+
+  hasMemory() {
+    const memorySize = this.getMemorySize()
+
+    return memorySize && memorySize > 0
+  }
+
+  getMemorySize() {
+    const {
+      memorySize = process.env.AGENT_MEMORY_SIZE === 'false'
+        ? false
+        : parseInt(process.env.AGENT_MEMORY_SIZE || '5'),
+    } = this.config
+
+    return memorySize
+  }
+
+  async buildWorkflow(): Promise<void> {
+    const { agentName, workflowName } = this.config
 
     if (workflowName !== agentName) {
       throw new Error(
@@ -64,88 +93,670 @@ export abstract class AgentWorkflowFactory extends WorkflowFactory {
       )
     }
 
-    const smtp = agentCreds.smtp
+    const smtp = this.agentCreds.smtp
     const hasMemoryRecall =
-      config.hasMemoryRecall ?? agentCreds.hasMemoryRecall ?? false
+      this.config.hasMemoryRecall ?? this.agentCreds.hasMemoryRecall ?? false
 
-    return createAgent({
-      ...config,
+    const fullConfig = {
+      ...this.config,
       canSendMail: !!smtp,
       smtp,
       hasMemoryRecall,
-    })
+    }
+
+    // Create flow-level workflows FIRST (one per flow, not per agent)
+    // so they are available in registry before createNestedFlows
+    const { hasGraphqlTool = false, credentialId, credentialName } = fullConfig
+
+    if (hasGraphqlTool) {
+      const toolGraphqlRequest = createToolGraphqlRequest({
+        agentName,
+        credentialId,
+        credentialName,
+      })
+      this.registry.addFlow(toolGraphqlRequest.name, toolGraphqlRequest)
+    }
+
+    // Now create nested flows (they can access flow-level workflows via registry)
+    const workflows = this.createNestedFlows(fullConfig)
+
+    // First workflow is the main one
+    if (workflows.length > 0) {
+      this.builtWorkflow = workflows[0]
+
+      // Register nested workflows
+      for (let i = 1; i < workflows.length; i++) {
+        const nested = workflows[i]
+        if (nested.name) {
+          this.registry.addFlow(nested.name, nested)
+        }
+      }
+    }
   }
-}
 
-export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
-  const {
-    agentId,
-    agentName,
-    agentDescription,
-    workflowName,
-    versionId,
-    credentialId,
-    credentialName,
-    instanceId,
-    hasWorkflowOutput = true,
-    memorySize = process.env.AGENT_MEMORY_SIZE === 'false'
-      ? false
-      : parseInt(process.env.AGENT_MEMORY_SIZE || '5'),
-    canAccessFileSystem = false,
-    canExecuteFetch = false,
-    canReadUrls = true,
-    authFromToken = false,
-    hasGraphqlTool = true,
-    hasTools = true,
-    hasMindLogs = process.env.N8N_MINDLOGS_NODES === 'true',
-    hasTasks = process.env.N8N_HAS_TASKS_NODES === 'true',
-    hasKBNodes = process.env.N8N_HAS_KNOWLEDGES_BASE_NODES === 'true',
-    hasEXNodes = process.env.HAS_EX_NODES === 'true',
-    hasWebSearchAgent = false,
-    hasMemoryRecall = false,
-    canSendMail = false,
-    smtp,
-    additionalNodes = [],
-    additionalConnections = {},
-    systemMessagePath,
-    webhookId,
-    model = getModel(),
-    maxIterations = parseInt(process.env.N8N_MAX_ITERATIONS || '10'),
-    agentNodeType = 'orchestrator',
-    enableStreaming = true,
-    workflowInputs = [
-      { name: 'chatInput', type: 'string' },
-      { name: 'sessionId', type: 'string' },
-      { name: 'user', type: 'object' },
-    ],
-  } = config
+  protected createNestedFlows(config: AgentFactoryConfig): AgentFactoryResult {
+    const {
+      agentName,
+      agentDescription,
+      hasEXNodes = process.env.HAS_EX_NODES === 'true',
+      canSendMail = false,
+      smtp,
+      webhookId,
+    } = config
 
-  const hasMemory = typeof memorySize === 'number' && memorySize > 0
+    const reflectionWorkflow = createReflectionWorkflow({
+      agentName,
+      hasEXNodes,
+      webhookId,
+      agentDescription,
+    })
 
-  const toolGraphqlRequest = createToolGraphqlRequest({
-    agentName,
-    credentialId,
-    credentialName,
-  })
+    const sendMailWorkflow =
+      canSendMail && smtp
+        ? createToolSendMail({
+            agentName,
+            credentialId: smtp.credentialId,
+            credentialName: smtp.credentialName,
+            fromEmail: smtp.user,
+            fromPassword: smtp.password,
+          })
+        : null
 
-  const reflectionWorkflow = createReflectionWorkflow({
-    agentName,
-    hasEXNodes,
-    webhookId,
-    agentDescription,
-  })
+    const agentWorkflow = this.buildMainWorkflow(config)
 
-  const authNodes: NodeType[] = authFromToken
-    ? [
+    this.upgradeMainWorkflow(agentWorkflow, config)
+
+    const workflows = [reflectionWorkflow, agentWorkflow]
+
+    if (sendMailWorkflow) {
+      workflows.push(sendMailWorkflow)
+    }
+
+    return workflows
+  }
+
+  buildMainWorkflow(config: AgentFactoryConfig): WorkflowBase {
+    const {
+      agentId,
+      agentName,
+      workflowName,
+      versionId,
+      instanceId,
+      // memorySize = process.env.AGENT_MEMORY_SIZE === 'false'
+      //   ? false
+      //   : parseInt(process.env.AGENT_MEMORY_SIZE || '5'),
+      canAccessFileSystem = false,
+      canExecuteFetch = false,
+      canReadUrls = false,
+      hasTools = true,
+      hasMindLogs = process.env.N8N_MINDLOGS_NODES === 'true',
+      hasTasks = process.env.N8N_HAS_TASKS_NODES === 'true',
+      hasKBNodes = process.env.N8N_HAS_KNOWLEDGES_BASE_NODES === 'true',
+      hasEXNodes = process.env.HAS_EX_NODES === 'true',
+      hasWebSearchAgent = false,
+      hasMemoryRecall = false,
+      canSendMail = false,
+      // hasGraphqlTool = false,
+      additionalNodes = [],
+      additionalConnections = {},
+    } = config
+
+    // Tool connections
+    const mindLogConnections: ConnectionsType =
+      hasTools && hasMindLogs
+        ? {
+            'Create MindLog Tool': {
+              ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+            },
+            'Search MindLogs Tool': {
+              ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+            },
+            'Update MindLog Tool': {
+              ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+            },
+            'Delete MindLog Tool': {
+              ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+            },
+          }
+        : {}
+
+    const taskConnections: ConnectionsType =
+      hasTools && hasTasks
+        ? {
+            'Create Task Tool': {
+              ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+            },
+            'Search Tasks Tool': {
+              ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+            },
+            'Update Task Tool': {
+              ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+            },
+            'Delete Task Tool': {
+              ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+            },
+          }
+        : {}
+
+    const taskWorkLogConnections: ConnectionsType =
+      hasTools && hasTasks
+        ? {
+            'Create Task Work Log Tool': {
+              ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+            },
+            'Search Task Work Log Tool': {
+              ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+            },
+            'Delete Task Work Log Tool': {
+              ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+            },
+          }
+        : {}
+
+    const kbConnections: ConnectionsType =
+      hasTools && hasKBNodes
+        ? {
+            'KB Concept Tool': {
+              ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+            },
+            'KB Fact Tool': {
+              ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+            },
+            'KB Fact Participation Tool': {
+              ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+            },
+            'KB Fact Projection Tool': {
+              ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+            },
+            'KB Knowledge Space Tool': {
+              ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+            },
+          }
+        : {}
+
+    const exConnections: ConnectionsType =
+      hasTools && hasEXNodes
+        ? {
+            'EX Reflex Tool': {
+              ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+            },
+            'EX Reaction Tool': {
+              ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+            },
+          }
+        : {}
+
+    // Tool nodes
+    const codeExecutionNodes: NodeType[] = canAccessFileSystem
+      ? getCodeExecutionNodes({ agentId, agentName })
+      : []
+
+    const codeExecutionConnections: ConnectionsType = canAccessFileSystem
+      ? getCodeExecutionConnections({ agentId, agentName })
+      : {}
+
+    const fetchRequestNodes: NodeType[] = canExecuteFetch
+      ? getFetchRequestNodes({ agentId, agentName })
+      : []
+
+    const fetchRequestConnections: ConnectionsType = canExecuteFetch
+      ? getFetchRequestConnections({ agentId, agentName })
+      : {}
+
+    const webSearchAgentNodes: NodeType[] = hasWebSearchAgent
+      ? getWebSearchAgentNodes({ agentId, agentName })
+      : []
+
+    const webSearchAgentConnections: ConnectionsType = hasWebSearchAgent
+      ? getWebSearchAgentConnections({ agentId, agentName })
+      : {}
+
+    const urlReaderNodes: NodeType[] = canReadUrls
+      ? getUrlReaderNodes({ agentId, agentName })
+      : []
+
+    const urlReaderConnections: ConnectionsType = canReadUrls
+      ? getUrlReaderConnections({ agentId, agentName })
+      : {}
+
+    const memoryRecallNodes: NodeType[] =
+      hasTools && hasMemoryRecall
+        ? getMemoryRecallNodes({ agentId, agentName })
+        : []
+
+    const memoryRecallConnections: ConnectionsType =
+      hasTools && hasMemoryRecall
+        ? getMemoryRecallConnections({ agentId, agentName })
+        : {}
+
+    const sendMailNodes: NodeType[] = canSendMail
+      ? getSendMailNodes({ agentId, agentName })
+      : []
+
+    const sendMailConnections: ConnectionsType = canSendMail
+      ? getSendMailConnections({ agentId, agentName })
+      : {}
+
+    const mindLogNodes =
+      hasTools && hasMindLogs ? getMindLogNodes({ agentId, agentName }) : []
+
+    const taskNodes =
+      hasTools && hasTasks ? getTaskNodes({ agentId, agentName }) : []
+
+    const taskWorkLogNodes =
+      hasTools && hasTasks ? getTaskWorkLogNodes({ agentId, agentName }) : []
+
+    const kbNodes =
+      hasTools && hasKBNodes ? getKBNodes({ agentId, agentName }) : []
+
+    const exNodes =
+      hasTools && hasEXNodes ? getEXNodes({ agentId, agentName }) : []
+
+    // Core nodes
+    const [triggerNodes, triggerConnections] = this.getTriggerNodes(config)
+    const [outputNodes, outputConnections] = this.getOutputNodes(config)
+    const [agentNodes, agentConnections, mainAgentNode] =
+      this.getMainAgent(config)
+
+    // const mainAgentNode = agentNodes.find(
+    //   // (node) => node.type === '@n8n/n8n-nodes-langchain.agent'
+    //   (node) => node.name === agentName,
+    // )
+
+    const [graphqlToolNode, graphqlToolConnections] = mainAgentNode
+      ? this.getGraphqlToolNodesAndConnections(config, mainAgentNode)
+      : [null, {}]
+
+    const { nodes: baseNodes, agentDataNode } = this.getBaseNodes(config)
+
+    const nodes: NodeType[] = [
+      ...triggerNodes,
+      ...baseNodes,
+      ...agentNodes,
+      ...mindLogNodes,
+      ...taskNodes,
+      ...taskWorkLogNodes,
+      ...kbNodes,
+      ...exNodes,
+      ...webSearchAgentNodes,
+      ...codeExecutionNodes,
+      ...fetchRequestNodes,
+      ...(graphqlToolNode ? [graphqlToolNode] : []),
+      ...urlReaderNodes,
+      ...sendMailNodes,
+      ...memoryRecallNodes,
+      ...outputNodes,
+      ...additionalNodes,
+    ]
+
+    const baseConnections: ConnectionsType = {
+      ...outputConnections,
+      ...agentConnections,
+      ...triggerConnections,
+      ...(hasTools && agentDataNode
+        ? {
+            'Merge Trigger': {
+              main: [
+                [
+                  { node: agentDataNode.name, type: 'main', index: 0 },
+                  { node: 'Fetch MindLogs', type: 'main', index: 0 },
+                ],
+              ],
+            },
+            [agentDataNode.name]: {
+              main: [[{ node: 'Merge', type: 'main', index: 0 }]],
+            },
+            'Fetch MindLogs': {
+              main: [[{ node: 'Merge', type: 'main', index: 1 }]],
+            },
+            Merge: {
+              main: [[{ node: 'Prepare Context', type: 'main', index: 0 }]],
+            },
+            'Prepare Context': {
+              main: [
+                [
+                  { node: 'Reflection', type: 'main', index: 0 },
+                  { node: 'Merge Context', type: 'main', index: 0 },
+                ],
+              ],
+            },
+            Reflection: {
+              main: [[{ node: 'Merge Context', type: 'main', index: 1 }]],
+            },
+            'Merge Context': {
+              main: [
+                [
+                  {
+                    node: `Prepare Agent Input (${agentId})`,
+                    type: 'main',
+                    index: 0,
+                  },
+                ],
+              ],
+            },
+          }
+        : {
+            'Merge Trigger': {
+              main: [
+                [
+                  {
+                    node: `Prepare Agent Input (${agentId})`,
+                    type: 'main',
+                    index: 0,
+                  },
+                ],
+              ],
+            },
+          }),
+    }
+
+    if (this.hasMemory()) {
+      baseConnections['Simple Memory'] = {
+        ai_memory: [[{ node: agentName, type: 'ai_memory', index: 0 }]],
+      }
+    }
+
+    const connections: ConnectionsType = {
+      ...baseConnections,
+      ...mindLogConnections,
+      ...taskConnections,
+      ...taskWorkLogConnections,
+      ...kbConnections,
+      ...exConnections,
+      ...webSearchAgentConnections,
+      ...codeExecutionConnections,
+      ...fetchRequestConnections,
+      ...graphqlToolConnections,
+      ...urlReaderConnections,
+      ...sendMailConnections,
+      ...memoryRecallConnections,
+      ...additionalConnections,
+    }
+
+    return {
+      name: workflowName,
+      active: true,
+      versionId,
+      nodes,
+      connections,
+      pinData: {},
+      settings: {
+        executionOrder: 'v1',
+      },
+      meta: {
+        instanceId,
+      },
+    }
+  }
+
+  getBaseNodes(config: AgentFactoryConfig) {
+    const { agentId, agentName, hasTools, hasGraphqlTool, memorySize } = config
+
+    const hasMemory = this.hasMemory()
+
+    const prepareContextTemplate = fs.readFileSync(
+      path.join(__dirname, 'nodes/baseNodes/prepareContext.js'),
+      'utf-8',
+    )
+
+    const prepareContextCode = prepareContextTemplate.replace(
+      '$config',
+      JSON.stringify({ agentId }, null, 2),
+    )
+
+    const agentDataNode = hasGraphqlTool
+      ? getAgentDataNode({
+          nodeId: `${agentId}-get-agent-data`,
+          agentName,
+          position: getNodeCoordinates('get-agent-data'),
+        })
+      : null
+
+    const prepareContextNode: NodeType = {
+      id: `${agentId}-prepare-context`,
+      name: 'Prepare Context',
+      type: 'n8n-nodes-base.code',
+      typeVersion: 2,
+      position: getNodeCoordinates('prepare-context'),
+      parameters: {
+        jsCode: prepareContextCode,
+      },
+    }
+
+    const baseNodes: NodeType[] = [
+      ...(agentDataNode ? [agentDataNode] : []),
+      prepareContextNode,
+      {
+        parameters: {
+          workflowId: {
+            __rl: true,
+            mode: 'list',
+            value: getReflectionWorkflowName(agentName),
+          },
+          workflowInputs: {
+            mappingMode: 'defineBelow',
+            value: {
+              agentId,
+              chatInput: '={{ $json.chatInput }}',
+            },
+            matchingColumns: [],
+            schema: [
+              {
+                id: 'agentId',
+                displayName: 'agentId',
+                required: true,
+                defaultMatch: false,
+                display: true,
+                canBeUsedToMatch: true,
+                type: 'string',
+              },
+              {
+                id: 'chatInput',
+                displayName: 'chatInput',
+                required: true,
+                defaultMatch: false,
+                display: true,
+                canBeUsedToMatch: true,
+                type: 'string',
+              },
+            ],
+            attemptToConvertTypes: false,
+            convertFieldsToString: false,
+          },
+        },
+        id: `${agentId}-reflection`,
+        name: 'Reflection',
+        type: 'n8n-nodes-base.executeWorkflow',
+        typeVersion: 1.2,
+        position: getNodeCoordinates('reflection'),
+      },
+      {
+        parameters: {},
+        type: 'n8n-nodes-base.merge',
+        typeVersion: 3.2,
+        position: getNodeCoordinates('merge-context'),
+        id: `${agentId}-merge-context`,
+        name: 'Merge Context',
+      },
+      ...(hasTools
+        ? [
+            getFetchMindLogsNode({ agentId, agentName }),
+            {
+              parameters: {},
+              type: 'n8n-nodes-base.merge',
+              typeVersion: 3.2,
+              position: getNodeCoordinates('merge'),
+              id: `${agentId}-merge`,
+              name: 'Merge',
+            },
+          ]
+        : []),
+    ]
+
+    if (hasMemory) {
+      baseNodes.push({
+        parameters: {
+          sessionIdType: 'customKey',
+          sessionKey: '={{ $json.sessionId }}',
+          contextWindowLength: memorySize,
+        },
+        id: `${agentId}-memory`,
+        name: 'Simple Memory',
+        type: '@n8n/n8n-nodes-langchain.memoryBufferWindow',
+        typeVersion: 1.3,
+        position: getNodeCoordinates('memory'),
+      })
+    }
+
+    return { nodes: baseNodes, agentDataNode, prepareContextNode }
+  }
+
+  upgradeMainWorkflow(
+    _workflow: WorkflowBase,
+    _config: AgentFactoryConfig,
+  ): void {
+    //
+  }
+
+  getGraphqlToolNodesAndConnections(
+    config: AgentFactoryConfig,
+    agentNode: NodeType,
+  ): [NodeType | null, ConnectionsType] {
+    const {
+      agentId,
+      agentName,
+      hasGraphqlTool = false,
+      hasTools = true,
+    } = config
+
+    if (!hasGraphqlTool || !hasTools) {
+      return [null, {}]
+    }
+
+    // Create GraphQL tool node once per flow
+    if (!this.graphqlToolNode) {
+      const nodes = getGraphqlToolNodes({ agentId, agentName })
+      this.graphqlToolNode = nodes[0] || null
+    }
+
+    if (!this.graphqlToolNode) {
+      return [null, {}]
+    }
+
+    // Return connection for this specific agent
+    const connections: ConnectionsType = {
+      [this.graphqlToolNode.name]: {
+        ai_tool: [
+          [
+            { node: agentNode.name, type: 'ai_tool', index: 0 },
+            // {
+            //   node: agentName + '-decompositor',
+            //   type: 'ai_tool',
+            //   index: 0,
+            // },
+          ],
+        ],
+      },
+    }
+
+    return [this.graphqlToolNode, connections]
+  }
+
+  getTriggerNodes(config: AgentFactoryConfig): [NodeType[], ConnectionsType] {
+    const {
+      agentId,
+      agentName,
+      agentDescription,
+      webhookId,
+      workflowInputs = [
+        { name: 'chatInput', type: 'string' },
+        { name: 'sessionId', type: 'string' },
+        { name: 'user', type: 'object' },
+      ],
+      authFromToken,
+    } = config
+
+    const nodes: NodeType[] = [
+      {
+        parameters: {
+          workflowInputs: {
+            values: workflowInputs?.map((input) => ({
+              name: input.name,
+              type: input.type || 'string',
+              ...(input.default !== undefined && { default: input.default }),
+            })),
+          },
+        },
+        id: `${agentId}-workflow-trigger`,
+        name: 'Execute Workflow Trigger',
+        type: 'n8n-nodes-base.executeWorkflowTrigger',
+        typeVersion: 1.1,
+        position: getNodeCoordinates('workflow-trigger'),
+      },
+      {
+        id: `${agentId}-webhook-trigger`,
+        name: 'Webhook Trigger',
+        type: 'n8n-nodes-base.webhook',
+        typeVersion: 2,
+        position: getNodeCoordinates('webhook-trigger'),
+        webhookId: `${agentId}-message`,
+        parameters: {
+          httpMethod: 'POST',
+          path: `${agentId}-webhook`,
+          responseMode: 'responseNode',
+          options: {
+            rawBody: false,
+          },
+        },
+      },
+      {
+        id: `${agentId}-webhook-prepare-input`,
+        name: 'Webhook Prepare Input',
+        type: 'n8n-nodes-base.code',
+        typeVersion: 2,
+        position: getNodeCoordinates('webhook-prepare-input'),
+        parameters: {
+          jsCode: `const body = $input.first().json.body || {}
+return [{
+  json: {
+    chatInput: body.chatInput || '',
+    sessionId: body.sessionId || '',
+    token: body.token || ''
+  }
+}]`,
+        },
+      },
+      {
+        id: `${agentId}-chat-trigger`,
+        name: 'When chat message received',
+        type: '@n8n/n8n-nodes-langchain.chatTrigger',
+        typeVersion: 1.4,
+        position: getNodeCoordinates('chat-trigger'),
+        webhookId,
+        parameters: {
+          public: true,
+          mode: 'webhook',
+          availableInChat: true,
+          agentName,
+          agentDescription,
+          options: {
+            allowFileUploads: true,
+          },
+        },
+      },
+    ]
+
+    if (authFromToken) {
+      nodes.push(
         {
           parameters: {
             workflowId: {
               __rl: true,
-              mode: 'list' as const,
+              mode: 'list',
               value: 'Tool: Get User By Token',
             },
             workflowInputs: {
-              mappingMode: 'defineBelow' as const,
+              mappingMode: 'defineBelow',
               value: {
                 token: '={{ $json.token }}',
               },
@@ -184,401 +795,307 @@ export function createAgent(config: AgentFactoryConfig): AgentFactoryResult {
             ),
           },
         },
-      ]
-    : []
+      )
+    }
 
-  const authConnections: ConnectionsType = authFromToken
-    ? {
-        'Get User By Token': {
-          main: [[{ node: 'Set Auth Context', type: 'main', index: 0 }]],
-        },
-        'Set Auth Context': {
-          main: [[{ node: 'Merge Trigger', type: 'main', index: 0 }]],
-        },
-      }
-    : {}
-
-  const mindLogConnections: ConnectionsType =
-    hasTools && hasMindLogs
-      ? {
-          'Create MindLog Tool': {
-            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-          },
-          'Search MindLogs Tool': {
-            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-          },
-          'Update MindLog Tool': {
-            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-          },
-          'Delete MindLog Tool': {
-            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-          },
-        }
-      : {}
-
-  const taskConnections: ConnectionsType =
-    hasTools && hasTasks
-      ? {
-          'Create Task Tool': {
-            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-          },
-          'Search Tasks Tool': {
-            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-          },
-          'Update Task Tool': {
-            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-          },
-          'Delete Task Tool': {
-            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-          },
-        }
-      : {}
-
-  const taskWorkLogConnections: ConnectionsType =
-    hasTools && hasTasks
-      ? {
-          'Create Task Work Log Tool': {
-            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-          },
-          'Search Task Work Log Tool': {
-            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-          },
-          'Delete Task Work Log Tool': {
-            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-          },
-        }
-      : {}
-
-  const kbConnections: ConnectionsType =
-    hasTools && hasKBNodes
-      ? {
-          'KB Concept Tool': {
-            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-          },
-          'KB Fact Tool': {
-            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-          },
-          'KB Fact Participation Tool': {
-            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-          },
-          'KB Fact Projection Tool': {
-            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-          },
-          'KB Knowledge Space Tool': {
-            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-          },
-        }
-      : {}
-
-  const exConnections: ConnectionsType =
-    hasTools && hasEXNodes
-      ? {
-          'EX Reflex Tool': {
-            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-          },
-          'EX Reaction Tool': {
-            ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-          },
-        }
-      : {}
-
-  const codeExecutionNodes: NodeType[] = canAccessFileSystem
-    ? getCodeExecutionNodes({ agentId, agentName })
-    : []
-
-  const codeExecutionConnections: ConnectionsType = canAccessFileSystem
-    ? getCodeExecutionConnections({ agentId, agentName })
-    : {}
-
-  const fetchRequestNodes: NodeType[] = canExecuteFetch
-    ? getFetchRequestNodes({ agentId, agentName })
-    : []
-
-  const fetchRequestConnections: ConnectionsType = canExecuteFetch
-    ? getFetchRequestConnections({ agentId, agentName })
-    : {}
-
-  const graphqlToolNodes: NodeType[] =
-    hasGraphqlTool && hasTools
-      ? getGraphqlToolNodes({ agentId, agentName })
-      : []
-
-  const graphqlToolConnections: ConnectionsType =
-    hasGraphqlTool && hasTools
-      ? getGraphqlToolConnections({ agentId, agentName })
-      : {}
-
-  const webSearchAgentNodes: NodeType[] = hasWebSearchAgent
-    ? getWebSearchAgentNodes({ agentId, agentName })
-    : []
-
-  const webSearchAgentConnections: ConnectionsType = hasWebSearchAgent
-    ? getWebSearchAgentConnections({ agentId, agentName })
-    : {}
-
-  const urlReaderNodes: NodeType[] = canReadUrls
-    ? getUrlReaderNodes({ agentId, agentName })
-    : []
-
-  const urlReaderConnections: ConnectionsType = canReadUrls
-    ? getUrlReaderConnections({ agentId, agentName })
-    : {}
-
-  const memoryRecallNodes: NodeType[] =
-    hasTools && hasMemoryRecall
-      ? getMemoryRecallNodes({ agentId, agentName })
-      : []
-
-  const memoryRecallConnections: ConnectionsType =
-    hasTools && hasMemoryRecall
-      ? getMemoryRecallConnections({ agentId, agentName })
-      : {}
-
-  const sendMailNodes: NodeType[] = canSendMail
-    ? getSendMailNodes({ agentId, agentName })
-    : []
-
-  const sendMailConnections: ConnectionsType = canSendMail
-    ? getSendMailConnections({ agentId, agentName })
-    : {}
-
-  const sendMailWorkflow =
-    canSendMail && smtp
-      ? createToolSendMail({
-          agentName,
-          credentialId: smtp.credentialId,
-          credentialName: smtp.credentialName,
-          fromEmail: smtp.user,
-          fromPassword: smtp.password,
-        })
-      : null
-
-  const mindLogNodes =
-    hasTools && hasMindLogs
-      ? getMindLogNodes({
-          agentId,
-          agentName,
-        })
-      : []
-
-  const taskNodes =
-    hasTools && hasTasks
-      ? getTaskNodes({
-          agentId,
-          agentName,
-        })
-      : []
-
-  const taskWorkLogNodes =
-    hasTools && hasTasks
-      ? getTaskWorkLogNodes({
-          agentId,
-          agentName,
-        })
-      : []
-
-  const kbNodes =
-    hasTools && hasKBNodes
-      ? getKBNodes({
-          agentId,
-          agentName,
-        })
-      : []
-
-  const exNodes =
-    hasTools && hasEXNodes
-      ? getEXNodes({
-          agentId,
-          agentName,
-        })
-      : []
-
-  const { nodes: baseNodes, agentDataNode } = getBaseNodes({
-    agentId,
-    agentName,
-    agentDescription,
-    agentNodeType,
-    enableStreaming,
-    hasMemory,
-    hasTools,
-    hasWorkflowOutput,
-    maxIterations,
-    memorySize,
-    model,
-    systemMessagePath,
-    webhookId,
-    workflowInputs,
-    hasToolsParam: hasTools,
-  })
-
-  const nodes: NodeType[] = [
-    ...baseNodes,
-    ...authNodes,
-    ...mindLogNodes,
-    ...taskNodes,
-    ...taskWorkLogNodes,
-    ...kbNodes,
-    ...exNodes,
-    ...webSearchAgentNodes,
-    ...codeExecutionNodes,
-    ...fetchRequestNodes,
-    ...graphqlToolNodes,
-    ...urlReaderNodes,
-    ...sendMailNodes,
-    ...memoryRecallNodes,
-    ...additionalNodes,
-  ]
-
-  const baseConnections: ConnectionsType = {
-    [agentName]: hasWorkflowOutput
-      ? { main: [[{ node: 'Workflow Output', type: 'main', index: 0 }]] }
-      : { main: [] },
-    ...(hasWorkflowOutput && {
-      'Workflow Output': {
-        main: [[{ node: 'If Not Streaming', type: 'main', index: 0 }]],
+    nodes.push({
+      parameters: {
+        jsCode: 'return $input.all()',
       },
+      id: `${agentId}-merge-trigger`,
+      name: 'Merge Trigger',
+      type: 'n8n-nodes-base.code',
+      typeVersion: 2,
+      position: getNodeCoordinates('merge-trigger'),
+    })
+
+    const connections: ConnectionsType = {
+      'Execute Workflow Trigger': {
+        main: [[{ node: 'Merge Trigger', type: 'main', index: 0 }]],
+      },
+      'Webhook Trigger': {
+        main: [[{ node: 'Webhook Prepare Input', type: 'main', index: 0 }]],
+      },
+      'Webhook Prepare Input': {
+        main: [
+          [
+            {
+              node: authFromToken ? 'Get User By Token' : 'Merge Trigger',
+              type: 'main',
+              index: 0,
+            },
+          ],
+        ],
+      },
+      'When chat message received': {
+        main: [
+          [
+            {
+              node: authFromToken ? 'Get User By Token' : 'Merge Trigger',
+              type: 'main',
+              index: 0,
+            },
+          ],
+        ],
+      },
+      ...(authFromToken
+        ? {
+            'Get User By Token': {
+              main: [[{ node: 'Set Auth Context', type: 'main', index: 0 }]],
+            },
+            'Set Auth Context': {
+              main: [[{ node: 'Merge Trigger', type: 'main', index: 0 }]],
+            },
+          }
+        : {}),
+    }
+
+    return [nodes, connections]
+  }
+
+  getOutputNodes(config: AgentFactoryConfig): [NodeType[], ConnectionsType] {
+    const { agentId, agentName, hasWorkflowOutput = false } = config
+
+    const nodes: NodeType[] = []
+
+    if (hasWorkflowOutput) {
+      nodes.push({
+        parameters: {
+          mode: 'manual',
+          duplicateItem: false,
+          assignments: {
+            assignments: [
+              {
+                id: 'output',
+                name: 'output',
+                value: '={{ $json.output }}',
+                type: 'string',
+              },
+              {
+                id: 'usage',
+                name: 'usage',
+                value: '={{ $json.usage }}',
+                type: 'object',
+              },
+            ],
+          },
+          options: {},
+        },
+        id: `${agentId}-workflow-output`,
+        name: 'Workflow Output',
+        type: 'n8n-nodes-base.set',
+        typeVersion: 3.4,
+        position: getNodeCoordinates('workflow-output'),
+      })
+    }
+
+    nodes.push({
+      parameters: {
+        conditions: {
+          options: {
+            caseSensitive: true,
+            leftValue: '',
+            typeValidation: 'strict',
+          },
+          conditions: [
+            {
+              id: 'check-streaming',
+              leftValue:
+                "={{ $('Prepare Context').first().json.enableStreaming }}",
+              rightValue: false,
+              operator: {
+                type: 'boolean',
+                operation: 'equals',
+              },
+            },
+          ],
+          combinator: 'and',
+        },
+        options: {},
+      },
+      id: `${agentId}-if-not-streaming`,
+      name: 'If Not Streaming',
+      type: 'n8n-nodes-base.if',
+      typeVersion: 2.2,
+      position: getNodeCoordinates('if-not-streaming'),
+    })
+
+    nodes.push({
+      parameters: {
+        respondWith: 'allIncomingItems',
+        options: {},
+      },
+      id: `${agentId}-respond-webhook`,
+      name: 'Respond to Webhook',
+      type: 'n8n-nodes-base.respondToWebhook',
+      typeVersion: 1.1,
+      position: getNodeCoordinates('respond-webhook'),
+    })
+
+    const connections: ConnectionsType = {
+      [agentName]: hasWorkflowOutput
+        ? { main: [[{ node: 'Workflow Output', type: 'main', index: 0 }]] }
+        : { main: [[{ node: 'If Not Streaming', type: 'main', index: 0 }]] },
+      ...(hasWorkflowOutput
+        ? {
+            'Workflow Output': {
+              main: [[{ node: 'If Not Streaming', type: 'main', index: 0 }]],
+            },
+          }
+        : {}),
       'If Not Streaming': {
         main: [[{ node: 'Respond to Webhook', type: 'main', index: 0 }], []],
       },
-    }),
-    ...(agentNodeType !== 'orchestrator' && {
-      'Chat Model': {
-        ai_languageModel: [
-          [{ node: agentName, type: 'ai_languageModel', index: 0 }],
-        ],
-      },
-    }),
-    'Execute Workflow Trigger': {
-      main: [[{ node: 'Merge Trigger', type: 'main', index: 0 }]],
-    },
-    'Webhook Trigger': {
-      main: [[{ node: 'Webhook Prepare Input', type: 'main', index: 0 }]],
-    },
-    'Webhook Prepare Input': {
-      main: [
-        [
-          {
-            node: authFromToken ? 'Get User By Token' : 'Merge Trigger',
-            type: 'main',
-            index: 0,
-          },
-        ],
-      ],
-    },
-    'When chat message received': {
-      main: [
-        [
-          {
-            node: authFromToken ? 'Get User By Token' : 'Merge Trigger',
-            type: 'main',
-            index: 0,
-          },
-        ],
-      ],
-    },
-    ...(hasTools
-      ? {
-          'Merge Trigger': {
-            main: [
-              [
-                { node: agentDataNode.name, type: 'main', index: 0 },
-                { node: 'Fetch MindLogs', type: 'main', index: 0 },
-              ],
-            ],
-          },
-          [agentDataNode.name]: {
-            main: [[{ node: 'Merge', type: 'main', index: 0 }]],
-          },
-          'Fetch MindLogs': {
-            main: [[{ node: 'Merge', type: 'main', index: 1 }]],
-          },
-          Merge: {
-            main: [[{ node: 'Prepare Context', type: 'main', index: 0 }]],
-          },
-          'Prepare Context': {
-            main: [
-              [
-                { node: 'Reflection', type: 'main', index: 0 },
-                { node: 'Merge Context', type: 'main', index: 0 },
-              ],
-            ],
-          },
-          Reflection: {
-            main: [[{ node: 'Merge Context', type: 'main', index: 1 }]],
-          },
-          'Merge Context': {
-            main: [[{ node: 'Prepare Agent Input', type: 'main', index: 0 }]],
-          },
-          'Prepare Agent Input': {
-            main: [[{ node: agentName, type: 'main', index: 0 }]],
-          },
-        }
-      : {
-          'Merge Trigger': {
-            main: [[{ node: agentDataNode.name, type: 'main', index: 0 }]],
-          },
-          [agentDataNode.name]: {
-            main: [[{ node: 'Prepare Context', type: 'main', index: 0 }]],
-          },
-          'Prepare Context': {
-            main: [
-              [
-                { node: 'Reflection', type: 'main', index: 0 },
-                { node: 'Merge Context', type: 'main', index: 0 },
-              ],
-            ],
-          },
-          Reflection: {
-            main: [[{ node: 'Merge Context', type: 'main', index: 1 }]],
-          },
-          'Merge Context': {
-            main: [[{ node: agentName, type: 'main', index: 0 }]],
-          },
-        }),
-  }
-
-  if (hasMemory) {
-    baseConnections['Simple Memory'] = {
-      ai_memory: [[{ node: agentName, type: 'ai_memory', index: 0 }]],
     }
+
+    return [nodes, connections]
   }
 
-  const connections: ConnectionsType = {
-    ...baseConnections,
-    ...authConnections,
-    ...mindLogConnections,
-    ...taskConnections,
-    ...taskWorkLogConnections,
-    ...kbConnections,
-    ...exConnections,
-    ...webSearchAgentConnections,
-    ...codeExecutionConnections,
-    ...fetchRequestConnections,
-    ...graphqlToolConnections,
-    ...urlReaderConnections,
-    ...sendMailConnections,
-    ...memoryRecallConnections,
-    ...additionalConnections,
+  // getAgentNodes(params: {
+  //   agentId: string
+  //   agentName: string
+  //   agentNodeType?: 'orchestrator' | 'default'
+  //   enableStreaming?: boolean
+  //   maxIterations?: number
+  //   model?: string
+  //   systemMessage: string
+  //   prepareAgentInputCode: string
+  //   hasTools?: boolean
+  // }): [NodeType[], ConnectionsType] {
+
+  getPrepareContextNode(_config: AgentFactoryConfig) {
+    //
   }
 
-  const agentWorkflow: WorkflowBase = {
-    name: workflowName,
-    active: true,
-    versionId,
-    nodes,
-    connections,
-    pinData: {},
-    settings: {
-      executionOrder: 'v1',
+  getAgentNodes(
+    config: AgentFactoryConfig & {
+      systemMessage: string
+      prepareAgentInputCode: string
+      position: [number, number]
     },
-    meta: {
-      instanceId,
-    },
+  ): [NodeType[], ConnectionsType, agentNode: NodeType] {
+    const {
+      agentId,
+      agentName,
+      agentNodeType = 'orchestrator',
+      enableStreaming = true,
+      maxIterations = parseInt(process.env.N8N_MAX_ITERATIONS || '10'),
+      model,
+      systemMessage,
+      prepareAgentInputCode,
+      hasTools = true,
+      position,
+    } = config
+
+    const agentNode = createAgentNode({
+      agentId,
+      agentName,
+      agentNodeType,
+      enableStreaming,
+      maxIterations,
+      model,
+      systemMessage,
+      hasTools,
+      position,
+    })
+
+    const nodes: NodeType[] = [
+      {
+        parameters: {
+          jsCode: prepareAgentInputCode,
+        },
+        id: `${agentId}-prepare-agent-input`,
+        name: `Prepare Agent Input (${agentId})`,
+        type: 'n8n-nodes-base.code',
+        typeVersion: 2,
+        position: [position[0] - 150, position[1]],
+      },
+      agentNode,
+    ]
+
+    if (agentNodeType !== 'orchestrator') {
+      nodes.push({
+        parameters: {
+          model,
+          options: {},
+        },
+        id: `${agentId}-chat-model`,
+        name: `Chat Model (${agentId})`,
+        type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
+        typeVersion: 1,
+        position,
+        credentials: {
+          openRouterApi: {
+            id: 'FsN0N48lU327xkz6',
+            name: 'OpenRouter',
+          },
+        },
+      })
+    }
+
+    const connections: ConnectionsType = {
+      [`Prepare Agent Input (${agentId})`]: {
+        main: [[{ node: agentName, type: 'main', index: 0 }]],
+      },
+      ...(agentNodeType !== 'orchestrator' && {
+        [`Chat Model (${agentId})`]: {
+          ai_languageModel: [
+            [{ node: agentName, type: 'ai_languageModel', index: 0 }],
+          ],
+        },
+      }),
+    }
+
+    return [nodes, connections, agentNode]
   }
 
-  const workflows = [toolGraphqlRequest, reflectionWorkflow, agentWorkflow]
-  if (sendMailWorkflow) {
-    workflows.push(sendMailWorkflow)
+  getMainAgent(
+    config: AgentFactoryConfig,
+  ): [NodeType[], ConnectionsType, agentNode: NodeType] {
+    const {
+      // agentId,
+      // agentName,
+      // agentNodeType = 'orchestrator',
+      // enableStreaming = true,
+      // maxIterations = parseInt(process.env.N8N_MAX_ITERATIONS || '10'),
+      // model,
+      // hasTools = true,
+      systemMessagePath,
+    } = config
+
+    const prepareAgentInputCode = fs.readFileSync(
+      path.join(__dirname, 'nodes/baseNodes/prepareAgentInput.js'),
+      'utf-8',
+    )
+
+    const baseSystemMessage = fs.readFileSync(
+      path.join(__dirname, 'nodes/baseNodes/base-system-message.md'),
+      'utf-8',
+    )
+
+    const customSystemMessage = systemMessagePath
+      ? fs.readFileSync(systemMessagePath, 'utf-8')
+      : ''
+
+    const systemMessage = `${baseSystemMessage}
+
+# Agent-Specific Instructions
+
+${customSystemMessage}`
+
+    return this.getAgentNodes({
+      // agentId,
+      // agentName,
+      // agentNodeType,
+      // enableStreaming,
+      // maxIterations,
+      // model,
+      // hasTools,
+      ...config,
+      systemMessage,
+      prepareAgentInputCode,
+      // position: [256, 520],
+      position: [112, 304],
+    })
   }
-  return workflows
 }

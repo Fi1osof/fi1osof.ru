@@ -2,7 +2,7 @@
 import fs from 'fs'
 import path from 'path'
 import { n8nConfig } from '../config'
-import { importWorkflows } from './importWorkflows'
+import { importWorkflowsWithRegistry } from './importWorkflows'
 import { importAgentCredentials } from './authenticateAgent'
 import { n8nApiRequest } from './n8nApiRequest'
 import { CredentialsMap } from '../workflows/interfaces'
@@ -199,7 +199,7 @@ export async function runBootstrap(): Promise<void> {
   const systemCredentials = await importCredentials(cookies)
   const agentCredentials = await importAgentCredentials(cookies)
   const credentialsMap = { ...systemCredentials, ...agentCredentials }
-  await importWorkflows(cookies, credentialsMap)
+  await importWorkflowsWithRegistry(cookies, credentialsMap)
   await cleanupCredentials()
 
   console.log('[bootstrap] Completed')

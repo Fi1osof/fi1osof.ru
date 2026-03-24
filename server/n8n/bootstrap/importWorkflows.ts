@@ -2,50 +2,12 @@
 import fs from 'fs'
 import path from 'path'
 import { n8nApiRequest } from './n8nApiRequest'
-import {
-  isWorkflowFactoryClass,
-  type CredentialsMap,
-} from '../workflows/interfaces'
+import { type CredentialsMap, type WorkflowBase } from '../workflows/interfaces'
+import { isWorkflowFactoryClass } from '../WorkflowFactory/helpers/isWorkflowFactoryClass'
+import { WorkflowRegistry } from '../WorkflowRegistry'
+import { WorkflowFactory } from '../WorkflowFactory'
 
 const WORKFLOWS_DIR = path.join(__dirname, '../workflows')
-
-async function loadWorkflow(
-  entry: string,
-  credentialsMap: CredentialsMap,
-): Promise<object[]> {
-  const fullPath = path.join(WORKFLOWS_DIR, entry)
-  const stat = fs.statSync(fullPath)
-
-  if (stat.isFile() && entry.endsWith('.json')) {
-    return [JSON.parse(fs.readFileSync(fullPath, 'utf-8'))]
-  }
-
-  if (stat.isDirectory()) {
-    const indexTs = path.join(fullPath, 'index.ts')
-    const indexJs = path.join(fullPath, 'index.js')
-
-    if (fs.existsSync(indexTs) || fs.existsSync(indexJs)) {
-      const module = await import(fullPath)
-      const exported = module.default || module
-
-      if (isWorkflowFactoryClass(exported)) {
-        const factory = new exported()
-        const result = await factory.createWorkflow(credentialsMap)
-        return Array.isArray(result) ? result : [result]
-      }
-
-      if (Array.isArray(exported)) {
-        return exported.filter(Boolean)
-      }
-      if (!exported) {
-        return []
-      }
-      return [exported]
-    }
-  }
-
-  return []
-}
 
 interface WorkflowData {
   id: string
@@ -200,69 +162,129 @@ async function activateWorkflow(
   }
 }
 
-export async function importWorkflows(
-  cookies: string,
-  credentialsMap: CredentialsMap = {},
-): Promise<void> {
+/**
+ * Collect all workflow factories/definitions from workflows directory
+ */
+async function collectWorkflows(registry: WorkflowRegistry): Promise<void> {
   if (!fs.existsSync(WORKFLOWS_DIR)) {
     return
   }
 
   const entries = fs.readdirSync(WORKFLOWS_DIR)
-  if (entries.length === 0) {
+
+  for (const entry of entries) {
+    const fullPath = path.join(WORKFLOWS_DIR, entry)
+    const stat = fs.statSync(fullPath)
+
+    // JSON files
+    if (stat.isFile() && entry.endsWith('.json')) {
+      const workflow = JSON.parse(
+        fs.readFileSync(fullPath, 'utf-8'),
+      ) as WorkflowBase
+      if (workflow.name) {
+        registry.addFlow(workflow.name, workflow)
+      }
+      continue
+    }
+
+    // Directories with index.ts/js
+    if (stat.isDirectory()) {
+      const indexTs = path.join(fullPath, 'index.ts')
+      const indexJs = path.join(fullPath, 'index.js')
+
+      if (fs.existsSync(indexTs) || fs.existsSync(indexJs)) {
+        const module = await import(fullPath)
+        const exported = module.default || module
+
+        if (isWorkflowFactoryClass(exported)) {
+          const factory = new exported({
+            credentialsMap: registry.getCredentialsMap(),
+            registry,
+          }) as WorkflowFactory
+
+          // Register factory with entry name as initial key
+          // Factory will register itself with proper name during build
+          registry.addFlow(entry, factory)
+        } else if (Array.isArray(exported)) {
+          for (const wf of exported.filter(Boolean) as WorkflowBase[]) {
+            if (wf.name) {
+              registry.addFlow(wf.name, wf)
+            }
+          }
+        } else if (exported && typeof exported === 'object' && exported.name) {
+          registry.addFlow(exported.name, exported as WorkflowBase)
+        }
+      }
+    }
+  }
+}
+
+/**
+ * New registry-based workflow import.
+ * 1. Collect all workflows into registry
+ * 2. Build all workflows (resolves nested dependencies)
+ * 3. POST all workflows to n8n
+ * 4. Resolve workflowId references
+ * 5. Activate workflows
+ */
+export async function importWorkflowsWithRegistry(
+  cookies: string,
+  credentialsMap: CredentialsMap = {},
+): Promise<void> {
+  console.log('[bootstrap] Importing workflows (registry mode)...')
+
+  // Step 1: Create registry and collect all workflows
+  const registry = new WorkflowRegistry(credentialsMap)
+  await collectWorkflows(registry)
+
+  // Step 2: Build all workflows
+  console.log('[bootstrap] Building workflows...')
+  await registry.buildAll()
+
+  // Step 3: POST all built workflows to n8n
+  const workflows = registry.getAllBuilt()
+  if (workflows.length === 0) {
+    console.log('[bootstrap] No workflows to import')
     return
   }
 
-  console.log('[bootstrap] Importing workflows...')
+  console.log(`[bootstrap] Importing ${workflows.length} workflows...`)
 
   const idMap: Record<string, string> = {}
   const toActivate: { id: string; name: string }[] = []
 
-  for (const entry of entries) {
-    try {
-      const workflows = await loadWorkflow(entry, credentialsMap)
-      if (workflows.length === 0) {
-        continue
+  for (const workflow of workflows) {
+    console.log(`[bootstrap] Importing workflow: ${workflow.name}`)
+
+    const { data } = await n8nApiRequest(
+      'POST',
+      '/rest/workflows',
+      workflow,
+      cookies,
+    )
+    const result = data as { data?: { id?: string }; id?: string }
+    const id = result?.data?.id || result?.id
+
+    if (id && workflow.name) {
+      console.log(`[bootstrap] Workflow imported: ${workflow.name} (id: ${id})`)
+      idMap[workflow.name] = id
+      if (workflow.active) {
+        toActivate.push({ id, name: workflow.name })
       }
-
-      for (const workflow of workflows) {
-        const wf = workflow as { name?: string; active?: boolean }
-        console.log(`[bootstrap] Importing workflow: ${wf.name || entry}`)
-
-        const { data } = await n8nApiRequest(
-          'POST',
-          '/rest/workflows',
-          workflow,
-          cookies,
-        )
-        const result = data as { data?: { id?: string }; id?: string }
-        const id = result?.data?.id || result?.id
-
-        if (id) {
-          const workflowName = wf.name || entry
-          console.log(
-            `[bootstrap] Workflow imported: ${workflowName} (id: ${id})`,
-          )
-          idMap[workflowName] = id
-          if (wf.active) {
-            toActivate.push({ id, name: workflowName })
-          }
-        } else {
-          console.error(
-            `[bootstrap] Failed to import workflow ${wf.name || entry}:`,
-            data,
-          )
-        }
-      }
-    } catch (err) {
-      console.error(`[bootstrap] Failed to load workflow ${entry}:`, err)
+    } else {
+      console.error(
+        `[bootstrap] Failed to import workflow ${workflow.name}:`,
+        data,
+      )
     }
   }
 
+  // Step 4: Resolve workflow dependencies
   if (Object.keys(idMap).length > 0) {
     await resolveWorkflowDependencies(idMap, cookies)
   }
 
+  // Step 5: Activate workflows
   if (toActivate.length > 0) {
     console.log('[bootstrap] Activating workflows...')
     for (const { id, name } of toActivate) {
@@ -273,4 +295,6 @@ export async function importWorkflows(
       }
     }
   }
+
+  console.log('[bootstrap] Registry import completed')
 }

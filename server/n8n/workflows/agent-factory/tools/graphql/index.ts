@@ -1,5 +1,5 @@
 import { createTool, createToolInputs } from '../../../helpers'
-import { ConnectionsType, NodeType } from '../../interfaces'
+import { NodeType } from '../../interfaces'
 import { getNodeCoordinates } from '../../../helpers/nodeCoordinates'
 
 interface GraphqlToolsConfig {
@@ -32,25 +32,25 @@ export function getGraphqlToolNodes(config: GraphqlToolsConfig): NodeType[] {
           type: 'string',
           required: true,
         },
-        {
-          name: 'operationName',
-          description:
-            'Optional: GraphQL operation name to execute specific operation from document',
-          type: 'string',
-        },
+        // {
+        //   name: 'operationName',
+        //   description:
+        //     'Optional: GraphQL operation name to execute specific operation from document',
+        //   type: 'string',
+        // },
       ]),
     }),
   ]
 }
 
-export function getGraphqlToolConnections(
-  config: GraphqlToolsConfig,
-): ConnectionsType {
-  const { agentName } = config
+// export function getGraphqlToolConnections(
+//   config: GraphqlToolsConfig,
+// ): ConnectionsType {
+//   const { agentName } = config
 
-  return {
-    'GraphQL Request Tool': {
-      ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
-    },
-  }
-}
+//   return {
+//     'GraphQL Request Tool': {
+//       ai_tool: [[{ node: agentName, type: 'ai_tool', index: 0 }]],
+//     },
+//   }
+// }

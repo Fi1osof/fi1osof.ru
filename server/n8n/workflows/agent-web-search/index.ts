@@ -4,7 +4,9 @@ import { AgentFactoryConfig } from '../agent-factory/interfaces'
 import { AgentCredentials } from 'server/n8n/bootstrap/interfaces'
 
 class WebSearchAgentWorkflow extends AgentWorkflowFactory {
-  agentCredentialsKey = 'agents/agent-web-search'
+  getCredentialsKey() {
+    return 'agents/agent-web-search'
+  }
 
   getConfig(agentCreds: AgentCredentials): AgentFactoryConfig {
     const { agentName } = agentCreds

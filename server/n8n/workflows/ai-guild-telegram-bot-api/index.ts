@@ -1,11 +1,12 @@
-import { CredentialsMap, WorkflowBase, WorkflowFactory } from '../interfaces'
+import { WorkflowFactory } from 'server/n8n/WorkflowFactory'
 
 const workflowName = 'AI-Guild Telegram Bot API'
 
 export class AiGuildTelegramBotApiWorkflow extends WorkflowFactory {
   credentialId = 'telegram-ai-guild-main-bot'
 
-  async createWorkflow(credentials: CredentialsMap): Promise<WorkflowBase> {
+  async buildWorkflow(): Promise<void> {
+    const credentials = this.registry.getCredentialsMap()
     let accessToken: string | undefined
 
     const telegramCreds = credentials[this.credentialId]
@@ -29,7 +30,7 @@ export class AiGuildTelegramBotApiWorkflow extends WorkflowFactory {
       )
     }
 
-    return {
+    this.builtWorkflow = {
       name: workflowName,
       active: true,
       versionId: 'telegram-bot-api-v1',
