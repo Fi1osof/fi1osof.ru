@@ -39,3 +39,26 @@ Located in `server/n8n/custom-nodes/`:
 Located in `server/n8n/workflows/agent-factory/`:
 - Generates n8n workflows from TypeScript
 - `hasTools` flag for models without tool support
+- Nodes store with Proxy for convenient access by name (`this.nodes['Node Name']`)
+
+## Knowledge Base (KB)
+
+Agent's knowledge storage system with concepts and facts.
+
+### KB Tools (Chat Agent)
+
+Located in `server/n8n/workflows/agent-chat/nodes/`:
+- **KB/KBConcept/** — CRUD workflow factories for concepts
+- **execTool/tools/KB/** — Tool node definitions for ExecTool proxy
+
+### GraphQL Queries
+
+- `concepts` / `myConcepts` — read concepts with optional `detailedInfo` for content
+- `createConcept` / `updateConcept` / `deleteConcept` — mutations
+
+### UI Components
+
+Located in `src/components/pages/KnowledgeBase/View/`:
+- **ConceptCard** — concept display with nested facts
+- **FactCard** — fact display with participations and projections
+- **ParticipationCard** / **ProjectionCard** / **SpaceCard** — nested entity cards

@@ -69,20 +69,20 @@ export abstract class AgentWorkflowFactory extends WorkflowFactory {
   }
 
   hasMemory() {
-    const memorySize = this.getMemorySize()
+    const memorySize = this.config.memorySize
 
-    return memorySize && memorySize > 0
+    return memorySize && memorySize > 0 ? true : false
   }
 
-  getMemorySize() {
-    const {
-      memorySize = process.env.AGENT_MEMORY_SIZE === 'false'
-        ? false
-        : parseInt(process.env.AGENT_MEMORY_SIZE || '5'),
-    } = this.config
+  // getMemorySize() {
+  //   const {
+  //     memorySize = process.env.AGENT_MEMORY_SIZE === 'false'
+  //       ? false
+  //       : parseInt(process.env.AGENT_MEMORY_SIZE || '5'),
+  //   } = this.config
 
-    return memorySize
-  }
+  //   return memorySize || 0
+  // }
 
   async buildWorkflow(): Promise<void> {
     const { agentName, workflowName } = this.config
@@ -286,108 +286,88 @@ export abstract class AgentWorkflowFactory extends WorkflowFactory {
           }
         : {}
 
-    // Tool nodes
-    const codeExecutionNodes: NodeType[] = canAccessFileSystem
-      ? getCodeExecutionNodes({ agentId, agentName })
-      : []
-
+    // Tool nodes - add to this.nodes
     const codeExecutionConnections: ConnectionsType = canAccessFileSystem
       ? getCodeExecutionConnections({ agentId, agentName })
       : {}
-
-    const fetchRequestNodes: NodeType[] = canExecuteFetch
-      ? getFetchRequestNodes({ agentId, agentName })
-      : []
+    if (canAccessFileSystem) {
+      this.addNodes(getCodeExecutionNodes({ agentId, agentName }))
+    }
 
     const fetchRequestConnections: ConnectionsType = canExecuteFetch
       ? getFetchRequestConnections({ agentId, agentName })
       : {}
-
-    const webSearchAgentNodes: NodeType[] = hasWebSearchAgent
-      ? getWebSearchAgentNodes({ agentId, agentName })
-      : []
+    if (canExecuteFetch) {
+      this.addNodes(getFetchRequestNodes({ agentId, agentName }))
+    }
 
     const webSearchAgentConnections: ConnectionsType = hasWebSearchAgent
       ? getWebSearchAgentConnections({ agentId, agentName })
       : {}
-
-    const urlReaderNodes: NodeType[] = canReadUrls
-      ? getUrlReaderNodes({ agentId, agentName })
-      : []
+    if (hasWebSearchAgent) {
+      this.addNodes(getWebSearchAgentNodes({ agentId, agentName }))
+    }
 
     const urlReaderConnections: ConnectionsType = canReadUrls
       ? getUrlReaderConnections({ agentId, agentName })
       : {}
-
-    const memoryRecallNodes: NodeType[] =
-      hasTools && hasMemoryRecall
-        ? getMemoryRecallNodes({ agentId, agentName })
-        : []
+    if (canReadUrls) {
+      this.addNodes(getUrlReaderNodes({ agentId, agentName }))
+    }
 
     const memoryRecallConnections: ConnectionsType =
       hasTools && hasMemoryRecall
         ? getMemoryRecallConnections({ agentId, agentName })
         : {}
-
-    const sendMailNodes: NodeType[] = canSendMail
-      ? getSendMailNodes({ agentId, agentName })
-      : []
+    if (hasTools && hasMemoryRecall) {
+      this.addNodes(getMemoryRecallNodes({ agentId, agentName }))
+    }
 
     const sendMailConnections: ConnectionsType = canSendMail
       ? getSendMailConnections({ agentId, agentName })
       : {}
+    if (canSendMail) {
+      this.addNodes(getSendMailNodes({ agentId, agentName }))
+    }
 
-    const mindLogNodes =
-      hasTools && hasMindLogs ? getMindLogNodes({ agentId, agentName }) : []
+    if (hasTools && hasMindLogs) {
+      this.addNodes(getMindLogNodes({ agentId, agentName }))
+    }
 
-    const taskNodes =
-      hasTools && hasTasks ? getTaskNodes({ agentId, agentName }) : []
+    if (hasTools && hasTasks) {
+      this.addNodes(getTaskNodes({ agentId, agentName }))
+      this.addNodes(getTaskWorkLogNodes({ agentId, agentName }))
+    }
 
-    const taskWorkLogNodes =
-      hasTools && hasTasks ? getTaskWorkLogNodes({ agentId, agentName }) : []
+    if (hasTools && hasKBNodes) {
+      this.addNodes(getKBNodes({ agentId, agentName }))
+    }
 
-    const kbNodes =
-      hasTools && hasKBNodes ? getKBNodes({ agentId, agentName }) : []
-
-    const exNodes =
-      hasTools && hasEXNodes ? getEXNodes({ agentId, agentName }) : []
+    if (hasTools && hasEXNodes) {
+      this.addNodes(getEXNodes({ agentId, agentName }))
+    }
 
     // Core nodes
     const [triggerNodes, triggerConnections] = this.getTriggerNodes(config)
+    this.addNodes(triggerNodes)
+
     const [outputNodes, outputConnections] = this.getOutputNodes(config)
+    this.addNodes(outputNodes)
+
     const [agentNodes, agentConnections, mainAgentNode] =
       this.getMainAgent(config)
-
-    // const mainAgentNode = agentNodes.find(
-    //   // (node) => node.type === '@n8n/n8n-nodes-langchain.agent'
-    //   (node) => node.name === agentName,
-    // )
+    this.addNodes(agentNodes)
 
     const [graphqlToolNode, graphqlToolConnections] = mainAgentNode
       ? this.getGraphqlToolNodesAndConnections(config, mainAgentNode)
       : [null, {}]
+    if (graphqlToolNode) {
+      this.addNode(graphqlToolNode)
+    }
 
-    const { nodes: baseNodes, agentDataNode } = this.getBaseNodes(config)
+    const { agentDataNode } = this.getBaseNodes(config)
 
-    const nodes: NodeType[] = [
-      ...triggerNodes,
-      ...baseNodes,
-      ...agentNodes,
-      ...mindLogNodes,
-      ...taskNodes,
-      ...taskWorkLogNodes,
-      ...kbNodes,
-      ...exNodes,
-      ...webSearchAgentNodes,
-      ...codeExecutionNodes,
-      ...fetchRequestNodes,
-      ...(graphqlToolNode ? [graphqlToolNode] : []),
-      ...urlReaderNodes,
-      ...sendMailNodes,
-      ...memoryRecallNodes,
-      ...outputNodes,
-      ...additionalNodes,
-    ]
+    this.addNodes(additionalNodes)
 
     const baseConnections: ConnectionsType = {
       ...outputConnections,
@@ -437,6 +417,9 @@ export abstract class AgentWorkflowFactory extends WorkflowFactory {
           }
         : {
             'Merge Trigger': {
+              main: [[{ node: 'Prepare Context', type: 'main', index: 0 }]],
+            },
+            'Prepare Context': {
               main: [
                 [
                   {
@@ -477,7 +460,7 @@ export abstract class AgentWorkflowFactory extends WorkflowFactory {
       name: workflowName,
       active: true,
       versionId,
-      nodes,
+      nodes: this.getNodesArray(),
       connections,
       pinData: {},
       settings: {
@@ -523,10 +506,14 @@ export abstract class AgentWorkflowFactory extends WorkflowFactory {
       },
     }
 
-    const baseNodes: NodeType[] = [
-      ...(agentDataNode ? [agentDataNode] : []),
-      prepareContextNode,
-      {
+    // Add nodes via this.addNode
+    if (agentDataNode) {
+      this.addNode(agentDataNode)
+    }
+    this.addNode(prepareContextNode)
+
+    if (hasTools && agentDataNode) {
+      this.addNode({
         parameters: {
           workflowId: {
             __rl: true,
@@ -569,46 +556,45 @@ export abstract class AgentWorkflowFactory extends WorkflowFactory {
         type: 'n8n-nodes-base.executeWorkflow',
         typeVersion: 1.2,
         position: getNodeCoordinates('reflection'),
-      },
-      {
+      })
+      this.addNode({
         parameters: {},
         type: 'n8n-nodes-base.merge',
         typeVersion: 3.2,
         position: getNodeCoordinates('merge-context'),
         id: `${agentId}-merge-context`,
         name: 'Merge Context',
-      },
-      ...(hasTools
-        ? [
-            getFetchMindLogsNode({ agentId, agentName }),
-            {
-              parameters: {},
-              type: 'n8n-nodes-base.merge',
-              typeVersion: 3.2,
-              position: getNodeCoordinates('merge'),
-              id: `${agentId}-merge`,
-              name: 'Merge',
-            },
-          ]
-        : []),
-    ]
+      })
+    }
+
+    if (hasTools) {
+      this.addNode(getFetchMindLogsNode({ agentId, agentName }))
+      this.addNode({
+        parameters: {},
+        type: 'n8n-nodes-base.merge',
+        typeVersion: 3.2,
+        position: getNodeCoordinates('merge'),
+        id: `${agentId}-merge`,
+        name: 'Merge',
+      })
+    }
 
     if (hasMemory) {
-      baseNodes.push({
-        parameters: {
-          sessionIdType: 'customKey',
-          sessionKey: '={{ $json.sessionId }}',
-          contextWindowLength: memorySize,
-        },
+      this.addNode({
         id: `${agentId}-memory`,
         name: 'Simple Memory',
         type: '@n8n/n8n-nodes-langchain.memoryBufferWindow',
         typeVersion: 1.3,
         position: getNodeCoordinates('memory'),
+        parameters: {
+          sessionIdType: 'customKey',
+          sessionKey: '={{ $json.sessionId }}',
+          contextWindowLength: memorySize,
+        },
       })
     }
 
-    return { nodes: baseNodes, agentDataNode, prepareContextNode }
+    return { agentDataNode, prepareContextNode }
   }
 
   upgradeMainWorkflow(

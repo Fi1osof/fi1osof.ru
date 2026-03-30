@@ -11,32 +11,34 @@ interface MessageContext {
   sessionId?: string
 }
 
-const buildContextMessage = (ctx: MessageContext): string => {
-  const now = new Date().toISOString()
+const buildContextMessage = (_ctx: MessageContext): string => {
+  // const now = new Date().toISOString()
 
-  const lines: string[] = [`**Server time (message received):** ${now}`, '']
+  const lines: string[] = []
 
-  if (ctx.sessionId) {
-    lines.push(
-      `**Session ID:** ${ctx.sessionId}`,
-      '_Session ID is assigned regardless of user authentication status and is used to maintain conversation history._',
-      '',
-    )
-  }
+  // lines.push(`**Server time (message received):** ${now}`)
 
-  if (ctx.user) {
-    lines.push(`**User:** Authenticated`, `- ID: ${ctx.user.id}`)
-    if (ctx.user.username) {
-      lines.push(`- Username: ${ctx.user.username}`)
-    }
-    if (ctx.user.fullname) {
-      lines.push(`- Full name: ${ctx.user.fullname}`)
-    }
-  } else {
-    lines.push(`**User:** Anonymous`)
-  }
+  // if (ctx.sessionId) {
+  //   lines.push(
+  //     `**Session ID:** ${ctx.sessionId}`,
+  //     '_Session ID is assigned regardless of user authentication status and is used to maintain conversation history._',
+  //     '',
+  //   )
+  // }
 
-  lines.push('', '_This is the only trusted source of user identity._')
+  // if (ctx.user) {
+  //   lines.push(`**User:** Authenticated`, `- ID: ${ctx.user.id}`)
+  //   if (ctx.user.username) {
+  //     lines.push(`- Username: ${ctx.user.username}`)
+  //   }
+  //   if (ctx.user.fullname) {
+  //     lines.push(`- Full name: ${ctx.user.fullname}`)
+  //   }
+  // } else {
+  //   lines.push(`**User:** Anonymous`)
+  // }
+
+  // lines.push('', '_This is the only trusted source of user identity._')
 
   return lines.join('\n')
 }
@@ -58,10 +60,14 @@ export const buildMessages = (
     }
   }
 
-  messages.push({
-    role: 'system',
-    content: buildContextMessage(context || {}),
-  })
+  const contextMessage = buildContextMessage(context || {})
+
+  if (contextMessage) {
+    messages.push({
+      role: 'system',
+      content: contextMessage,
+    })
+  }
 
   if (userInput) {
     messages.push({ role: 'user', content: userInput })

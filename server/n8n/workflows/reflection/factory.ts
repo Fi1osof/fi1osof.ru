@@ -53,7 +53,7 @@ export function createReflectionWorkflow(
         name: 'Execute Workflow Trigger',
         type: 'n8n-nodes-base.executeWorkflowTrigger',
         typeVersion: 1.1,
-        position: [-400, 300] as [number, number],
+        position: [-400, 300],
       },
     ]
 
@@ -64,7 +64,7 @@ export function createReflectionWorkflow(
         name: 'When chat message received',
         type: '@n8n/n8n-nodes-langchain.chatTrigger',
         typeVersion: 1.4,
-        position: [-400, 500] as [number, number],
+        position: [-400, 500],
         webhookId,
         parameters: {
           public: true,
@@ -88,7 +88,7 @@ export function createReflectionWorkflow(
       name: 'Empty Output',
       type: 'n8n-nodes-base.code',
       typeVersion: 2,
-      position: [-200, 300] as [number, number],
+      position: [-200, 300],
     })
 
     const connections: WorkflowBase['connections'] = {
@@ -145,7 +145,7 @@ export function createReflectionWorkflow(
       name: 'Execute Workflow Trigger',
       type: 'n8n-nodes-base.executeWorkflowTrigger',
       typeVersion: 1.1,
-      position: [-400, 300] as [number, number],
+      position: [-400, 300],
     },
   ]
 
@@ -156,7 +156,7 @@ export function createReflectionWorkflow(
       name: 'When chat message received',
       type: '@n8n/n8n-nodes-langchain.chatTrigger',
       typeVersion: 1.4,
-      position: [-400, 100] as [number, number],
+      position: [-400, 100],
       webhookId,
       parameters: {
         public: true,
@@ -177,7 +177,7 @@ export function createReflectionWorkflow(
       parameters: {},
       type: 'n8n-nodes-base.manualTrigger',
       typeVersion: 1,
-      position: [-400, 500] as [number, number],
+      position: [-400, 500],
       id: 'manual-trigger',
       name: 'Manual Trigger',
     },
@@ -208,7 +208,7 @@ export function createReflectionWorkflow(
       name: 'Set Test Input',
       type: 'n8n-nodes-base.set',
       typeVersion: 3.4,
-      position: [-200, 500] as [number, number],
+      position: [-200, 500],
     },
     {
       parameters: {
@@ -218,7 +218,7 @@ export function createReflectionWorkflow(
       name: 'Merge Trigger',
       type: 'n8n-nodes-base.code',
       typeVersion: 2,
-      position: [-100, 300] as [number, number],
+      position: [-100, 300],
     },
     {
       parameters: {
@@ -272,7 +272,7 @@ export function createReflectionWorkflow(
       name: 'Fetch Reflexes',
       type: 'n8n-nodes-base.executeWorkflow',
       typeVersion: 1.2,
-      position: [100, 300] as [number, number],
+      position: [100, 300],
     },
     {
       parameters: {
@@ -282,7 +282,7 @@ export function createReflectionWorkflow(
       name: 'Prepare Prompt',
       type: 'n8n-nodes-base.code',
       typeVersion: 2,
-      position: [300, 300] as [number, number],
+      position: [300, 300],
     },
     {
       parameters: {
@@ -305,7 +305,7 @@ export function createReflectionWorkflow(
       name: 'Basic LLM Chain',
       type: '@n8n/n8n-nodes-langchain.chainLlm',
       typeVersion: 1.8,
-      position: [500, 300] as [number, number],
+      position: [500, 300],
     },
     {
       parameters: {
@@ -316,7 +316,7 @@ export function createReflectionWorkflow(
       name: 'OpenRouter Chat Model',
       type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
       typeVersion: 1,
-      position: [500, 520] as [number, number],
+      position: [500, 520],
       credentials: {
         openRouterApi: {
           id: 'FsN0N48lU327xkz6',
@@ -340,7 +340,7 @@ return [{
       name: 'Build Output',
       type: 'n8n-nodes-base.code',
       typeVersion: 2,
-      position: [848, 304] as [number, number],
+      position: [848, 304],
     },
   )
 

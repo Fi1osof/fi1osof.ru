@@ -1,3 +1,9 @@
+query facts($where: KBFactWhereInput, $orderBy: KBFactOrderByInput, $skip: Int, $take: Int) {
+  response: facts(where: $where, orderBy: $orderBy, skip: $skip, take: $take) {
+    ...KBFact_
+  }
+}
+
 query myFacts($where: KBFactWhereInput, $orderBy: KBFactOrderByInput, $skip: Int, $take: Int) {
   response: myFacts(where: $where, orderBy: $orderBy, skip: $skip, take: $take) {
     ...KBFact_

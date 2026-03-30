@@ -51,6 +51,9 @@ async function resolveWorkflowDependencies(
 
     let hasChanges = false
     const resolvedNodes = wf.nodes.map((node) => {
+      let updatedNode = node
+
+      // Resolve workflowId parameter
       const workflowId = node.parameters?.workflowId
       if (
         workflowId?.__rl === true &&
@@ -66,10 +69,10 @@ async function resolveWorkflowDependencies(
             node: (node as { name?: string }).name || 'unknown',
             ref: workflowId.value,
           })
-          return {
-            ...node,
+          updatedNode = {
+            ...updatedNode,
             parameters: {
-              ...node.parameters,
+              ...updatedNode.parameters,
               workflowId: {
                 ...workflowId,
                 mode: 'id',
@@ -77,21 +80,55 @@ async function resolveWorkflowDependencies(
               },
             },
           }
-        }
-
-        return {
-          ...node,
-          parameters: {
-            ...node.parameters,
-            workflowId: {
-              ...workflowId,
-              mode: 'id',
-              value: resolvedId,
+        } else {
+          updatedNode = {
+            ...updatedNode,
+            parameters: {
+              ...updatedNode.parameters,
+              workflowId: {
+                ...workflowId,
+                mode: 'id',
+                value: resolvedId,
+              },
             },
-          },
+          }
         }
       }
-      return node
+
+      // Resolve targetWorkflow in workflowInputs.value (for proxy workflows)
+      // targetWorkflow is a WorkflowName string that gets resolved to workflow ID
+      const workflowInputs = updatedNode.parameters?.workflowInputs as
+        | { value?: { targetWorkflow?: string } }
+        | undefined
+      const targetWorkflow = workflowInputs?.value?.targetWorkflow
+      if (typeof targetWorkflow === 'string' && targetWorkflow) {
+        const resolvedId = idMap[targetWorkflow]
+        hasChanges = true
+
+        if (!resolvedId) {
+          unresolvedRefs.push({
+            workflow: name,
+            node: (node as { name?: string }).name || 'unknown',
+            ref: `targetWorkflow: ${targetWorkflow}`,
+          })
+        } else {
+          updatedNode = {
+            ...updatedNode,
+            parameters: {
+              ...updatedNode.parameters,
+              workflowInputs: {
+                ...(updatedNode.parameters?.workflowInputs as object),
+                value: {
+                  ...(workflowInputs?.value as object),
+                  targetWorkflow: resolvedId,
+                },
+              },
+            },
+          }
+        }
+      }
+
+      return updatedNode
     })
 
     if (hasChanges) {

@@ -57,3 +57,9 @@ export type WorkflowName =
   | 'Agent World'
   | 'Tool: Agent World'
   | 'Tool: Add Conversation'
+  // Other
+  | `Tool: Create Concept (${string})`
+  | `Tool: Read Concepts (${string})`
+  | `Tool: Update Concept (${string})`
+  | `Tool: Delete Concept (${string})`
+  | `Tool: Exec Tool (${string})`

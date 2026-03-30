@@ -35,13 +35,13 @@ export function getUsefulInfoAgent({
   mainAgentNode,
   mergeToolsNode: _mergeToolsNode,
 }: GetUsefulInfoAgentProps) {
-  const { agentId, agentName, model } = config
+  const { agentId, agentName, modelUseful } = config
 
   const usefulInfoAgentId = agentId + '-useful-info'
   const usefulInfoAgentName = agentName + '-useful-info'
 
   const position: [number, number] = [
-    mainAgentNode.position[0] - 500,
+    mainAgentNode.position[0] - 1000,
     mainAgentNode.position[1] + 200,
   ]
 
@@ -91,7 +91,7 @@ export function getUsefulInfoAgent({
     agentNodeType: 'orchestrator',
     enableStreaming: true,
     maxIterations: parseInt(process.env.N8N_MAX_ITERATIONS || '10'),
-    model,
+    model: modelUseful,
     systemMessage: USEFUL_INFO_SYSTEM_MESSAGE,
     hasTools: false,
     position,

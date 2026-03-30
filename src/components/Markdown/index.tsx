@@ -45,11 +45,12 @@ const components: Components = {
 
 type MarkdownProps = {
   children: string | null | undefined
+  className?: string
 }
 
-export const Markdown: React.FC<MarkdownProps> = ({ children }) => {
+export const Markdown: React.FC<MarkdownProps> = ({ children, ...other }) => {
   return children ? (
-    <MarkdownStyled>
+    <MarkdownStyled {...other}>
       <ReactMarkdown
         urlTransform={urlTransform}
         remarkPlugins={[remarkGfm]}

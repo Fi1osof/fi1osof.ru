@@ -35,8 +35,12 @@ export interface AgentFactoryConfig {
   workflowInputs?: WorkflowInputValue[]
   /** Enable workflow output node */
   hasWorkflowOutput?: boolean
-  /** AI model to use (e.g., 'anthropic/claude-sonnet-4') */
+  /** AI model to use (e.g., 'anthropic/claude-sonnet-4') main agent */
   model?: string
+  /** AI model to use decompositor agent */
+  modelDecompositor?: string
+  /** AI model to use useful agent */
+  modelUseful?: string
   /** Maximum tool execution iterations */
   maxIterations?: number
   /** Conversation memory size (false to disable) */

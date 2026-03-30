@@ -1,3 +1,9 @@
+query factProjections($where: KBFactProjectionWhereInput, $orderBy: KBFactProjectionOrderByInput, $skip: Int, $take: Int) {
+  response: factProjections(where: $where, orderBy: $orderBy, skip: $skip, take: $take) {
+    ...KBFactProjection_
+  }
+}
+
 query myFactProjections($where: KBFactProjectionWhereInput, $orderBy: KBFactProjectionOrderByInput, $skip: Int, $take: Int) {
   response: myFactProjections(where: $where, orderBy: $orderBy, skip: $skip, take: $take) {
     ...KBFactProjection_

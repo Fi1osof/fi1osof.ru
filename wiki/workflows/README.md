@@ -26,6 +26,7 @@ server/n8n/workflows/
 ├── error-handler/           # Error handling workflow
 ├── reflection/              # Agent reflection workflow
 ├── tool-*/                  # Tool workflows
+├── tool-exec-tool/          # ExecTool proxy for tool calls with reasoning
 └── verify-token/            # Token verification
 ```
 
@@ -36,6 +37,65 @@ server/n8n/workflows/
 - `memorySize` — conversation memory size, `0` to disable
 - `authFromToken` — authenticate users from JWT token
 - `hasMemoryRecall` — enable Memory Recall tool for searching tool execution history
+
+## ExecTool Proxy Pattern
+
+Tools can be called through a proxy workflow that logs reasoning before execution.
+
+### Structure
+
+```
+server/n8n/workflows/
+├── tool-exec-tool/           # Proxy workflow factory
+│   ├── factory.ts            # createToolExecTool()
+│   └── helpers.ts            # getExecToolWorkflowName()
+└── agent-chat/nodes/execTool/
+    ├── index.ts              # getExecTools() - returns tool nodes
+    ├── interfaces.ts         # GetExecToolConfig, reasoningTitle
+    └── tools/                # Individual tool definitions
+        ├── KB/KBConcept/     # KB Concept CRUD tools
+        ├── fetchRequest.ts
+        ├── graphqlRequest.ts
+        ├── urlReader.ts
+        └── webSearchAgent.ts
+```
+
+### How it works
+
+1. Tool node calls `ExecTool` proxy workflow with `targetWorkflow` and `reasoning`
+2. Proxy logs reasoning and executes target workflow dynamically
+3. Bootstrap resolves `targetWorkflow` name to workflow ID
+
+### Creating a new ExecTool
+
+```typescript
+// tools/myTool.ts
+import { getExecToolWorkflowName } from 'server/n8n/workflows/tool-exec-tool/factory'
+
+export function getMyTool(config: GetExecToolConfig): NodeType {
+  return {
+    parameters: {
+      name: 'my_tool',
+      description: 'Tool description',
+      workflowId: {
+        __rl: true,
+        mode: 'name',
+        value: getExecToolWorkflowName(config.agentName),
+      },
+      workflowInputs: {
+        mappingMode: 'defineBelow',
+        value: {
+          targetWorkflow: `Tool: My Tool (${config.agentName})`,
+          reasoning: `={{ $fromAI('reasoning', '${reasoningTitle}', 'string') }}`,
+          // ... other parameters
+        },
+      },
+    },
+    type: '@n8n/n8n-nodes-langchain.toolWorkflow',
+    // ...
+  }
+}
+```
 
 ## Best Practices
 

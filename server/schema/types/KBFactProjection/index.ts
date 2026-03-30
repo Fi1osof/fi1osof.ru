@@ -7,6 +7,7 @@ import './enums'
 import './inputs'
 
 // Import resolvers
+import './resolvers/factProjections'
 import './resolvers/myFactProjections'
 import './resolvers/myFactProjection'
 import './resolvers/createFactProjection'

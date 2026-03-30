@@ -7,6 +7,7 @@ import './enums'
 import './inputs'
 
 // Import resolvers
+import './resolvers/facts'
 import './resolvers/myFacts'
 import './resolvers/myFact'
 import './resolvers/createFact'

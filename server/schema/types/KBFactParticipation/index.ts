@@ -4,6 +4,7 @@ import { builder } from '../../builder'
 import './inputs'
 
 // Import resolvers
+import './resolvers/factParticipations'
 import './resolvers/myFactParticipations'
 import './resolvers/createFactParticipation'
 import './resolvers/updateFactParticipation'

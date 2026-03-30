@@ -36,13 +36,13 @@ export function getDecompositor({
   config,
   mainAgentNode,
 }: getDecompositorProps) {
-  const { agentId, agentName, model } = config
+  const { agentId, agentName, modelDecompositor } = config
 
   const decompositorAgentId = agentId + '-decompositor'
   const decompositorAgentName = agentName + '-decompositor'
 
   const position: [number, number] = [
-    mainAgentNode.position[0] - 500,
+    mainAgentNode.position[0] - 1000,
     mainAgentNode.position[1] - 300,
   ]
 
@@ -63,7 +63,7 @@ export function getDecompositor({
     agentNodeType: 'orchestrator',
     enableStreaming: false,
     maxIterations: parseInt(process.env.N8N_MAX_ITERATIONS || '10'),
-    model,
+    model: modelDecompositor,
     systemMessage: DECOMPOSITOR_SYSTEM_MESSAGE,
     hasTools: false,
     position,

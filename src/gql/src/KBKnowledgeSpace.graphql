@@ -1,3 +1,9 @@
+query knowledgeSpaces($where: KBKnowledgeSpaceWhereInput, $orderBy: KBKnowledgeSpaceOrderByInput, $skip: Int, $take: Int) {
+  response: knowledgeSpaces(where: $where, orderBy: $orderBy, skip: $skip, take: $take) {
+    ...KBKnowledgeSpace_
+  }
+}
+
 query myKnowledgeSpaces($where: KBKnowledgeSpaceWhereInput, $orderBy: KBKnowledgeSpaceOrderByInput, $skip: Int, $take: Int) {
   response: myKnowledgeSpaces(where: $where, orderBy: $orderBy, skip: $skip, take: $take) {
     ...KBKnowledgeSpace_

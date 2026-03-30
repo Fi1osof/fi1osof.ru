@@ -1,3 +1,9 @@
+query factParticipations($where: KBFactParticipationWhereInput, $orderBy: KBFactParticipationOrderByInput, $skip: Int, $take: Int) {
+  response: factParticipations(where: $where, orderBy: $orderBy, skip: $skip, take: $take) {
+    ...KBFactParticipation_
+  }
+}
+
 query myFactParticipations($where: KBFactParticipationWhereInput, $orderBy: KBFactParticipationOrderByInput, $skip: Int, $take: Int) {
   response: myFactParticipations(where: $where, orderBy: $orderBy, skip: $skip, take: $take) {
     ...KBFactParticipation_

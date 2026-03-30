@@ -1,22 +1,57 @@
-query myConcepts($where: KBConceptWhereInput, $orderBy: KBConceptOrderByInput, $skip: Int, $take: Int) {
-  response: myConcepts(where: $where, orderBy: $orderBy, skip: $skip, take: $take) {
+query myConcepts(
+  $where: KBConceptWhereInput
+  $orderBy: KBConceptOrderByInput
+  $skip: Int
+  $take: Int
+  $detailedInfo: Boolean = false
+) {
+  response: myConcepts(
+    where: $where
+    orderBy: $orderBy
+    skip: $skip
+    take: $take
+  ) {
     ...KBConcept_
   }
 }
 
-query myConcept($id: String!) {
+query myConcept($id: String!, $detailedInfo: Boolean = true) {
   response: myConcept(id: $id) {
     ...KBConcept_
   }
 }
 
-mutation createConcept($data: KBConceptCreateInput!) {
+query concepts(
+  $where: KBConceptWhereInput
+  $orderBy: KBConceptOrderByInput
+  $skip: Int
+  $take: Int
+  $detailedInfo: Boolean = true
+) {
+  response: concepts(
+    where: $where
+    orderBy: $orderBy
+    skip: $skip
+    take: $take
+  ) {
+    ...KBConcept_
+  }
+}
+
+mutation createConcept(
+  $data: KBConceptCreateInput!
+  $detailedInfo: Boolean = true
+) {
   response: createConcept(data: $data) {
     ...KBConcept_
   }
 }
 
-mutation updateConcept($id: String!, $data: KBConceptUpdateInput!) {
+mutation updateConcept(
+  $id: String!
+  $data: KBConceptUpdateInput!
+  $detailedInfo: Boolean = true
+) {
   response: updateConcept(id: $id, data: $data) {
     ...KBConcept_
   }
@@ -24,7 +59,7 @@ mutation updateConcept($id: String!, $data: KBConceptUpdateInput!) {
 
 mutation deleteConcept($id: String!) {
   response: deleteConcept(id: $id) {
-    ...KBConcept_
+    id
   }
 }
 
@@ -34,11 +69,11 @@ fragment KBConcept_ on KBConcept {
 
 fragment KBConceptNoNesting on KBConcept {
   id
-  createdAt
+  # createdAt
   updatedAt
   type
   name
   description
-  content
   createdById
+  content @include(if: $detailedInfo)
 }

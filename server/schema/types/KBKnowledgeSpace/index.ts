@@ -7,6 +7,7 @@ import './enums'
 import './inputs'
 
 // Import resolvers
+import './resolvers/knowledgeSpaces'
 import './resolvers/myKnowledgeSpaces'
 import './resolvers/myKnowledgeSpace'
 import './resolvers/createKnowledgeSpace'

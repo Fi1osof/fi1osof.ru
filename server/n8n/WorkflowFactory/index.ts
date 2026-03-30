@@ -1,7 +1,7 @@
 import { AgentCredentials } from '../bootstrap/interfaces'
 import { CredentialsMap, WorkflowBase } from '../workflows/interfaces'
 import type { WorkflowRegistry } from '../WorkflowRegistry'
-import { WorkflowFactoryProps } from './interfaces'
+import { NodeType, WorkflowFactoryProps } from './interfaces'
 
 export abstract class WorkflowFactory {
   credentialId: string | undefined
@@ -12,9 +12,44 @@ export abstract class WorkflowFactory {
 
   registry: WorkflowRegistry
 
+  private _nodesStore: Record<string, NodeType> = {}
+
+  protected nodes: Record<string, NodeType>
+
   constructor({ credentialsMap, registry }: WorkflowFactoryProps) {
     this.credentialsMap = credentialsMap
     this.registry = registry
+
+    this.nodes = new Proxy(this._nodesStore, {
+      get: (target, prop: string) => {
+        if (prop === Symbol.iterator.toString() || typeof prop === 'symbol') {
+          return Reflect.get(target, prop)
+        }
+        const node = target[prop]
+        if (!node) {
+          throw new Error(`Node "${prop}" not found`)
+        }
+        return node
+      },
+      set: (target, prop: string, value: NodeType) => {
+        target[prop] = value
+        return true
+      },
+    })
+  }
+
+  protected addNode(node: NodeType): void {
+    this._nodesStore[node.name] = node
+  }
+
+  protected addNodes(nodes: NodeType[]): void {
+    for (const node of nodes) {
+      this.addNode(node)
+    }
+  }
+
+  protected getNodesArray(): NodeType[] {
+    return Object.values(this._nodesStore)
   }
 
   getCredentials(agentCredentialsKey: string) {

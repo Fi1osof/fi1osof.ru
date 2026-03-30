@@ -9,7 +9,12 @@ import { AgentCredentials } from 'server/n8n/bootstrap/interfaces'
 import { WorkflowBase } from '../interfaces'
 import { getDecompositor } from './nodes/decompositor'
 import { getMainAgent } from './nodes/mainAgent'
-import { getUsefulInfoAgent } from './nodes/usefulInfoAgent'
+import { createToolCreateConcept } from './nodes/KB/KBConcept/createConcept'
+import { createToolReadConcepts } from './nodes/KB/KBConcept/readConcepts'
+import { createToolUpdateConcept } from './nodes/KB/KBConcept/updateConcept'
+import { createToolDeleteConcept } from './nodes/KB/KBConcept/deleteConcept'
+import { createToolExecTool } from '../tool-exec-tool/factory'
+import { getExecTools } from './nodes/execTool'
 
 class ChatAgentWorkflow extends AgentWorkflowFactory {
   getCredentialsKey() {
@@ -29,6 +34,11 @@ class ChatAgentWorkflow extends AgentWorkflowFactory {
       ...other
     } = agentCreds
 
+    const memorySize =
+      process.env.AGENT_MEMORY_SIZE === 'false'
+        ? false
+        : parseInt(process.env.AGENT_MEMORY_SIZE || '5')
+
     return {
       agentName,
       agentDescription: 'Main chat agent. Handles user conversations.',
@@ -42,6 +52,7 @@ class ChatAgentWorkflow extends AgentWorkflowFactory {
       instanceId: 'narasim-dev-agent-chat',
       agentNodeType: 'orchestrator',
       model: model || getModel(process.env.AGENT_CHAT_MODEL),
+      memorySize,
       ...other,
     }
   }
@@ -49,57 +60,91 @@ class ChatAgentWorkflow extends AgentWorkflowFactory {
   buildMainWorkflow(config: AgentFactoryConfig): WorkflowBase {
     const { workflowName, versionId, instanceId, agentId } = config
 
+    // Trigger nodes
     const [triggerNodes, triggerConnections] = this.getTriggerNodes(config)
+    this.addNodes(triggerNodes)
+
+    // Main agent nodes
     const [agentNodes, agentConnections, mainAgentNode] =
       this.getMainAgent(config)
 
+    this.addNodes(agentNodes)
+
+    // GraphQL tool
     const [graphqlToolNode, graphqlToolConnectionsMain] =
       this.getGraphqlToolNodesAndConnections(config, mainAgentNode)
+    if (graphqlToolNode) {
+      this.addNode(graphqlToolNode)
+    }
 
-    const {
-      decompositorAgentNodes,
-      decompositorAgentConnections,
-      mergeToolsNode,
-      decompositorAgentNode,
-    } = this.getDecompositor(config, mainAgentNode)
+    // Exec Tools - прокси для вызова инструментов с обоснованием
+    const execTools = getExecTools(config)
+    this.addNodes(execTools)
 
-    const {
-      usefulInfoAgentNodes,
-      usefulInfoAgentConnections,
-      prepareAgentInputNode: usefulInfoPrepareNode,
-      usefulInfoAgentNode,
-    } = getUsefulInfoAgent({ config, mainAgentNode, mergeToolsNode })
-
-    // Add connection from mergeToolsNode to usefulInfoAgent
-    decompositorAgentConnections[mergeToolsNode.name]?.main[0]?.push({
-      node: usefulInfoPrepareNode.name,
-      type: 'main',
-      index: 0,
+    this.addNode({
+      id: `${agentId}-merge-agent-data`,
+      name: 'Merge Agent Data',
+      type: 'n8n-nodes-base.merge',
+      typeVersion: 3,
+      position: [
+        mainAgentNode.position[0] - 1168,
+        mainAgentNode.position[1] + 16,
+      ],
+      parameters: {
+        numberInputs: 2,
+      },
     })
 
-    // Merge node to collect results from decompositor and useful-info agents
-    const mergeAgentsNode: NodeType = {
+    this.addNode({
+      id: `${agentId}-prepare-agent-data`,
+      name: 'Prepare Agent Data',
+      type: 'n8n-nodes-base.code',
+      typeVersion: 2,
+      position: [
+        mainAgentNode.position[0] - 928,
+        mainAgentNode.position[1] + 16,
+      ],
+      parameters: {
+        jsCode: `const items = $input.all()
+const agentData = items[0]?.json?.data?.me || null
+const mindLogs = items[1]?.json?.data?.response || []
+
+return {
+  agentData,
+  mindLogs,
+}`,
+      },
+    })
+
+    // Merge node to collect results from decompositor, useful-info agents, and agent data
+    this.addNode({
       id: `${agentId}-merge-agents`,
       name: 'Merge Agents',
       type: 'n8n-nodes-base.merge',
       typeVersion: 3,
-      position: [mainAgentNode.position[0] - 300, mainAgentNode.position[1]],
+      position: [
+        mainAgentNode.position[0] - 432,
+        mainAgentNode.position[1] - 16,
+      ],
       parameters: {
-        numberInputs: 2,
+        numberInputs: 3,
       },
-    }
+    })
 
+    // Output nodes
     const [outputNodes, outputConnections] = this.getOutputNodes({
       ...config,
       hasWorkflowOutput: true,
     })
+    this.addNodes(outputNodes)
 
-    const saveConversationNode: NodeType = {
+    // Save conversation node
+    this.addNode({
       id: `${agentId}-save-conversation`,
       name: 'Save Conversation',
       type: 'n8n-nodes-base.executeWorkflow',
       typeVersion: 1.2,
-      position: [700, 50],
+      position: [2672, -368],
       parameters: {
         source: 'database',
         workflowId: {
@@ -117,35 +162,14 @@ class ChatAgentWorkflow extends AgentWorkflowFactory {
           },
         },
       },
-    }
+    })
 
+    // Base nodes (prepareContext)
     const { prepareContextNode } = this.getBaseNodes(config)
-    prepareContextNode.position = [
-      prepareContextNode.position[0] - 400,
-      prepareContextNode.position[1],
-    ]
 
-    const nodes: NodeType[] = [
-      ...triggerNodes,
-      prepareContextNode,
-      ...decompositorAgentNodes,
-      ...usefulInfoAgentNodes,
-      mergeAgentsNode,
-      ...agentNodes,
-      ...(graphqlToolNode ? [graphqlToolNode] : []),
-      ...outputNodes,
-      saveConversationNode,
-    ]
-
+    // Get references to nodes for connections
     const agentNodesFirst = agentNodes.at(0)
     const triggerNodesLast = triggerNodes.at(-1)
-    const decompositorAgentNodesFirst = decompositorAgentNodes.at(0)
-
-    outputConnections[mainAgentNode.name].main[0]?.push({
-      node: saveConversationNode.name,
-      type: 'main',
-      index: 0,
-    })
 
     const connections: ConnectionsType = {
       ...triggerConnections,
@@ -163,45 +187,61 @@ class ChatAgentWorkflow extends AgentWorkflowFactory {
             ],
           },
         }),
-      ...(prepareContextNode &&
-        decompositorAgentNodesFirst && {
-          [prepareContextNode.name]: {
-            main: [
-              [
-                {
-                  node: decompositorAgentNodesFirst.name,
-                  type: 'main',
-                  index: 0,
-                },
-              ],
-            ],
-          },
-        }),
-      ...decompositorAgentConnections,
-      ...usefulInfoAgentConnections,
-      // decompositor and useful-info agents to Merge
-      [decompositorAgentNode.name]: {
-        main: [[{ node: mergeAgentsNode.name, type: 'main', index: 0 }]],
+      [this.nodes['Merge Agent Data'].name]: {
+        main: [
+          [
+            {
+              node: this.nodes['Prepare Agent Data'].name,
+              type: 'main',
+              index: 0,
+            },
+          ],
+        ],
       },
-      [usefulInfoAgentNode.name]: {
-        main: [[{ node: mergeAgentsNode.name, type: 'main', index: 1 }]],
+      [this.nodes['Prepare Agent Data'].name]: {
+        main: [
+          [{ node: this.nodes['Merge Agents'].name, type: 'main', index: 2 }],
+        ],
       },
-      // Merge to Prepare Agent Input (chat-agent)
       ...(agentNodesFirst && {
-        [mergeAgentsNode.name]: {
+        [this.nodes['Merge Agents'].name]: {
           main: [[{ node: agentNodesFirst.name, type: 'main', index: 0 }]],
         },
       }),
       ...agentConnections,
       ...graphqlToolConnectionsMain,
       ...outputConnections,
+      ...Object.fromEntries(
+        execTools.map((tool) => [
+          tool.name,
+          {
+            ai_tool: [
+              [{ node: mainAgentNode.name, type: 'ai_tool', index: 0 }],
+            ],
+          },
+        ]),
+      ),
+
+      ...{
+        [this.nodes['Prepare Context'].name]: {
+          main: [
+            [
+              {
+                node: 'Prepare Agent Input (chat-agent)',
+                type: 'main',
+                index: 0,
+              },
+            ],
+          ],
+        },
+      },
     }
 
     return {
       name: workflowName,
       active: true,
       versionId,
-      nodes,
+      nodes: this.getNodesArray(),
       connections,
       pinData: {},
       settings: {
@@ -223,23 +263,38 @@ class ChatAgentWorkflow extends AgentWorkflowFactory {
   getMainAgent(
     config: AgentFactoryConfig,
   ): [NodeType[], ConnectionsType, agentNode: NodeType] {
-    return getMainAgent({ config })
+    return getMainAgent({ config, hasMemory: this.hasMemory() })
   }
 
-  upgradeMainWorkflow(workflow: WorkflowBase, config: AgentFactoryConfig) {
-    super.upgradeMainWorkflow(workflow, config)
+  protected createNestedFlows(config: AgentFactoryConfig): WorkflowBase[] {
+    const workflows = super.createNestedFlows(config)
 
-    const getUserByTokenConnections = workflow.connections['Get User By Token']
-
-    if (!getUserByTokenConnections) {
-      throw new Error('Can not get getUserByTokenConnections')
-    }
-
-    getUserByTokenConnections.main[0]?.push({
-      type: 'main',
-      node: 'Merge Tools',
-      index: 3,
+    const saveConceptWorkflow = createToolCreateConcept({
+      agentName: config.agentName,
     })
+    workflows.push(saveConceptWorkflow)
+
+    const readConceptsWorkflow = createToolReadConcepts({
+      agentName: config.agentName,
+    })
+    workflows.push(readConceptsWorkflow)
+
+    const updateConceptWorkflow = createToolUpdateConcept({
+      agentName: config.agentName,
+    })
+    workflows.push(updateConceptWorkflow)
+
+    const deleteConceptWorkflow = createToolDeleteConcept({
+      agentName: config.agentName,
+    })
+    workflows.push(deleteConceptWorkflow)
+
+    const execToolWorkflow = createToolExecTool({
+      agentName: config.agentName,
+    })
+    workflows.push(execToolWorkflow)
+
+    return workflows
   }
 }
 

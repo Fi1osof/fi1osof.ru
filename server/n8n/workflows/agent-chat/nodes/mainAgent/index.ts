@@ -6,13 +6,23 @@ import {
   NodeType,
 } from 'server/n8n/workflows/agent-factory/interfaces'
 import { createAgentNode } from 'server/n8n/workflows/agent-factory/nodes/createAgentNode'
+import {
+  getCodeExecutionNodes,
+  getCodeExecutionConnections,
+} from 'server/n8n/workflows/agent-factory/tools/codeExecution'
+import {
+  getMemoryRecallNodes,
+  getMemoryRecallConnections,
+} from 'server/n8n/workflows/agent-factory/tools/memoryRecall'
 
 type GetMainAgentProps = {
   config: AgentFactoryConfig
+  hasMemory: boolean
 }
 
 export function getMainAgent({
   config,
+  hasMemory,
 }: GetMainAgentProps): [NodeType[], ConnectionsType, agentNode: NodeType] {
   const {
     agentId,
@@ -21,7 +31,8 @@ export function getMainAgent({
     enableStreaming = true,
     maxIterations = parseInt(process.env.N8N_MAX_ITERATIONS || '10'),
     model,
-    // systemMessagePath,
+    canAccessFileSystem = false,
+    hasMemoryRecall = false,
   } = config
 
   const prepareAgentInputCode = fs.readFileSync(
@@ -34,10 +45,9 @@ export function getMainAgent({
     'utf-8',
   )
 
-  const systemMessage = `${baseSystemMessage}
-  `
+  const systemMessage = `${baseSystemMessage}`
 
-  const position: [number, number] = [112, 304]
+  const position: [number, number] = [2080, -128]
 
   const agentNode = createAgentNode({
     agentId,
@@ -59,15 +69,44 @@ export function getMainAgent({
     name: `Prepare Agent Input (${agentId})`,
     type: 'n8n-nodes-base.code',
     typeVersion: 2,
-    position: [position[0] - 150, position[1]],
+    position: [position[0] - 144, position[1]],
   }
 
-  const nodes: NodeType[] = [prepareAgentInputNode, agentNode]
+  // Tool nodes based on config flags
+  const codeExecutionNodes: NodeType[] = canAccessFileSystem
+    ? getCodeExecutionNodes({ agentId, agentName })
+    : []
+
+  const codeExecutionConnections: ConnectionsType = canAccessFileSystem
+    ? getCodeExecutionConnections({ agentId, agentName })
+    : {}
+
+  const memoryRecallNodes: NodeType[] = hasMemoryRecall
+    ? getMemoryRecallNodes({ agentId, agentName })
+    : []
+
+  const memoryRecallConnections: ConnectionsType = hasMemoryRecall
+    ? getMemoryRecallConnections({ agentId, agentName })
+    : {}
+
+  const nodes: NodeType[] = [
+    prepareAgentInputNode,
+    agentNode,
+    ...codeExecutionNodes,
+    ...memoryRecallNodes,
+  ]
 
   const connections: ConnectionsType = {
     [`Prepare Agent Input (${agentId})`]: {
       main: [[{ node: agentName, type: 'main', index: 0 }]],
     },
+    ...codeExecutionConnections,
+    ...memoryRecallConnections,
+    ...(hasMemory && {
+      ['Simple Memory']: {
+        ai_memory: [[{ node: agentName, type: 'ai_memory', index: 0 }]],
+      },
+    }),
   }
 
   return [nodes, connections, agentNode]

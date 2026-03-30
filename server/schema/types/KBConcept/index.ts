@@ -4,6 +4,7 @@ import { builder } from '../../builder'
 import './inputs'
 
 // Import resolvers
+import './resolvers/concepts'
 import './resolvers/myConcepts'
 import './resolvers/myConcept'
 import './resolvers/createConcept'
