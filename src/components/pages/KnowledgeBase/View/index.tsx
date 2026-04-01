@@ -5,6 +5,7 @@ import {
   useKnowledgeSpacesQuery,
   useFactProjectionsQuery,
   useConceptsQuery,
+  SortOrder,
 } from 'src/gql/generated'
 import { ViewStyled, SectionStyled, NestedListStyled } from './styles'
 import { SpaceCard } from './SpaceCard'
@@ -13,7 +14,13 @@ import { FactCard } from './FactCard'
 import { EnrichedConcept, EnrichedFact } from './interfaces'
 
 export const KnowledgeBaseView: React.FC = () => {
-  const { data: conceptsData } = useConceptsQuery()
+  const { data: conceptsData } = useConceptsQuery({
+    variables: {
+      orderBy: {
+        createdAt: SortOrder.DESC,
+      },
+    },
+  })
   const { data: factsData } = useFactsQuery()
   const { data: participationsData } = useFactParticipationsQuery()
   const { data: knowledgeSpacesData } = useKnowledgeSpacesQuery()
@@ -27,6 +34,7 @@ export const KnowledgeBaseView: React.FC = () => {
     const projections = projectionsData?.response || []
 
     const enrichedFacts: Map<string, EnrichedFact> = new Map()
+
     facts.forEach((fact) => {
       if (fact.id) {
         enrichedFacts.set(fact.id, {
@@ -37,20 +45,13 @@ export const KnowledgeBaseView: React.FC = () => {
       }
     })
 
-    const enrichedConcepts: EnrichedConcept[] = concepts
-      .map((concept) => ({
-        concept,
-        participatingFacts: participations
-          .filter((p) => p.conceptId === concept.id)
-          .map((p) => enrichedFacts.get(p.factId || ''))
-          .filter((f) => f !== undefined) as EnrichedFact[],
-      }))
-      .sort((a, b) => {
-        return (
-          (a.concept.type?.charCodeAt(0) ?? 0) -
-          (b.concept.type?.charCodeAt(0) ?? 0)
-        )
-      })
+    const enrichedConcepts: EnrichedConcept[] = concepts.map((concept) => ({
+      concept,
+      participatingFacts: participations
+        .filter((p) => p.conceptId === concept.id)
+        .map((p) => enrichedFacts.get(p.factId || ''))
+        .filter((f) => f !== undefined),
+    }))
 
     return {
       concepts: enrichedConcepts,
