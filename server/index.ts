@@ -6,6 +6,7 @@ import { setupGraphqlServer } from './graphqlServer'
 import { initN8n, stopN8n } from './n8n'
 import { runBootstrap } from './n8n/bootstrap'
 import { generateSitemap, SitemapSection } from './sitemap'
+import { imageResizerMiddleware } from './middleware/imageResizer'
 
 const withN8N = process.env.N8N_ENABLED === 'true'
 
@@ -70,6 +71,9 @@ async function startServer() {
   server.use('/webhook', n8nProxy)
   server.use('/webhook-test', n8nProxy)
   server.use('/mcp', n8nProxy)
+
+  // Image resizer
+  server.use('/images/', imageResizerMiddleware)
 
   // Static files from shared (uploads, not tracked)
   server.use(express.static(cwd + '/shared'))
