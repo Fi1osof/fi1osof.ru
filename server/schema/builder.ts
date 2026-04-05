@@ -7,6 +7,7 @@ import { Prisma } from '@prisma/client'
 import { prismaClient } from '../prisma'
 import { DateTimeResolver, JSONResolver } from 'graphql-scalars'
 import { PrismaContext } from 'server/context/interfaces'
+import { GraphQLUpload } from './scalars/Upload'
 
 export const builder = new SchemaBuilder<{
   PrismaTypes: PrismaTypes
@@ -20,6 +21,10 @@ export const builder = new SchemaBuilder<{
       Input: unknown
       Output: unknown
     }
+    Upload: {
+      Input: unknown
+      Output: never
+    }
   }
 }>({
   plugins: [PrismaPlugin, RelayPlugin, SimpleObjectsPlugin],
@@ -32,6 +37,7 @@ export const builder = new SchemaBuilder<{
 
 builder.addScalarType('DateTime', DateTimeResolver)
 builder.addScalarType('Json', JSONResolver)
+builder.addScalarType('Upload', GraphQLUpload)
 
 builder.queryType({})
 builder.mutationType({})

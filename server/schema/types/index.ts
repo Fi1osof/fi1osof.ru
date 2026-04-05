@@ -1,4 +1,5 @@
 export * from './common'
+export * from './File'
 export * from './User'
 export * from './MindLog'
 export * from './Task'

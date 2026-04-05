@@ -66,6 +66,7 @@ model User {
   Referrer   User?   @relation(fields: [referrerId], references: [id], name: "Referrer")
   Referrals  User[]  @relation(name: "Referrer")
   referrerId String? @db.VarChar(36)
+  Files      File[]
 
   @@unique([email])
   @@unique([username])
@@ -106,6 +107,25 @@ model TelegramAccount {
 
   userId String @unique @db.VarChar(36)
   User   User   @relation(fields: [userId], references: [id])
+}
+
+model File {
+  id        String   @id @default(cuid()) @db.VarChar(36)
+  path      String   @db.Text
+  name      String?  @db.Text
+  filename  String?  @db.Text
+  mimetype  String   @db.Text
+  encoding  String   @db.Text
+  hash      String?  @db.Text
+  size      Decimal?
+  CreatedBy String?  @db.VarChar(36)
+  rank      Int?
+  Gallery   String?  @db.VarChar(36)
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp(3)
+  User      User?    @relation(fields: [CreatedBy], references: [id])
+
+  @@index([CreatedBy], map: "File_CreatedBy")
 }
 
 enum MindLogType {
