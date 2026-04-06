@@ -59,6 +59,7 @@ const ruleTree = {
     createTaskWorkLog: isActive,
     createMindLog: isActive,
     updateMindLog: isActive,
+    singleUpload: isActive,
   },
 } satisfies PermissionsRuleTree
 

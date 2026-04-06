@@ -9,6 +9,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
 import cors from 'cors'
 import { applyMiddleware } from 'graphql-middleware'
 import type { Context } from 'graphql-ws'
+import { graphqlUploadExpress } from 'graphql-upload-minimal'
 
 import { schema } from '../schema'
 import { createContext } from '../context'
@@ -96,6 +97,7 @@ export async function setupGraphqlServer(): Promise<{
   app.use(
     '/api',
     cors<cors.CorsRequest>(),
+    graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }),
     express.json(),
     expressMiddleware(apolloServer, {
       context: ({ req }) => createContext({ req }),
