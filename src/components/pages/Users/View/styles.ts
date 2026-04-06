@@ -1,8 +1,6 @@
 import styled from 'styled-components'
 
-export const UsersViewStyled = styled.div`
-  padding: ${({ theme }) => theme.spacing.lg};
-`
+export const UsersViewStyled = styled.div``
 
 export const UsersViewGridStyled = styled.div`
   display: flex;

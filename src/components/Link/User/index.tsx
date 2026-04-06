@@ -7,26 +7,16 @@ import {
   NameContainer,
   NameLink,
 } from './styles'
+import { Avatar } from 'src/components/Avatar'
 
-type UserLike = {
-  id?: UserNoNestingFragment['id']
-  username?: UserNoNestingFragment['username']
-  fullname?: UserNoNestingFragment['fullname']
-}
-
-export function createUserLink(user: UserLike): string {
+export function createUserLink(user: UserNoNestingFragment): string {
   const { id } = user
-
-  if (!id) {
-    console.error(`Can not get user ID`, user)
-    return '#'
-  }
 
   return `/users/${id}`
 }
 
 type UserLinkProps = {
-  user: UserLike
+  user: UserNoNestingFragment
   withAvatar?: boolean
   showName?: boolean
   size?: 'small' | 'normal' | 'big'
@@ -60,9 +50,13 @@ export const UserLink: React.FC<UserLinkProps> = ({
 
   const avatarElement = withAvatar ? (
     <AvatarLink href={url} title={displayName}>
-      <UserAvatar $size={size}>
-        <UserIcon />
-      </UserAvatar>
+      {user.image ? (
+        <Avatar user={user} size={size} />
+      ) : (
+        <UserAvatar $size={size}>
+          <UserIcon />
+        </UserAvatar>
+      )}
     </AvatarLink>
   ) : null
 

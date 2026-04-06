@@ -3,6 +3,8 @@ import {
   UserPageViewStyled,
   UserPageActionsStyled,
   UserPageViewToolbarStyled,
+  UserPageViewAvatarStyled,
+  UserPageViewInfoStyled,
 } from './styles'
 import { UserEditForm } from './Form'
 import { useCallback, useState } from 'react'
@@ -15,6 +17,7 @@ import { SendTransfer } from './SendTransfer'
 import { StatusToggler } from './StatusToggler'
 import { SeparatorStyled } from 'src/components/Separator/styles'
 import { GetReferrerToken } from './GetReferrerToken'
+import { getResizedImagePath } from 'src/helpers/getResizedImagePath'
 
 type UserPageViewProps = {
   user: UserFragment
@@ -48,11 +51,22 @@ export const UserPageView: React.FC<UserPageViewProps> = ({
         </>
       </UserPageViewToolbarStyled>
 
-      <Markdown>{user.content}</Markdown>
-
       {isEditing ? (
         <UserEditForm user={user} closeForm={handleCloseForm} />
-      ) : null}
+      ) : (
+        <UserPageViewInfoStyled>
+          {user.image && (
+            <UserPageViewAvatarStyled
+              src={getResizedImagePath({
+                path: user.image,
+                size: 'avatar',
+              })}
+            />
+          )}
+
+          <Markdown>{user.content}</Markdown>
+        </UserPageViewInfoStyled>
+      )}
 
       {isCurrentUser && currentUser && (
         <>

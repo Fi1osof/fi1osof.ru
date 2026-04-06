@@ -1,13 +1,15 @@
-import { MeQuery, UserFragment } from 'src/gql/generated'
+import { MeQuery, UserFragment, UserStatusEnum } from 'src/gql/generated'
 
 export const mockUser: MeQuery['me'] = {
   __typename: 'User',
   id: 'mock-user-id',
   createdAt: new Date('2024-01-01'),
+  updatedAt: new Date('2024-01-01'),
   username: 'john_doe',
   fullname: 'John Doe',
   image: null,
   content: null,
+  status: UserStatusEnum.ACTIVE,
 }
 
 export const mockAdminUser: MeQuery['me'] = {
@@ -15,6 +17,9 @@ export const mockAdminUser: MeQuery['me'] = {
   id: 'mock-admin-id',
   username: 'admin',
   fullname: 'Admin User',
+  createdAt: new Date('2024-01-01'),
+  updatedAt: new Date('2024-01-01'),
+  status: UserStatusEnum.NEWBIE,
 }
 
 export const mockViewedUser: UserFragment = {
@@ -23,7 +28,9 @@ export const mockViewedUser: UserFragment = {
   username: 'johndoe',
   fullname: 'John Doe',
   createdAt: new Date('2024-01-01'),
+  updatedAt: new Date('2024-01-01'),
   image: null,
+  status: UserStatusEnum.ACTIVE,
   content:
     '# About John\n\n' +
     'This profile is written in **Markdown**, but it also contains some raw HTML-like tags for testing.\n\n' +
@@ -39,6 +46,8 @@ export const mockCurrentUser: UserFragment = {
   username: 'currentuser',
   fullname: 'Current User',
   createdAt: new Date('2024-01-01'),
+  updatedAt: new Date('2024-01-01'),
   image: null,
   content: 'I am the current user.',
+  status: UserStatusEnum.ACTIVE,
 }

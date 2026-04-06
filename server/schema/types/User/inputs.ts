@@ -51,6 +51,7 @@ export const CurrentUserUpdateInput = builder.inputType(
       password: t.string(),
       image: t.string(),
       content: t.string(),
+      intro: t.string(),
     }),
   },
 )

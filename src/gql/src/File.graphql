@@ -1,0 +1,17 @@
+mutation singleUpload($data: SingleUploadInput!) {
+  singleUpload(data: $data) {
+    ...File_
+  }
+}
+
+fragment FileNoNesting on File {
+  id
+  createdAt
+  path
+  filename
+  name
+}
+
+fragment File_ on File {
+  ...FileNoNesting
+}

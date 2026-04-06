@@ -135,7 +135,7 @@ export const SendTransfer: React.FC<SendTransferProps> = ({
             onChange={onChangeAmount}
             disabled={loading}
             min="0"
-            step="0.01"
+            step="0.0001"
           />
         </SendTransferFieldStyled>
 

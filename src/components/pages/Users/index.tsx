@@ -27,6 +27,7 @@ export const UsersPage: Page<UsersPageProps> = ({ page }) => {
         users={users}
         page={page}
         count={response.data?.usersCount ?? 0}
+        limit={response.variables.first || 10}
       />
     </>
   )

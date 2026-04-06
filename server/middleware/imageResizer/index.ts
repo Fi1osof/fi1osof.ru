@@ -55,6 +55,7 @@ export const imageResizerMiddleware: RequestHandler = async (
 
               return await img
                 .withMetadata()
+                .jpeg({ quality: 95 })
                 .toBuffer()
                 .catch((e) => {
                   console.error(e)

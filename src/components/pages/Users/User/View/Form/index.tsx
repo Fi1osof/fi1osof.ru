@@ -16,6 +16,7 @@ import { TextField } from 'src/ui-kit/controls/TextField'
 import { FormControl } from 'src/ui-kit/FormControl'
 import { Button } from 'src/ui-kit/Button'
 import { ComponentVariant } from 'src/ui-kit/interfaces'
+import { FileUploader, FileUploaderProps } from 'src/components/FileUploader'
 
 const MarkdownEditor = dynamic(() => import('src/components/Markdown/Editor'), {
   ssr: false,
@@ -27,6 +28,7 @@ function getDefaultValues(user: UserEditFormProps['user']): UserFormData {
     fullname: user?.fullname ?? '',
     image: user?.image ?? '',
     content: user?.content ?? '',
+    intro: user?.intro ?? '',
   }
 }
 
@@ -107,46 +109,82 @@ export const UserEditForm: React.FC<UserEditFormProps> = ({
     [addMessage, form, updateCurrentUserMutation, closeForm],
   )
 
+  const onChangeImage = useCallback<NonNullable<FileUploaderProps['onChange']>>(
+    (file) => {
+      if (file?.path) {
+        form.setValue('image', file.path, {
+          shouldValidate: true,
+        })
+      }
+    },
+    [form],
+  )
+
   const fieldRenderer = useCallback<
     ControllerProps<
       UserFormData,
-      'username' | 'fullname' | 'image' | 'content'
+      'username' | 'fullname' | 'image' | 'content' | 'intro'
     >['render']
-  >(({ field: { name, value, onChange, onBlur }, fieldState: { error } }) => {
-    let label: string
-    const helperText = undefined
-    let EditorComponent: typeof TextField | typeof MarkdownEditor = TextField
+  >(
+    ({ field: { name, value, onChange, onBlur }, fieldState: { error } }) => {
+      let label: string
+      const helperText = undefined
+      let EditorComponent:
+        | typeof TextField
+        | typeof MarkdownEditor
+        | React.FC<{
+            value: string
+          }> = TextField
 
-    switch (name) {
-      case 'username':
-        label = 'Username'
-        break
-      case 'fullname':
-        label = 'Full name'
-        break
-      case 'image':
-        label = 'Image'
-        break
-      case 'content':
-        label = 'Content'
-        EditorComponent = MarkdownEditor
-        break
-    }
+      switch (name) {
+        case 'username':
+          label = 'Username'
+          break
+        case 'fullname':
+          label = 'Full name'
+          break
+        case 'image':
+          label = 'Image'
 
-    return (
-      <FormControl
-        label={label}
-        helperText={error ? error.message : helperText}
-        error={!!error}
-      >
-        <EditorComponent
-          value={value || ''}
-          onChange={onChange}
-          onBlur={onBlur}
-        />
-      </FormControl>
-    )
-  }, [])
+          EditorComponent = ({ value }: { value: string }) => {
+            return (
+              <>
+                <FileUploader
+                  value={value ? `/images/resized/middle/${value}` : ''}
+                  onChange={onChangeImage}
+                />
+              </>
+            )
+          }
+
+          break
+        case 'content':
+          label = 'Content'
+          EditorComponent = MarkdownEditor
+          break
+        case 'intro':
+          label = 'Intro'
+          EditorComponent = MarkdownEditor
+          break
+      }
+
+      return (
+        <FormControl
+          key={name}
+          label={label}
+          helperText={error ? error.message : helperText}
+          error={!!error}
+        >
+          <EditorComponent
+            value={value || ''}
+            onChange={onChange}
+            onBlur={onBlur}
+          />
+        </FormControl>
+      )
+    },
+    [onChangeImage],
+  )
 
   return (
     <UserEditFormStyled {...other} onSubmit={onSubmit}>
@@ -154,6 +192,7 @@ export const UserEditForm: React.FC<UserEditFormProps> = ({
         <Controller name="username" render={fieldRenderer} />
         <Controller name="fullname" render={fieldRenderer} />
         <Controller name="image" render={fieldRenderer} />
+        <Controller name="intro" render={fieldRenderer} />
         <Controller name="content" render={fieldRenderer} />
 
         <div>

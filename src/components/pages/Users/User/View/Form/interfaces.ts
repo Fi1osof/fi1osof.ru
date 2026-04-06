@@ -11,4 +11,5 @@ export const userEditSchema: yup.ObjectSchema<UserFormData> = yup
     username: yup.string(),
     image: yup.string(),
     content: yup.string(),
+    intro: yup.string(),
   })
