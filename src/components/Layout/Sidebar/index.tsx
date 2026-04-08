@@ -33,7 +33,7 @@ const LoginIcon: React.FC = () => (
 )
 
 const navItems = [
-  process.env.NEXT_PUBLIC_POSTS_ENABLED && {
+  process.env.NEXT_PUBLIC_POSTS_ENABLED === 'true' && {
     label: 'Posts',
     href: '/posts',
     icon: (
