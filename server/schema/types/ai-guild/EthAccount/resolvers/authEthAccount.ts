@@ -7,6 +7,7 @@ import {
 } from '../helpers/crypto'
 import { createToken } from '../../../User/helpers/auth'
 import { Prisma } from '@prisma/client'
+import { checkReferrerToken } from 'server/schema/types/User/helpers/checkReferrerToken'
 
 builder.mutationField('authEthAccount', (t) =>
   t.field({
@@ -17,7 +18,7 @@ builder.mutationField('authEthAccount', (t) =>
     resolve: async (_root, args, ctx) => {
       const { currentUser } = ctx
 
-      const { address, signature, nonce } = args.data
+      const { address, signature, nonce, referrerToken } = args.data
 
       if (!verifyNonce(nonce, address)) {
         return {
@@ -36,17 +37,35 @@ builder.mutationField('authEthAccount', (t) =>
         }
       }
 
-      const ethAccountUser:
+      let ethAccountUser:
         | Prisma.EthAccountUpsertArgs['create']['User']
-        | Prisma.EthAccountUpsertArgs['update']['User'] = currentUser
-        ? {
-            connect: {
-              id: currentUser.id,
-            },
-          }
-        : {
-            create: {},
-          }
+        | Prisma.EthAccountUpsertArgs['update']['User']
+
+      if (currentUser) {
+        ethAccountUser = {
+          connect: {
+            id: currentUser.id,
+          },
+        }
+      } else {
+        let referrerId: string | undefined = undefined
+
+        const ethAccount = await ctx.prisma.ethAccount.findUnique({
+          where: { address: address.toLowerCase() },
+        })
+
+        if (!ethAccount?.userId) {
+          referrerId = checkReferrerToken({
+            referrerToken,
+          })
+        }
+
+        ethAccountUser = {
+          create: {
+            referrerId,
+          },
+        }
+      }
 
       const ethAccount = await ctx.prisma.ethAccount.upsert({
         where: { address: address.toLowerCase() },

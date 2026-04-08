@@ -5,6 +5,7 @@ export const EthAccountAuthInput = builder.inputType('EthAccountAuthInput', {
     address: t.string({ required: true }),
     signature: t.string({ required: true }),
     nonce: t.string({ required: true }),
+    referrerToken: t.string({ required: false }),
   }),
 })
 

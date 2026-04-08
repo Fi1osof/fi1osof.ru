@@ -23,9 +23,13 @@ declare global {
 
 export interface MetaMaskAuthProps {
   onSuccess?: () => void
+  referrerToken: string | null
 }
 
-export const MetaMaskAuth: React.FC<MetaMaskAuthProps> = ({ onSuccess }) => {
+export const MetaMaskAuth: React.FC<MetaMaskAuthProps> = ({
+  onSuccess,
+  referrerToken,
+}) => {
   const { onAuth } = useAppContext()
   const { addMessage } = useSnackbar() || {}
   const [loading, setLoading] = useState(false)
@@ -67,7 +71,7 @@ export const MetaMaskAuth: React.FC<MetaMaskAuthProps> = ({ onSuccess }) => {
 
       const authResult = await authEthAccount({
         variables: {
-          data: { address, signature, nonce },
+          data: { address, signature, nonce, referrerToken },
         },
       })
 
@@ -86,7 +90,7 @@ export const MetaMaskAuth: React.FC<MetaMaskAuthProps> = ({ onSuccess }) => {
     } finally {
       setLoading(false)
     }
-  }, [addMessage, authEthAccount, getNonce, onAuth, onSuccess])
+  }, [addMessage, authEthAccount, getNonce, onAuth, onSuccess, referrerToken])
 
   return (
     <MetaMaskAuthStyled>

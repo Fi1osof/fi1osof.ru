@@ -16,6 +16,7 @@ import { Button } from 'src/ui-kit/Button'
 import { useSnackbar } from 'src/ui-kit/Snackbar'
 import { ComponentVariant } from 'src/ui-kit/interfaces'
 import { transactionsRefreshQueriesList } from '../Transactions/interfaces'
+import { MetaMaskAuth } from 'src/components/Auth/MetaMaskAuth'
 
 const ARBITRUM_CHAIN_ID = 42161
 
@@ -168,7 +169,10 @@ export const Balance: React.FC<BalanceProps> = ({ currentUser }) => {
             </Button>
           </BalanceFormStyled>
         ) : (
-          'Привяжите MetaMask, чтобы иметь возможность пополнить баланс'
+          <>
+            Привяжите MetaMask, чтобы иметь возможность пополнить баланс
+            <MetaMaskAuth referrerToken={null} />
+          </>
         )}
         {status && <BalanceStatusStyled>{status}</BalanceStatusStyled>}
       </BalanceStyled>

@@ -58,6 +58,7 @@ export const CurrentUserData: React.FC<CurrentUserData> = ({
             <TelegramAuthForm
               buttonSize="small"
               onAuthSuccessHandler={undefined}
+              referrerToken={null}
             />
           )}
         </CurrentUserDataRowStyled>
@@ -78,7 +79,11 @@ export const CurrentUserData: React.FC<CurrentUserData> = ({
           <path d="M10 10L5.5 12.5L10 3V10Z" fill="white" opacity="0.4" />
           <path d="M10 10L5.5 12.5L10 17V10Z" fill="white" opacity="0.2" />
         </svg>
-        {EthAccount ? EthAccount.address : <MetaMaskAuth />}
+        {EthAccount ? (
+          EthAccount.address
+        ) : (
+          <MetaMaskAuth referrerToken={null} />
+        )}
       </CurrentUserDataRowStyled>
 
       <Balance currentUser={currentUser} />

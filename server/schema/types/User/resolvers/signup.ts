@@ -2,13 +2,7 @@ import { builder } from '../../../builder'
 import { AuthPayload, UserSignupDataInput } from '../inputs'
 import { createToken, hashPassword } from '../helpers/auth'
 import { UserStatus } from '@prisma/client'
-import jwt from 'jsonwebtoken'
-import {
-  ReferrerTokenPayload,
-  signupStrategy,
-  SignupStrategy,
-} from '../interfaces'
-import { JWT_SECRET, JWT_TYPE_REFERRER } from '../../../../helpers/jwt'
+import { checkReferrerToken } from '../helpers/checkReferrerToken'
 
 builder.mutationField('signup', (t) =>
   t.field({
@@ -23,28 +17,9 @@ builder.mutationField('signup', (t) =>
       const fullname = args.data.fullname || undefined
       const referrerToken = args.data.referrerToken
 
-      let referrerId: string | undefined
-
-      if (referrerToken) {
-        const decoded = jwt.verify(
-          referrerToken,
-          JWT_SECRET,
-        ) as Partial<ReferrerTokenPayload>
-
-        if (decoded.type !== JWT_TYPE_REFERRER) {
-          throw new Error('Invalid token type')
-        }
-
-        referrerId = decoded.userId
-
-        if (!referrerId) {
-          throw new Error('Referrer not found')
-        }
-      } else {
-        if (signupStrategy !== SignupStrategy.ANY) {
-          throw new Error('Referrer token required')
-        }
-      }
+      const referrerId = checkReferrerToken({
+        referrerToken,
+      })
 
       if (
         email &&

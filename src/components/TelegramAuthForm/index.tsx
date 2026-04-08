@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 import {
   AuthPayloadFragment,
+  TelegramAuthDataInput,
   useAuthViaTelegramMutation,
 } from 'src/gql/generated'
 import { useAppContext } from '../AppContext'
@@ -13,14 +14,18 @@ type TelegramButtonProps = {
   cornerRadius: number
 }
 
+type TgAuthData = Omit<TelegramAuthDataInput, 'referrerToken'>
+
 export type TelegramAuthFormProps = {
   onAuthSuccessHandler: ((data?: AuthPayloadFragment) => void) | undefined
   buttonSize?: TelegramButtonProps['buttonSize']
+  referrerToken: string | null
 }
 
 export const TelegramAuthForm: React.FC<TelegramAuthFormProps> = ({
   onAuthSuccessHandler,
   buttonSize = 'large',
+  referrerToken,
 }) => {
   const botName = process.env.NEXT_PUBLIC_TELEGRAM_BOT_NAME
   const [container, containerSetter] = useState<HTMLDivElement | null>(null)
@@ -62,12 +67,14 @@ export const TelegramAuthForm: React.FC<TelegramAuthFormProps> = ({
   const [authMutation] = useAuthViaTelegramMutation()
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async function onAuth(authData: any) {
+    async function onAuth(authData: TgAuthData) {
       try {
         await authMutation({
           variables: {
-            tgAuthData: authData,
+            tgAuthData: {
+              ...authData,
+              referrerToken,
+            },
           },
         }).then((r) => {
           if (
@@ -90,7 +97,13 @@ export const TelegramAuthForm: React.FC<TelegramAuthFormProps> = ({
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).onTelegramAuth = onAuth
-  }, [addMessage, authMutation, onAuthSuccess, onAuthSuccessHandler])
+  }, [
+    addMessage,
+    authMutation,
+    onAuthSuccess,
+    onAuthSuccessHandler,
+    referrerToken,
+  ])
 
   return (
     botName && (

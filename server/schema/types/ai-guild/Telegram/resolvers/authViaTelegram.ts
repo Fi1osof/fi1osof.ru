@@ -4,6 +4,7 @@ import { builder } from '../../../../builder'
 import { TelegramAuthDataInput } from '../inputs'
 import { createToken } from '../../../User/helpers/auth'
 import { AuthPayload } from '../../../User/inputs'
+import { checkReferrerToken } from 'server/schema/types/User/helpers/checkReferrerToken'
 
 interface TelegramAuthData {
   id: number
@@ -51,6 +52,8 @@ builder.mutationField('authViaTelegram', (t) =>
     resolve: async (_root, args, ctx) => {
       const { tgAuthData } = args
       const { prisma, currentUser } = ctx
+
+      const { referrerToken } = tgAuthData
 
       const externalKey = tgAuthData.id.toString()
 
@@ -116,11 +119,16 @@ builder.mutationField('authViaTelegram', (t) =>
             tgAccount = newTgAccount
           }
         } else {
+          const referrerId = checkReferrerToken({
+            referrerToken,
+          })
+
           const newUser = await prisma.user.create({
             data: {
               TelegramAccount: {
                 create: tgCreateData,
               },
+              referrerId,
             },
             include: {
               TelegramAccount: true,

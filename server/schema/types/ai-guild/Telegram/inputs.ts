@@ -11,6 +11,7 @@ export const TelegramAuthDataInput = builder.inputType(
       photo_url: t.string(),
       auth_date: t.int(),
       hash: t.string(),
+      referrerToken: t.string({ required: false }),
     }),
   },
 )

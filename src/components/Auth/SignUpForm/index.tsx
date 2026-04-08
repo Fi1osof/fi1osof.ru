@@ -42,6 +42,8 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
     resolver: yupResolver(signUpSchema),
   })
 
+  form.watch('referrerToken')
+
   const { addMessage } = useSnackbar() || {}
 
   const [signupMutation] = useSignupMutation({})
@@ -150,7 +152,10 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
         <Controller name="password" render={fieldRenderer} />
         <Controller name="referrerToken" render={fieldRenderer} />
 
-        <AuthProviders onSuccessHandler={onSuccessHandler} />
+        <AuthProviders
+          onSuccessHandler={onSuccessHandler}
+          referrerToken={form.getValues().referrerToken ?? null}
+        />
 
         <Button type="submit" disabled={loading}>
           {loading ? 'Signing up...' : 'Sign up'}
