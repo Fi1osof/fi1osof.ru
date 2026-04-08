@@ -40,7 +40,7 @@ export const UserLink: React.FC<UserLinkProps> = ({
   }
 
   const { id, fullname, username } = user
-  const displayName = fullname || username || 'Unnamed User'
+  const displayName = fullname || username || id
 
   if (!id) {
     return null
