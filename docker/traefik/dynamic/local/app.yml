@@ -25,6 +25,8 @@ http:
       rule: 'PathPrefix(`/`)'
       entryPoints:
         - web
+      middlewares:
+        - compress
       service: app
       priority: 1
 
@@ -38,6 +40,11 @@ http:
       priority: 100
 
   middlewares:
+    compress:
+      compress:
+        excludedContentTypes:
+          - text/event-stream
+
     world3d-strip-prefix:
       stripPrefix:
         prefixes:
