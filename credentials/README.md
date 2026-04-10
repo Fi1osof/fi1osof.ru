@@ -14,6 +14,8 @@ credentials/
 
 n8n credentials in JSON format. The `id` field is used to link credentials to workflow factories.
 
+### OpenRouter (Cloud API)
+
 ```json
 [
   {
@@ -24,6 +26,40 @@ n8n credentials in JSON format. The `id` field is used to link credentials to wo
   }
 ]
 ```
+
+### Local LM Studio / LocalAI
+
+`172.17.0.1` is the Docker bridge gateway (host machine from inside a container):
+
+```json
+[
+  {
+    "id": "openrouter-cred",
+    "name": "OpenRouter",
+    "type": "openRouterApi",
+    "data": { "apiKey": "local", "url": "http://172.17.0.1:1234/v1" }
+  }
+]
+```
+
+### Local llama.cpp server
+
+Included in docker-compose. See [wiki/llama-server/README.md](../wiki/llama-server/README.md) for setup (requires NVIDIA GPU with CUDA).
+
+```json
+[
+  {
+    "id": "openrouter-cred",
+    "name": "OpenRouter",
+    "type": "openRouterApi",
+    "data": { "apiKey": "llama", "url": "http://llama:8080/v1" }
+  }
+]
+```
+
+### Multiple configurations
+
+To keep multiple options in one file, rename unused ones to `data_`, `data__` — only `data` is active.
 
 ### Telegram
 

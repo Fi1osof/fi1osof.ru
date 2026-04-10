@@ -7,7 +7,7 @@
 - **Database**: PostgreSQL + Prisma ORM 6
 - **Auth**: JWT
 - **AI Engine**: n8n (code-first workflows, custom AgentOrchestrator node)
-- **Infrastructure**: Docker, Traefik, docker-mailserver
+- **Infrastructure**: Docker, Traefik, docker-mailserver, llama.cpp (optional local LLM)
 
 ## Project Structure
 
@@ -157,7 +157,21 @@ Create `credentials/system/openrouter.json`:
 ]
 ```
 
+For local llama.cpp server:
+
+```json
+[
+  {
+    "id": "openrouter-cred",
+    "name": "OpenRouter",
+    "type": "openRouterApi",
+    "data": { "apiKey": "llama", "url": "http://llama:8080/v1" }
+  }
+]
+```
+
 See [credentials/README.md](../credentials/README.md) for details.
+See [llama-server/README.md](./llama-server/README.md) for local LLM setup (requires NVIDIA GPU with CUDA).
 
 ## Manual Setup
 

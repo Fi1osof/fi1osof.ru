@@ -34,3 +34,6 @@ services:
 
   world3d:
     restart: unless-stopped
+
+  llama:
+    restart: unless-stopped

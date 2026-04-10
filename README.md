@@ -15,6 +15,7 @@ First, ask the user which AI integration they prefer:
 **Options:**
 - **OpenRouter API key** (recommended for best results)
 - **Local LM Studio** or similar local service
+- **Local llama.cpp server** (included in docker-compose, requires NVIDIA GPU with CUDA)
 - **Other custom AI endpoint**
 
 **Recommended models:**
@@ -23,11 +24,20 @@ First, ask the user which AI integration they prefer:
   - Minimum: `haiku 4.5`
 - **Local models:**
   - Minimum: `qwen3 4B`
+- **Local llama.cpp:**
+  - Default: `Qwen3.5-0.8B` (lightweight, good for testing)
+  - Recommended: `Qwen3-8B` or larger for production use
 
 **Required credentials from user:**
 - For OpenRouter: API key
-- For local service: endpoint URL and any authentication details
+- For local LM Studio: endpoint URL and any authentication details
+- For local llama.cpp: no credentials needed (runs locally), but requires NVIDIA GPU with CUDA drivers
 - For custom endpoints: full connection details
+
+**⚠️ Local llama.cpp requirements:**
+- NVIDIA GPU with CUDA support
+- CUDA drivers installed on host system (verify with `nvidia-smi`)
+- Docker with NVIDIA Container Toolkit configured
 
 ### 2. Quick Test
 
@@ -221,70 +231,7 @@ Technical details, architecture, and configuration — [wiki](wiki/README.md).
 
 The `credentials/` directory is fully gitignored. Create these files manually before starting either scenario.
 
-**`credentials/bootstrap.env`** — n8n owner account:
-
-```
-N8N_BOOTSTRAP_OWNER_EMAIL=admin@example.com
-N8N_BOOTSTRAP_OWNER_PASSWORD=AdminPassword123!
-N8N_BOOTSTRAP_OWNER_FIRSTNAME=Admin
-N8N_BOOTSTRAP_OWNER_LASTNAME=User
-```
-
-**`credentials/system/openrouter.json`** — AI model API key.
-
-Cloud (OpenRouter):
-
-```json
-[
-  {
-    "id": "openrouter-cred",
-    "name": "OpenRouter",
-    "type": "openRouterApi",
-    "data": { "apiKey": "sk-or-v1-xxx" }
-  }
-]
-```
-
-Local API (LM Studio / LocalAI — `172.17.0.1` is the Docker bridge gateway, i.e. the host machine from inside a container):
-
-```json
-[
-  {
-    "id": "openrouter-cred",
-    "name": "OpenRouter",
-    "type": "openRouterApi",
-    "data": { "apiKey": "local", "url": "http://172.17.0.1:1234/v1" }
-  }
-]
-```
-
-To keep multiple options in one file, rename unused ones to `data_`, `data__` — only `data` is active.
-
-**`credentials/agents/agent-chat.json`:**
-
-```json
-{
-  "agentName": "Chat Agent",
-  "username": "agent-chat",
-  "password": "<any password>",
-  "email": "agent-chat@example.com",
-  "fullname": "Chat Agent"
-}
-```
-
-**`credentials/agents/agent-web-search.json`:**
-
-```json
-{
-  "agentName": "Web Search Agent",
-  "username": "agent-web-search",
-  "password": "<any password>",
-  "email": "agent-web-search@example.com",
-  "fullname": "Web Search Agent"
-}
-```
-
-> See `credentials/README.md` for full documentation including SMTP/IMAP and Telegram setup.
+See [`credentials/README.md`](credentials/README.md) for full documentation including AI providers (OpenRouter, LM Studio, llama.cpp), agent credentials, SMTP/IMAP, and Telegram setup.
 
 ---
 

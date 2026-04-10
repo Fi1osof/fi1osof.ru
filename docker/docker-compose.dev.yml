@@ -42,3 +42,7 @@ services:
     command: 'npm run dev'
     ports:
       - 4100:4100
+
+  llama:
+    ports:
+      - 8080:8080
