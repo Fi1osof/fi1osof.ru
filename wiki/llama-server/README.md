@@ -115,7 +115,51 @@ The server provides OpenAI-compatible API:
 2. Reduce `LLAMA_GPU_LAYERS` to offload some layers to CPU
 3. Reduce `LLAMA_CTX_SIZE`
 
+## Chat Templates
+
+llama.cpp server uses Jinja templates to format chat messages. By default, the template is read from GGUF model metadata.
+
+### Configuration
+
+Add to `docker/.env`:
+
+```env
+# Enable Jinja template engine (default: 1)
+LLAMA_JINJA=1
+
+# Built-in template: chatml, llama2, llama3, qwen, gemma, phi3, deepseek, etc.
+LLAMA_CHAT_TEMPLATE=qwen
+
+# Or use custom template file (path inside container)
+LLAMA_CHAT_TEMPLATE_FILE=/config/templates/my-template.jinja
+
+# Template kwargs as JSON (e.g., disable thinking for Qwen3)
+LLAMA_CHAT_TEMPLATE_KWARGS={"enable_thinking":false}
+```
+
+### Extract Template from Model
+
+Use the script to extract the default template from a GGUF model:
+
+```bash
+python3 docker/llama/scripts/extract-chat-template.py \
+    docker/llama/models/Qwen3.5-0.8B-Q8_0.gguf \
+    > docker/llama/config/templates/qwen/default.jinja
+```
+
+### Inspect Current Template
+
+```bash
+# Check which template is active
+curl http://localhost:8080/props | jq .chat_template
+
+# View process arguments
+docker exec -it llama cat /proc/1/cmdline | tr '\0' ' '
+```
+
 ## Files
 
 - `docker/llama/entrypoint.sh` — startup script with auto-download
 - `docker/llama/models/` — downloaded models (gitignored)
+- `docker/llama/config/templates/` — custom Jinja templates
+- `docker/llama/scripts/extract-chat-template.py` — extract template from GGUF

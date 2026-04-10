@@ -127,14 +127,31 @@ services:
     image: ghcr.io/ggml-org/llama.cpp:server-cuda
     volumes:
       - ./llama/models:/models
+      - ./llama/config:/config
       - ./llama/entrypoint.sh:/entrypoint.sh:ro
     entrypoint: ['/bin/bash', '/entrypoint.sh']
     environment:
+      # Model path in format: owner/repo/filename (auto-downloads from HuggingFace)
       - LLAMA_MODEL=${LLAMA_MODEL:-unsloth/Qwen3.5-0.8B-GGUF/Qwen3.5-0.8B-Q8_0.gguf}
+      # HuggingFace token for gated models (optional)
       - HUGGINGFACE_TOKEN=${HUGGINGFACE_TOKEN:-}
+      # Number of layers to offload to GPU (99 = all)
       - LLAMA_GPU_LAYERS=${LLAMA_GPU_LAYERS:-99}
+      # Context window size in tokens
       - LLAMA_CTX_SIZE=${LLAMA_CTX_SIZE:-4096}
+      # Server port
       - LLAMA_PORT=${LLAMA_PORT:-8080}
+      # Enable verbose logging (0/1)
+      - LLAMA_VERBOSE=${LLAMA_VERBOSE:-0}
+      # Enable Jinja template engine (0/1)
+      - LLAMA_JINJA=${LLAMA_JINJA:-1}
+      # Built-in template name: chatml, llama2, llama3, qwen, gemma, phi3, deepseek, etc.
+      - LLAMA_CHAT_TEMPLATE=${LLAMA_CHAT_TEMPLATE:-}
+      # Path to custom Jinja template file (inside /config volume)
+      - LLAMA_CHAT_TEMPLATE_FILE=${LLAMA_CHAT_TEMPLATE_FILE:-}
+      # JSON kwargs for template, e.g. '{"enable_thinking":false}'
+      # Note: only set if non-empty, llama-server reads this directly
+      - LLAMA_TEMPLATE_KWARGS=${LLAMA_TEMPLATE_KWARGS:-}
     deploy:
       resources:
         reservations:
