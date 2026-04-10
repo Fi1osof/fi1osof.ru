@@ -1,10 +1,13 @@
-import { NodeType } from 'server/n8n/workflows/agent-factory/interfaces'
+import {
+  AgentFactoryConfig,
+  NodeType,
+} from 'server/n8n/workflows/agent-factory/interfaces'
 import { getExecToolWorkflowName } from 'server/n8n/workflows/tool-exec-tool/factory'
-import { GetExecToolConfig, reasoningTitle } from '../interfaces'
+import { reasoningTitle } from '../interfaces'
 import { WebSearchAgentWorkflowName } from 'server/n8n/workflows/agent-web-search/interfaces'
 
 export function getWebSearchAgentTool(
-  config: GetExecToolConfig,
+  config: AgentFactoryConfig,
 ): NodeType | undefined {
   const { agentId, agentName, hasWebSearchAgent } = config
 

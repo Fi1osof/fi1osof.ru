@@ -1,9 +1,18 @@
-import { NodeType } from 'server/n8n/workflows/agent-factory/interfaces'
+import {
+  AgentFactoryConfig,
+  NodeType,
+} from 'server/n8n/workflows/agent-factory/interfaces'
 import { getExecToolWorkflowName } from 'server/n8n/workflows/tool-exec-tool/factory'
-import { GetExecToolConfig, reasoningTitle } from '../../../interfaces'
+import { reasoningTitle } from '../../../interfaces'
 
-export function getUpdateConceptTool(config: GetExecToolConfig): NodeType {
-  const { agentId, agentName } = config
+export function getUpdateConceptTool(
+  config: AgentFactoryConfig,
+): NodeType | null {
+  const { agentId, agentName, hasGraphqlTool } = config
+
+  if (!hasGraphqlTool) {
+    return null
+  }
 
   return {
     parameters: {

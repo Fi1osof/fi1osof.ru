@@ -3,21 +3,22 @@ import { createHandleResponseNode } from 'server/n8n/workflows/helpers'
 import { getGraphqlRequestWorkflowName } from 'server/n8n/workflows/tool-graphql-request/helpers'
 import { print } from 'graphql'
 import { MyConceptsDocument } from 'src/gql/generated'
+import { AgentFactoryConfig } from 'server/n8n/workflows/agent-factory/interfaces'
 
 export function getReadConceptsWorkflowName(agentName: string): WorkflowName {
   return `Tool: Read Concepts (${agentName})`
 }
 
-export interface ReadConceptsConfig {
-  agentName: string
-}
-
 const readConceptsQuery = print(MyConceptsDocument)
 
 export function createToolReadConcepts(
-  config: ReadConceptsConfig,
-): WorkflowBase {
-  const { agentName } = config
+  config: AgentFactoryConfig,
+): WorkflowBase | null {
+  const { agentName, hasGraphqlTool } = config
+
+  if (!hasGraphqlTool) {
+    return null
+  }
 
   const prepareGraphqlCode = `
 const input = $input.first().json

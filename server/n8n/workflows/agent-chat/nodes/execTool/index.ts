@@ -1,5 +1,7 @@
-import { NodeType } from 'server/n8n/workflows/agent-factory/interfaces'
-import { GetExecToolConfig } from './interfaces'
+import {
+  AgentFactoryConfig,
+  NodeType,
+} from 'server/n8n/workflows/agent-factory/interfaces'
 import { getCreateConceptTool } from './tools/KB/KBConcept/createConcept'
 import { getReadConceptsTool } from './tools/KB/KBConcept/readConcepts'
 import { getUpdateConceptTool } from './tools/KB/KBConcept/updateConcept'
@@ -9,7 +11,7 @@ import { getWebSearchAgentTool } from './tools/webSearchAgent'
 import { getUrlReaderTool } from './tools/urlReader'
 import { getGraphqlRequestTool } from './tools/graphqlRequest'
 
-export function getExecTools(config: GetExecToolConfig): NodeType[] {
+export function getExecTools(config: AgentFactoryConfig): NodeType[] {
   return [
     getCreateConceptTool(config),
     getReadConceptsTool(config),

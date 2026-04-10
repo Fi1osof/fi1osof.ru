@@ -269,25 +269,17 @@ return {
   protected createNestedFlows(config: AgentFactoryConfig): WorkflowBase[] {
     const workflows = super.createNestedFlows(config)
 
-    const saveConceptWorkflow = createToolCreateConcept({
-      agentName: config.agentName,
-    })
-    workflows.push(saveConceptWorkflow)
+    const saveConceptWorkflow = createToolCreateConcept(config)
+    saveConceptWorkflow && workflows.push(saveConceptWorkflow)
 
-    const readConceptsWorkflow = createToolReadConcepts({
-      agentName: config.agentName,
-    })
-    workflows.push(readConceptsWorkflow)
+    const readConceptsWorkflow = createToolReadConcepts(config)
+    readConceptsWorkflow && workflows.push(readConceptsWorkflow)
 
-    const updateConceptWorkflow = createToolUpdateConcept({
-      agentName: config.agentName,
-    })
-    workflows.push(updateConceptWorkflow)
+    const updateConceptWorkflow = createToolUpdateConcept(config)
+    updateConceptWorkflow && workflows.push(updateConceptWorkflow)
 
-    const deleteConceptWorkflow = createToolDeleteConcept({
-      agentName: config.agentName,
-    })
-    workflows.push(deleteConceptWorkflow)
+    const deleteConceptWorkflow = createToolDeleteConcept(config)
+    deleteConceptWorkflow && workflows.push(deleteConceptWorkflow)
 
     const execToolWorkflow = createToolExecTool({
       agentName: config.agentName,

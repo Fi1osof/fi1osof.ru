@@ -3,21 +3,22 @@ import { createHandleResponseNode } from 'server/n8n/workflows/helpers'
 import { getGraphqlRequestWorkflowName } from 'server/n8n/workflows/tool-graphql-request/helpers'
 import { print } from 'graphql'
 import { DeleteConceptDocument } from 'src/gql/generated'
+import { AgentFactoryConfig } from 'server/n8n/workflows/agent-factory/interfaces'
 
 export function getDeleteConceptWorkflowName(agentName: string): WorkflowName {
   return `Tool: Delete Concept (${agentName})`
 }
 
-export interface DeleteConceptConfig {
-  agentName: string
-}
-
 const deleteConceptMutation = print(DeleteConceptDocument)
 
 export function createToolDeleteConcept(
-  config: DeleteConceptConfig,
-): WorkflowBase {
-  const { agentName } = config
+  config: AgentFactoryConfig,
+): WorkflowBase | null {
+  const { agentName, hasGraphqlTool } = config
+
+  if (!hasGraphqlTool) {
+    return null
+  }
 
   const prepareGraphqlCode = `
 const input = $input.first().json
