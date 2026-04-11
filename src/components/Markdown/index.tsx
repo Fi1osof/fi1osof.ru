@@ -9,6 +9,7 @@ import ReactMarkdown, {
 import rehypeRaw from 'rehype-raw'
 import remarkGfm from 'remark-gfm'
 
+import { Image } from 'src/components/Image'
 import { MarkdownStyled } from './styles'
 
 /**
@@ -48,7 +49,7 @@ const components: Components = {
       return null
     }
 
-    return <img src={src} alt={alt ?? ''} {...props} />
+    return <Image src={src} alt={alt ?? ''} {...props} />
   },
 }
 
