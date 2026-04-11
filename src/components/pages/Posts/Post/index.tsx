@@ -1,9 +1,12 @@
+import { useMemo } from 'react'
 import { Page } from '../../_App/interfaces'
 import { PostPageView } from './View'
 import { PostPageProps } from './interfaces'
 import { postPageGetInitialProps } from './postPageGetInitialProps'
 import { PostStatus, usePostQuery, UserStatusEnum } from 'src/gql/generated'
 import { SeoHeaders } from 'src/components/seo/SeoHeaders'
+import { JsonLd } from 'src/components/seo/JsonLd'
+import { createBlogPosting } from 'src/components/seo/JsonLd/helpers'
 
 export const PostPage: Page<PostPageProps> = ({ postId }) => {
   const response = usePostQuery({
@@ -17,13 +20,32 @@ export const PostPage: Page<PostPageProps> = ({ postId }) => {
 
   const post = response.data?.object
 
+  const searchable =
+    post?.CreatedBy?.status === UserStatusEnum.ACTIVE &&
+    post?.status === PostStatus.PUBLISHED
+
+  const blogPostingSchema = useMemo(() => {
+    if (!post) {
+      return null
+    }
+
+    return createBlogPosting({
+      headline: post.title || '',
+      description: post.description || undefined,
+      datePublished: post.createdAt,
+      dateModified: post.updatedAt,
+      author: post.CreatedBy
+        ? {
+            '@type': 'Person',
+            name: post.CreatedBy.fullname || post.CreatedBy.username || '',
+          }
+        : undefined,
+    })
+  }, [post])
+
   if (!post) {
     return null
   }
-
-  const searchable =
-    post.CreatedBy?.status === UserStatusEnum.ACTIVE &&
-    post.status === PostStatus.PUBLISHED
 
   return (
     <>
@@ -33,6 +55,7 @@ export const PostPage: Page<PostPageProps> = ({ postId }) => {
         noindex={!searchable}
         nofollow={!searchable}
       />
+      {blogPostingSchema && <JsonLd data={blogPostingSchema} />}
       <PostPageView post={post} />
     </>
   )

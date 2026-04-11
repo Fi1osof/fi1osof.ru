@@ -2,7 +2,9 @@ import React, { useMemo } from 'react'
 import { ImageProps } from './interfaces'
 import { ImageStyled } from './styles'
 import { ImagePopup } from 'src/components/ImagePopup'
+import { JsonLd } from 'src/components/seo/JsonLd'
 import { useBoolean } from 'src/hooks/useBoolean'
+import { createImageObject } from '../seo/JsonLd/helpers'
 
 export const Image: React.FC<ImageProps> = ({ src, alt, ...props }) => {
   const [isOpen, handleOpen, handleClose] = useBoolean()
@@ -24,8 +26,18 @@ export const Image: React.FC<ImageProps> = ({ src, alt, ...props }) => {
     }
   }, [src])
 
+  const imageSchema = useMemo(
+    () =>
+      createImageObject({
+        contentUrl: big,
+        caption: alt,
+      }),
+    [big, alt],
+  )
+
   return (
     <>
+      <JsonLd data={imageSchema} />
       <ImageStyled
         src={middle}
         alt={alt ?? ''}
