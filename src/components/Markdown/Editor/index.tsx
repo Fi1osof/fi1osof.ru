@@ -81,7 +81,25 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorEditorProps> = ({
       linkPlugin(),
       linkDialogPlugin(),
       codeBlockPlugin({ defaultCodeBlockLanguage: 'text' }),
-      codeMirrorPlugin(),
+      codeMirrorPlugin({
+        codeBlockLanguages: {
+          '': 'Plain Text',
+          text: 'Plain Text',
+          js: 'JavaScript',
+          ts: 'TypeScript',
+          tsx: 'TypeScript (React)',
+          jsx: 'JavaScript (React)',
+          css: 'CSS',
+          html: 'HTML',
+          json: 'JSON',
+          bash: 'Bash',
+          sql: 'SQL',
+          gql: 'GraphQL',
+          python: 'Python',
+          markdown: 'Markdown',
+          django: 'Jinja/Django',
+        },
+      }),
 
       toolbarPlugin({
         toolbarContents: () => {

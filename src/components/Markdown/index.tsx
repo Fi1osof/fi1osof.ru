@@ -7,6 +7,7 @@ import ReactMarkdown, {
   UrlTransform,
 } from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
+import rehypePrism from 'rehype-prism-plus'
 import remarkGfm from 'remark-gfm'
 
 import { Image } from 'src/components/Image'
@@ -70,7 +71,7 @@ export const Markdown: React.FC<MarkdownProps> = ({ children, ...other }) => {
         remarkPlugins={[remarkGfm]}
         components={components}
         // allowElement={allowElement}
-        rehypePlugins={[rehypeRaw]}
+        rehypePlugins={[rehypeRaw, rehypePrism]}
       >
         {children}
       </ReactMarkdown>

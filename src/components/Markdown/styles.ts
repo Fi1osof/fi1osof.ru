@@ -1,18 +1,19 @@
 import styled, { css } from 'styled-components'
+import { theme } from 'src/theme'
 
 export const markdownStyles = css`
   /* Headings */
   h1 {
     font-size: 2em;
     margin: 1em 0;
-    border-bottom: 1px solid #eaecef;
+    border-bottom: 1px solid ${theme.colors.border};
     padding-bottom: 0.3em;
   }
 
   h2 {
     font-size: 1.5em;
     margin: 1em 0;
-    border-bottom: 1px solid #eaecef;
+    border-bottom: 1px solid ${theme.colors.border};
     padding-bottom: 0.3em;
   }
 
@@ -48,14 +49,14 @@ export const markdownStyles = css`
   blockquote {
     margin: 1em 0;
     padding-left: 1em;
-    border-left: 4px solid #ccc;
-    color: #555;
-    background: #f9f9f9;
+    border-left: 4px solid ${theme.colors.gray[300]};
+    color: ${theme.colors.text.secondary};
+    background: ${theme.colors.gray[50]};
   }
 
   /* Inline and block code */
   code {
-    background-color: #f3f4f6;
+    background-color: ${theme.colors.gray[100]};
     padding: 0.2em 0.4em;
     font-family: monospace;
     border-radius: 4px;
@@ -63,7 +64,7 @@ export const markdownStyles = css`
   }
 
   pre {
-    background-color: #f3f4f6;
+    background-color: ${theme.colors.gray[100]};
     padding: 1em;
     overflow-x: auto;
     border-radius: 6px;
@@ -78,7 +79,7 @@ export const markdownStyles = css`
 
   /* Links */
   a {
-    color: #0366d6;
+    color: ${theme.colors.primary};
     text-decoration: none;
   }
 
@@ -103,14 +104,70 @@ export const markdownStyles = css`
 
   th,
   td {
-    border: 1px solid #ccc;
+    border: 1px solid ${theme.colors.gray[300]};
     padding: 0.5em;
     text-align: left;
     vertical-align: top;
   }
 
   thead {
-    background: #f6f8fa;
+    background: ${theme.colors.gray[50]};
+  }
+
+  /* Prism syntax highlighting */
+  .token.comment,
+  .token.prolog,
+  .token.doctype,
+  .token.cdata {
+    color: ${theme.colors.gray[500]};
+  }
+
+  .token.punctuation {
+    color: ${theme.colors.gray[800]};
+  }
+
+  .token.property,
+  .token.tag,
+  .token.boolean,
+  .token.number,
+  .token.constant,
+  .token.symbol,
+  .token.deleted {
+    color: ${theme.colors.primary};
+  }
+
+  .token.selector,
+  .token.attr-name,
+  .token.string,
+  .token.char,
+  .token.builtin,
+  .token.inserted {
+    color: ${theme.colors.success};
+  }
+
+  .token.operator,
+  .token.entity,
+  .token.url,
+  .language-css .token.string,
+  .style .token.string {
+    color: ${theme.colors.error};
+  }
+
+  .token.atrule,
+  .token.attr-value,
+  .token.keyword {
+    color: ${theme.colors.error};
+  }
+
+  .token.function,
+  .token.class-name {
+    color: #8b5cf6;
+  }
+
+  .token.regex,
+  .token.important,
+  .token.variable {
+    color: ${theme.colors.warning};
   }
 `
 
