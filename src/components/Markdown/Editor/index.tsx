@@ -10,6 +10,7 @@ import {
   directivesPlugin,
   quotePlugin,
   linkPlugin,
+  linkDialogPlugin,
   codeBlockPlugin,
   codeMirrorPlugin,
   jsxPlugin,
@@ -60,6 +61,7 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorEditorProps> = ({
 
       quotePlugin(),
       linkPlugin(),
+      linkDialogPlugin(),
       codeBlockPlugin({ defaultCodeBlockLanguage: 'text' }),
       codeMirrorPlugin(),
 

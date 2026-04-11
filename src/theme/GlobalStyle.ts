@@ -1,5 +1,6 @@
 import { createGlobalStyle } from 'styled-components'
 import { theme } from './index'
+import { MarkdownEditorGlobalStyled } from 'src/components/Markdown/Editor/styles'
 
 export const GlobalStyle = createGlobalStyle`
   * {
@@ -47,4 +48,6 @@ export const GlobalStyle = createGlobalStyle`
       cursor: pointer;
     }
   }
+
+  ${MarkdownEditorGlobalStyled}
 `
