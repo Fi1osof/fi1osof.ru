@@ -1,5 +1,5 @@
 import {
-  // InsertImage,
+  InsertImage,
   UndoRedo,
   BoldItalicUnderlineToggles,
   // CodeToggle,
@@ -38,7 +38,7 @@ const MarkdownEditorToolbarComponent: React.FC<
       {/* <InsertCodeBlock /> */}
       <InsertThematicBreak />
       <CreateLink />
-      {/* <InsertImage /> */}
+      <InsertImage />
 
       <Separator />
 

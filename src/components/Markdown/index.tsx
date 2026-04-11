@@ -1,13 +1,15 @@
+import React from 'react'
+import Link from 'next/link'
 import ReactMarkdown, {
+  // AllowElement,
   Components,
   defaultUrlTransform,
   UrlTransform,
 } from 'react-markdown'
+import rehypeRaw from 'rehype-raw'
+import remarkGfm from 'remark-gfm'
 
 import { MarkdownStyled } from './styles'
-import React from 'react'
-import Link from 'next/link'
-import remarkGfm from 'remark-gfm'
 
 /**
  * Начиная с 9 версии ремарк стал обнулять тел и мейлто ссылки.
@@ -41,7 +43,18 @@ const components: Components = {
       </>
     )
   },
+  img: ({ node: _node, src, alt, ...props }) => {
+    if (!src) {
+      return null
+    }
+
+    return <img src={src} alt={alt ?? ''} {...props} />
+  },
 }
+
+// const allowElement: AllowElement = (element, index, parent) => {
+//   return element.tagName !== 'img'
+// }
 
 type MarkdownProps = {
   children: string | null | undefined
@@ -55,6 +68,8 @@ export const Markdown: React.FC<MarkdownProps> = ({ children, ...other }) => {
         urlTransform={urlTransform}
         remarkPlugins={[remarkGfm]}
         components={components}
+        // allowElement={allowElement}
+        rehypePlugins={[rehypeRaw]}
       >
         {children}
       </ReactMarkdown>
