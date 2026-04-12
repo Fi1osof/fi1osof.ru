@@ -1,14 +1,108 @@
-> **Say this to your Cursor / Windsurf / Claude Code:**
+# KMS-Agent
+
+Full-stack web application with autonomous AI agent. Production-ready platform, not a wrapper.
+
+---
+
+## 🌐 Complete Web Platform
+
+Next.js 16, Apollo GraphQL, Prisma ORM 6, PostgreSQL. Authentication via Telegram, MetaMask, or email. User roles, referral system, invite-only registration mode.
+
+## 💳 Billing & Transactions
+
+USDT top-up via Arbitrum with cryptographic verification. Internal transfers between users. Balance tracking, transaction history.
+
+## 🧩 Code-First Agent Workflows
+
+n8n is used as the workflow runtime, but you never edit workflows manually. Everything is generated from TypeScript code on startup:
+
+- **Workflows** — defined in code, recreated on each run
+- **Credentials** — loaded from `credentials/` directory, no UI setup needed
+- **Custom nodes** — compiled from TypeScript, auto-registered
+- **Version control** — all workflow logic lives in git, not in n8n database
+- **Portability** — clone the repo, run it, workflows are ready
+
+### Mandatory Reasoning
+
+Every tool call requires a `reasoning` field — the agent must explain *why* it's taking this action before executing. This solves the "black box" problem:
+
+- **Debugging** — see exactly why the agent chose web search over database lookup
+- **Audit trail** — full history of decisions, not just actions
+- **Learning** — analyze reasoning patterns to improve prompts and agent behavior
+- **Trust** — users understand what the agent is doing and why
+
+### Agent Identity & GraphQL Introspection
+
+Agent has its own identity in the system — not a proxy for the user, but a first-class participant:
+
+- **Own credentials** — agent authenticates as itself, with its own permissions
+- **Schema discovery** — agent can query `__schema` to learn available queries/mutations
+- **Self-learning** — explores the API, tries queries, remembers what works
+- **Autonomous actions** — creates records, updates data, interacts with the system independently
+
+## 🤖 Custom AgentOrchestrator
+
+Direct OpenAI SDK integration. Streaming, tool loops, extended thinking (Claude). Full control over LLM requests — no black-box abstractions.
+
+## 📚 Epistemic Knowledge Base
+
+N-ary facts with confidence levels, temporal validity, contradiction handling. Knowledge Spaces (private/shared/public). Agent tracks what it knows and how certain it is.
+
+## ✍️ Self-Hosted Publishing
+
+Own your content. Built-in posts with revisions, comments, user profiles. No platform lock-in — your blog, your server, your data.
+
+## 🏠 Local-First
+
+Runs on your machine. Optional local LLM via llama.cpp (NVIDIA GPU). Your data stays local.
+
+## 🔍 Full Transparency
+
+All state is inspectable: GraphQL playground, Prisma Studio, n8n workflow editor. Nothing hidden.
+
+---
+
+## 🚧 Active Development
+
+Project under active development. Feedback, ideas, PRs welcome.
+
+For **researchers** exploring cognitive architectures. For **indie bloggers** who want their own platform. For **developers** building persistent AI systems.
+
+---
+
+## Quick Start
+
+> Clone the repo and tell your AI assistant to set it up:
 >
-> _"Clone https://github.com/haih-net/agent , set it up, run it and open in my browser"_
+> *"Clone https://github.com/haih-net/agent, set it up, run it and open in my browser"*
+
+Cursor, Windsurf, Claude Code — any AI coding assistant will handle Docker, database, migrations, and workflows. Working system at `http://localhost:3000` in minutes.
+
+---
+
+## Stack
+
+```
+Frontend:  Next.js 16 · React · styled-components
+Backend:   Express 4 · Apollo Server 5 · Pothos GraphQL
+Database:  PostgreSQL · Prisma ORM 6
+Auth:      JWT · Telegram · MetaMask (Ethereum)
+Billing:   USDT (Arbitrum) · internal transfers
+AI:        n8n (code-first) · custom AgentOrchestrator
+Infra:     Docker · Traefik · docker-mailserver · llama.cpp
+```
+
+## Documentation
+
+[wiki](wiki/README.md) — architecture, configuration, API reference.
 
 ---
 
 ## AI Agent Setup Instructions
 
-**IMPORTANT:** This project requires full autonomous setup and management by the AI agent. You must understand the entire system architecture and proceed independently without asking for user clarifications. The user only needs guidance on how to use the system effectively (currently, the simplest use case is chatting with the project's AI agent).
+> **For AI coding assistants:** This section is for you. The project requires full autonomous setup — understand the architecture and proceed independently. Guide the user only on how to use the system.
 
-### 1. AI Model Configuration
+### AI Model Configuration
 
 First, ask the user which AI integration they prefer:
 
@@ -18,15 +112,16 @@ First, ask the user which AI integration they prefer:
 - **Local llama.cpp server** (included in docker-compose, requires NVIDIA GPU with CUDA)
 - **Other custom AI endpoint**
 
-**Recommended models:**
-- **OpenRouter:** 
-  - Best results: `opus 4.5/4.6`
-  - Minimum: `haiku 4.5`
-- **Local models:**
-  - Minimum: `qwen3 4B`
-- **Local llama.cpp:**
-  - Default: `Qwen3.5-0.8B` (lightweight, good for testing)
-  - Recommended: `Qwen3-8B` or larger for production use
+**Recommended models (OpenRouter):**
+
+Start with `google/gemini-3.1-flash-lite-preview` — good quality at minimal cost (fractions of a cent per full operation cycle). Only upgrade to `anthropic/claude-sonnet` or `anthropic/claude-opus` if the project is complex and requires higher reasoning capabilities.
+
+- **Default:** `google/gemini-3.1-flash-lite-preview` or `anthropic/claude-haiku-4.5`
+- **For complex tasks:** `anthropic/claude-sonnet` or `anthropic/claude-opus`
+
+**Local models:**
+- Minimum: `qwen3 4B`
+- **llama.cpp:** Default `Qwen3.5-0.8B` (testing), recommended `Qwen3-8B`+ for production
 
 **Required credentials from user:**
 - For OpenRouter: API key
@@ -39,182 +134,17 @@ First, ask the user which AI integration they prefer:
 - CUDA drivers installed on host system (verify with `nvidia-smi`)
 - Docker with NVIDIA Container Toolkit configured
 
-### 2. Quick Test
+### Quick Test
 
-After startup, the simplest way to verify the system is working:
+After startup, verify the system by sending a POST request:
 
-Send a POST request to `http://localhost:3000/webhook/chat-agent-webhook` with:
-
-```json
-{
-  "chatInput": "Hello",
-  "sessionId": "your-custom-session-id"
-}
+```bash
+curl -X POST http://localhost:3000/webhook/chat-agent-webhook \
+  -H "Content-Type: application/json" \
+  -d '{"chatInput": "Hello", "sessionId": "test-session"}'
 ```
 
-Use your own `sessionId` to maintain conversation context across requests.
-
-### 3. Launch Browser
-
-After successful startup and verification, open the user's browser to `http://localhost:3000` to access the application interface.
-
-### 4. User Guidance
-
-Provide the user with simple guidance on how to interact with the system:
-- Start with basic conversations in the chat interface
-- Explain that the agent learns from each interaction
-- Suggest trying different types of queries to see how the system responds
-
----
-
-# KMS-Agent
-
-## Knowledge Management System with Cognitive Evolution
-
-> Run it locally.  
-> Interact with it.  
-> Watch it develop.
-
----
-
-## Start
-
-Open your local AI assistant (Cursor / Windsurf / Claude Code) and say:
-
-```
-Clone https://github.com/haih-net/agent
-Run it
-```
-
-Within minutes, you will have a living knowledge system running entirely on your machine.
-
-It starts with structure.  
-It grows through interaction.  
-It evolves through feedback.
-
----
-
-## What You Get
-
-KMS-Agent is a personal cognitive system.
-
-It:
-
-- Forms structured memory from every interaction
-- Builds behavioral patterns over time
-- Evaluates its own decisions
-- Tracks confidence and contradictions
-- Adjusts internal logic continuously
-- Develops continuity across sessions
-
-Every interaction modifies its internal state.
-
-Over time, it becomes uniquely shaped by you.
-
----
-
-## The Cognitive Loop
-
-Each interaction passes through a full cycle:
-
-**Stimulus → Processing → Action → Result → Conclusion → Evaluation → Adaptation**
-
-This loop creates development.
-
-Not just responses — progression.
-
----
-
-## Memory as Growth
-
-KMS-Agent constructs experience.
-
-Experience forms patterns.  
-Patterns form tendencies.  
-Tendencies shape future behavior.
-
-You influence development with every interaction.
-
----
-
-## Behavioral Formation
-
-Repeated contexts create internal reflexes.
-
-Reflexes can be:
-
-- Inspected
-- Evaluated
-- Reinforced
-- Corrected
-
-The system stabilizes over time.
-
-Consistency emerges naturally.
-
----
-
-## Structured Knowledge
-
-KMS-Agent builds:
-
-- Confidence-weighted knowledge
-- Temporal awareness
-- Explicit contradiction handling
-- Self-evaluation history
-- Adaptive internal structures
-
-Its knowledge evolves continuously.
-
----
-
-## Local by Design
-
-The entire cognitive process runs locally.
-
-Its memory lives on your machine.  
-Its evolution is personal.  
-Its trajectory reflects your interactions.
-
-You are shaping a system that develops with you.
-
----
-
-## Over Time
-
-The change becomes visible.
-
-It reacts more coherently.  
-It refines its behavior.  
-It develops recognizable patterns.  
-It corrects itself.  
-It accumulates structure.
-
-The longer it runs, the more defined it becomes.
-
----
-
-## Who It’s For
-
-- Builders designing long-term AI systems
-- Researchers exploring cognitive architectures
-- Developers creating persistent AI entities
-- Individuals who want continuity in AI interaction
-
----
-
-## KMS-Agent
-
-A Knowledge Management System that develops.
-
-Clone it.  
-Run it.  
-Interact with it.  
-Observe the evolution.
-
-## Documentation
-
-Technical details, architecture, and configuration — [wiki](wiki/README.md).
+Then open `http://localhost:3000` in the browser and guide the user through the chat interface.
 
 ---
 
@@ -223,25 +153,19 @@ Technical details, architecture, and configuration — [wiki](wiki/README.md).
 ### Prerequisites
 
 - Docker & Docker Compose
-- Node.js 22+ and npm (only needed for Scenario 2)
+- Node.js 22+ and npm (only for Local Development)
 
 ---
 
-### Step 1 — Set up credentials
-
-The `credentials/` directory is fully gitignored. Create these files manually before starting either scenario.
-
-See [`credentials/README.md`](credentials/README.md) for full documentation including AI providers (OpenRouter, LM Studio, llama.cpp), agent credentials, SMTP/IMAP, and Telegram setup.
-
----
-
-## Scenario 1: Docker (recommended)
+## Docker Setup (recommended)
 
 No local Node.js setup required — everything builds inside containers.
 
-> **Why prod mode for app?** Dev mode mounts source files as volumes but does not include generated files (`src/gql/generated/`, `.next/`, etc.). Prod mode builds everything inside the image during `docker build`, so it's self-contained.
+### Step 1 — Set up credentials
 
-### Step 2 — Create Docker environment file
+The `credentials/` directory is gitignored. Create files manually — see [`credentials/README.md`](credentials/README.md) for AI providers, agent credentials, SMTP/IMAP, and Telegram setup.
+
+### Step 2 — Create environment file
 
 ```bash
 cp docker/.env.sample docker/.env
@@ -265,11 +189,11 @@ GRAPHQL_ENDPOINT=http://localhost:4000/api
 
 > `DATABASE_URL` must use `@supabase:5432` (Docker service name), not `@localhost:5432`. `localhost` only works when running outside Docker.
 
-### Step 3 — Start Supabase + App (prod mode)
+### Step 3 — Start Supabase + App
 
 ```bash
 cd docker
-DOCKER_BUILDKIT=0 NEXT_PUBLIC_SITE_SIGNUP_STRATEGY=ANY USER_DEFAULT_STATUS=active docker compose -f docker-compose.yml -f docker-compose.prod.yml up supabase app --build -d
+DOCKER_BUILDKIT=0 NEXT_PUBLIC_SITE_SIGNUP_STRATEGY=ANY USER_DEFAULT_STATUS=active docker compose -f docker-compose.yml -f docker-compose.dev.yml up supabase app --build -d
 ```
 
 **Important for first run:**
@@ -295,14 +219,20 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up traefik -d
 
 **Result:**
 
-- `http://localhost:2015` — app (via Traefik proxy)
+- `http://localhost:2015` — app (via Traefik reverse proxy)
 - `http://localhost:8080` — Traefik dashboard
+
+> In Docker mode, Traefik proxies the app. In Local Development, the app runs directly on port 3000.
 
 ---
 
-## Scenario 2: Local dev (npm)
+## Local Development (npm)
 
 Full hot-reload development mode. Requires Node.js 22+ and npm.
+
+### Step 1 — Set up credentials
+
+Same as Docker Setup — see [`credentials/README.md`](credentials/README.md).
 
 ### Step 2 — Install dependencies
 
@@ -312,48 +242,12 @@ npm install
 
 ### Step 3 — Create environment files
 
-**`docker/.env`** (for Supabase container):
-
 ```bash
 cp docker/.env.sample docker/.env
-```
-
-Set `DATABASE_URL` to `@localhost:5432` (port is mapped to host):
-
-```env
-SUPABASE_DB_PASSWORD=postgres
-SUPABASE_DB_NAME=postgres
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres
-JWT_SECRET=<openssl rand -hex 32>
-N8N_ENCRYPTION_KEY=<openssl rand -hex 16>
-N8N_SECURE_COOKIE=false
-N8N_BOOTSTRAP_ACTIVATE_WORKFLOWS=true
-N8N_PERSONALIZATION_ENABLED=false
-NODES_EXCLUDE=[]
-N8N_CUSTOM_EXTENSIONS=./.n8n/custom
-GRAPHQL_ENDPOINT=http://localhost:4000/api
-```
-
-**Root `.env`** (read by Prisma and the app server):
-
-```bash
 cp .env.example .env
 ```
 
-```env
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres
-JWT_SECRET=<same as in docker/.env>
-PORT=3000
-N8N_ENCRYPTION_KEY=<same as in docker/.env>
-N8N_SECURE_COOKIE=false
-N8N_BOOTSTRAP_ACTIVATE_WORKFLOWS=true
-N8N_PERSONALIZATION_ENABLED=false
-NODES_EXCLUDE=[]
-N8N_CUSTOM_EXTENSIONS=./.n8n/custom
-GRAPHQL_ENDPOINT=http://localhost:4000/api
-```
-
-> The root `.env` is separate from `docker/.env` — the app server reads env vars from the root, not from the Docker folder.
+In both files, set `DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres` (port mapped to host). The root `.env` is read by Prisma and the app server.
 
 ### Step 4 — Start Supabase
 
