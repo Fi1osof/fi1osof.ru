@@ -21,6 +21,13 @@ http:
       service: n8n
       priority: 100
 
+    n8n:
+      rule: 'Host(`n8n.localhost`)'
+      entryPoints:
+        - web
+      service: n8n
+      priority: 100
+
     app:
       rule: 'PathPrefix(`/`)'
       entryPoints:

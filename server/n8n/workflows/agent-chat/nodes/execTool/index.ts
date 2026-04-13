@@ -10,6 +10,7 @@ import { getFetchRequestTool } from './tools/fetchRequest'
 import { getWebSearchAgentTool } from './tools/webSearchAgent'
 import { getUrlReaderTool } from './tools/urlReader'
 import { getGraphqlRequestTool } from './tools/graphqlRequest'
+import { getShellExecuteTool } from './tools/shellExecute'
 
 export function getExecTools(config: AgentFactoryConfig): NodeType[] {
   return [
@@ -21,5 +22,6 @@ export function getExecTools(config: AgentFactoryConfig): NodeType[] {
     getWebSearchAgentTool(config),
     getUrlReaderTool(config),
     getGraphqlRequestTool(config),
+    getShellExecuteTool(config),
   ].filter((n) => !!n)
 }

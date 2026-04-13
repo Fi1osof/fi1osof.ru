@@ -56,6 +56,7 @@ server/n8n/workflows/
         ├── KB/KBConcept/     # KB Concept CRUD tools
         ├── fetchRequest.ts
         ├── graphqlRequest.ts
+        ├── shellExecute.ts
         ├── urlReader.ts
         └── webSearchAgent.ts
 ```

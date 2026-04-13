@@ -33,6 +33,7 @@ export type WorkflowName =
   | 'Tool: Read File'
   | 'Tool: List Files'
   | 'Tool: Fetch Request'
+  | 'Tool: Shell Execute'
   | 'Tool: Parsing HTML'
   | 'Tool: Verify Token'
   | 'Tool: Get Config'

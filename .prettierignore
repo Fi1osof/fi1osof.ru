@@ -4,6 +4,7 @@
 
 /shared
 /uploads
+/storage
 
 # next
 next-env.d.ts

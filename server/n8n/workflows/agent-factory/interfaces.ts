@@ -49,6 +49,8 @@ export interface AgentFactoryConfig {
   canAccessFileSystem?: boolean
   /** Enable HTTP fetch tool */
   canExecuteFetch?: boolean
+  /** Enable shell command execution tool */
+  canExecuteShell?: boolean
   /** Enable URL reading tool */
   canReadUrls?: boolean
   /** Authenticate user from JWT token */

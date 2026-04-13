@@ -26,6 +26,7 @@ module.exports = [
       'docker/**',
       'shared/**',
       'uploads/**',
+      'storage/**',
       '.prettierignore',
       '.dockerignore',
     ],
