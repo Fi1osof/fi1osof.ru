@@ -3,5 +3,3 @@ if (!process.env.JWT_SECRET) {
 }
 
 export const JWT_SECRET = process.env.JWT_SECRET
-
-export const JWT_TYPE_REFERRER = 'referrer'

@@ -1,6 +1,6 @@
 import { builder } from '../../../builder'
 import { AuthPayload, UserSignupDataInput } from '../inputs'
-import { createToken, hashPassword } from '../helpers/auth'
+import { createToken, hashPassword, TokenType } from '../helpers/auth'
 import { UserStatus } from '@prisma/client'
 import { checkReferrerToken } from '../helpers/checkReferrerToken'
 
@@ -17,8 +17,9 @@ builder.mutationField('signup', (t) =>
       const fullname = args.data.fullname || undefined
       const referrerToken = args.data.referrerToken
 
-      const referrerId = checkReferrerToken({
+      const referrerId = await checkReferrerToken({
         referrerToken,
+        ctx,
       })
 
       if (
@@ -72,7 +73,7 @@ builder.mutationField('signup', (t) =>
         },
       })
 
-      const token = await createToken(user, ctx)
+      const token = await createToken(user, ctx, TokenType.Auth)
 
       return {
         success: true,

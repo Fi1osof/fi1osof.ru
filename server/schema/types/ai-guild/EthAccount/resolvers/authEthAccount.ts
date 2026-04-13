@@ -5,7 +5,7 @@ import {
   verifySignature,
   buildSignMessage,
 } from '../helpers/crypto'
-import { createToken } from '../../../User/helpers/auth'
+import { createToken, TokenType } from '../../../User/helpers/auth'
 import { Prisma } from '@prisma/client'
 import { checkReferrerToken } from 'server/schema/types/User/helpers/checkReferrerToken'
 
@@ -48,15 +48,16 @@ builder.mutationField('authEthAccount', (t) =>
           },
         }
       } else {
-        let referrerId: string | undefined = undefined
+        let referrerId: string | null | undefined = undefined
 
         const ethAccount = await ctx.prisma.ethAccount.findUnique({
           where: { address: address.toLowerCase() },
         })
 
         if (!ethAccount?.userId) {
-          referrerId = checkReferrerToken({
+          referrerId = await checkReferrerToken({
             referrerToken,
+            ctx,
           })
         }
 
@@ -87,7 +88,7 @@ builder.mutationField('authEthAccount', (t) =>
         }
       }
 
-      const token = await createToken(ethAccount.User, ctx)
+      const token = await createToken(ethAccount.User, ctx, TokenType.Auth)
 
       return {
         success: true,

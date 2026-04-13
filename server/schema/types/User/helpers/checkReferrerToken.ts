@@ -1,29 +1,26 @@
-import jwt from 'jsonwebtoken'
-import { JWT_SECRET, JWT_TYPE_REFERRER } from 'server/helpers/jwt'
-import {
-  ReferrerTokenPayload,
-  SignupStrategy,
-  signupStrategy,
-} from '../interfaces'
+import { SignupStrategy, signupStrategy } from '../interfaces'
+import { TokenType, verifyToken } from './auth'
+import { PrismaContext } from 'server/context/interfaces'
 
 type checkReferrerTokenProps = {
   referrerToken: string | null | undefined
+  ctx: PrismaContext
 }
 
-export function checkReferrerToken({ referrerToken }: checkReferrerTokenProps) {
-  let referrerId: string | undefined
+export async function checkReferrerToken({
+  referrerToken,
+  ctx,
+}: checkReferrerTokenProps) {
+  let referrerId: string | null | undefined
 
   if (referrerToken) {
-    const decoded = jwt.verify(
-      referrerToken,
-      JWT_SECRET,
-    ) as Partial<ReferrerTokenPayload>
+    const payload = await verifyToken({
+      token: referrerToken,
+      type: TokenType.Referrer,
+      prisma: ctx.prisma,
+    })
 
-    if (decoded.type !== JWT_TYPE_REFERRER) {
-      throw new Error('Invalid token type')
-    }
-
-    referrerId = decoded.userId
+    referrerId = payload?.userId
 
     if (!referrerId) {
       throw new Error('Referrer not found')

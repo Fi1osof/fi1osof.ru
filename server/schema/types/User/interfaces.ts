@@ -3,11 +3,6 @@ import { SignOptions } from 'jsonwebtoken'
 export const REFERRER_TOKEN_TTL = (process.env.REFERRER_TOKEN_TTL ||
   '1H') as SignOptions['expiresIn']
 
-export interface ReferrerTokenPayload {
-  userId: string
-  type: 'referrer'
-}
-
 export enum SignupStrategy {
   ANY = 'ANY',
 }

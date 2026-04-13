@@ -2,7 +2,7 @@ import crypto from 'crypto'
 import type { Prisma, TelegramAccount, User } from '@prisma/client'
 import { builder } from '../../../../builder'
 import { TelegramAuthDataInput } from '../inputs'
-import { createToken } from '../../../User/helpers/auth'
+import { createToken, TokenType } from '../../../User/helpers/auth'
 import { AuthPayload } from '../../../User/inputs'
 import { checkReferrerToken } from 'server/schema/types/User/helpers/checkReferrerToken'
 
@@ -83,7 +83,7 @@ builder.mutationField('authViaTelegram', (t) =>
       if (tgAccountResponse) {
         user = tgAccountResponse.User
         tgAccount = tgAccountResponse
-        token = await createToken(user, ctx)
+        token = await createToken(user, ctx, TokenType.Auth)
       } else {
         const { auth_date, first_name, last_name, photo_url, username } =
           tgAuthData
@@ -115,12 +115,13 @@ builder.mutationField('authViaTelegram', (t) =>
           })
 
           if (newTgAccount) {
-            token = await createToken(currentUser, ctx)
+            token = await createToken(currentUser, ctx, TokenType.Auth)
             tgAccount = newTgAccount
           }
         } else {
-          const referrerId = checkReferrerToken({
+          const referrerId = await checkReferrerToken({
             referrerToken,
+            ctx,
           })
 
           const newUser = await prisma.user.create({
@@ -136,7 +137,7 @@ builder.mutationField('authViaTelegram', (t) =>
           })
 
           if (newUser) {
-            token = await createToken(newUser, ctx)
+            token = await createToken(newUser, ctx, TokenType.Auth)
             user = newUser
             tgAccount = newUser.TelegramAccount
           }

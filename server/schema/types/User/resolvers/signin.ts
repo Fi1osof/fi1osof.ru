@@ -4,7 +4,7 @@ import {
   UserWhereUniqueInput,
   UserSigninDataInput,
 } from '../inputs'
-import { createToken, comparePassword } from '../helpers/auth'
+import { createToken, comparePassword, TokenType } from '../helpers/auth'
 
 builder.mutationField('signin', (t) =>
   t.field({
@@ -59,7 +59,7 @@ builder.mutationField('signin', (t) =>
         }
       }
 
-      const token = await createToken(user, ctx)
+      const token = await createToken(user, ctx, TokenType.Auth)
 
       return {
         success: true,

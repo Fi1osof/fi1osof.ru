@@ -1,6 +1,6 @@
 import type { User } from '@prisma/client'
 import { prismaClient } from '../prisma'
-import { verifyToken } from '../schema/types/User/helpers/auth'
+import { TokenType, verifyToken } from '../schema/types/User/helpers/auth'
 import { world3dClient } from '../world3d/client'
 import { PrismaContext } from './interfaces'
 
@@ -18,7 +18,12 @@ export async function createContext({
 
   if (authHeader) {
     token = authHeader.replace('Bearer ', '')
-    const payload = verifyToken(token)
+    const payload = await verifyToken({
+      token,
+      type: TokenType.Auth,
+      prisma: prismaClient,
+    })
+
     if (payload?.userId) {
       currentUser = await prismaClient.user.findUnique({
         where: { id: payload.userId },
