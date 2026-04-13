@@ -47,7 +47,7 @@ ENV NEXT_PUBLIC_SITE_SIGNUP_STRATEGY $NEXT_PUBLIC_SITE_SIGNUP_STRATEGY
 # ENV GRAPHQL_API_ENDPOINT $GRAPHQL_API_ENDPOINT
 
 RUN apk update
-RUN apk add curl sudo git jq mc nmap
+RUN apk add curl sudo git jq mc nmap bash
 
 WORKDIR /app
 
