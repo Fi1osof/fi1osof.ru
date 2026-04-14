@@ -17,6 +17,7 @@ import { FormControl } from 'src/ui-kit/FormControl'
 import { Button } from 'src/ui-kit/Button'
 import { ComponentVariant } from 'src/ui-kit/interfaces'
 import { FileUploader, FileUploaderProps } from 'src/components/FileUploader'
+import { PasswordField } from 'src/ui-kit/controls/PasswordField'
 
 const MarkdownEditor = dynamic(() => import('src/components/Markdown/Editor'), {
   ssr: false,
@@ -64,12 +65,13 @@ export const UserEditForm: React.FC<UserEditFormProps> = ({
         .trigger()
         .then((reason) => {
           if (reason === true) {
-            const { ...other } = form.getValues()
+            const { password, ...other } = form.getValues()
 
             const request = updateCurrentUserMutation({
               variables: {
                 data: {
                   ...other,
+                  password: password || undefined,
                 },
               },
             })
@@ -123,7 +125,7 @@ export const UserEditForm: React.FC<UserEditFormProps> = ({
   const fieldRenderer = useCallback<
     ControllerProps<
       UserFormData,
-      'username' | 'fullname' | 'image' | 'content' | 'intro'
+      'username' | 'fullname' | 'image' | 'content' | 'intro' | 'password'
     >['render']
   >(
     ({ field: { name, value, onChange, onBlur }, fieldState: { error } }) => {
@@ -132,6 +134,7 @@ export const UserEditForm: React.FC<UserEditFormProps> = ({
       let EditorComponent:
         | typeof TextField
         | typeof MarkdownEditor
+        | typeof PasswordField
         | React.FC<{
             value: string
           }> = TextField
@@ -166,6 +169,10 @@ export const UserEditForm: React.FC<UserEditFormProps> = ({
           label = 'Intro'
           EditorComponent = MarkdownEditor
           break
+        case 'password':
+          label = 'Password'
+          EditorComponent = PasswordField
+          break
       }
 
       return (
@@ -190,6 +197,7 @@ export const UserEditForm: React.FC<UserEditFormProps> = ({
     <UserEditFormStyled {...other} onSubmit={onSubmit}>
       <FormProvider {...form}>
         <Controller name="username" render={fieldRenderer} />
+        <Controller name="password" render={fieldRenderer} />
         <Controller name="fullname" render={fieldRenderer} />
         <Controller name="image" render={fieldRenderer} />
         <Controller name="intro" render={fieldRenderer} />
