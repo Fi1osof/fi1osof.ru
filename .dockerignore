@@ -1,7 +1,14 @@
 /.env
+.vscode
+.vscode*
+.windsurf
+.n8n
+.next
 node_modules
 generated
-.n8n
+/dist
 /docker
+/public
 /shared
+/storage
 /uploads
