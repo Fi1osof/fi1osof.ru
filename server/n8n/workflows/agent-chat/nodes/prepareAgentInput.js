@@ -1,10 +1,10 @@
 const items = $input.all()
 
-const firstItem = items[0]?.json || {}
-const secondItem = items[1]?.json || {}
+const item = items[0]?.json || {}
+const item2 = items[1]?.json || {}
 
-const assistantMessages = firstItem.assistantMessages || []
-const instructions = secondItem.instructions || ''
+const assistantMessages = item.assistantMessages || []
+const instructions = item2.instructions || ''
 
 const combinedAssistantMessages = [...assistantMessages]
 
@@ -27,6 +27,6 @@ if (instructions) {
 }
 
 return {
-  ...firstItem,
+  ...item,
   assistantMessages: combinedAssistantMessages,
 }

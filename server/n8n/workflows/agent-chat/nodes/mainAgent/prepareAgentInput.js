@@ -2,9 +2,10 @@
 
 const mainContext = $('Prepare Context').first().json
 
-const [decompositorItem, usefulInfoItem] = $input.all()
+const [decompositorItem, agentDataItem, usefulInfoItem] = $input.all()
 
 const decompositorData = decompositorItem?.json || {}
+const { agentData } = agentDataItem?.json || {}
 const usefulInfoData = usefulInfoItem?.json || {}
 
 // Data from decompositor agent (output contains instructions)
@@ -15,6 +16,17 @@ const usefulInfoOutput = usefulInfoData.output || ''
 
 const assistantMessages = decompositorData.assistantMessages || []
 const combinedAssistantMessages = [...assistantMessages]
+
+if (agentData) {
+  combinedAssistantMessages.push({
+    role: 'assistant',
+    content: `## The following is your agent profile data. This information defines who you are, your capabilities, and your role. Use it to guide your behavior and responses.
+
+    ### Your profile
+ 
+    ${JSON.stringify(agentData, null, 2)}`,
+  })
+}
 
 // Build system message with analysis results
 if (decompositorOutput || usefulInfoOutput) {

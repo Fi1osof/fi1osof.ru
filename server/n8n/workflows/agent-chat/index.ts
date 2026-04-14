@@ -201,7 +201,7 @@ return {
       },
       [this.nodes['Prepare Agent Data'].name]: {
         main: [
-          [{ node: this.nodes['Merge Agents'].name, type: 'main', index: 2 }],
+          [{ node: this.nodes['Merge Agents'].name, type: 'main', index: 1 }],
         ],
       },
       ...(agentNodesFirst && {
@@ -228,7 +228,7 @@ return {
           main: [
             [
               {
-                node: 'Prepare Agent Input (chat-agent)',
+                node: 'Merge Agents',
                 type: 'main',
                 index: 0,
               },
@@ -236,7 +236,25 @@ return {
           ],
         },
       },
+
+      [this.nodes['Get Agent Data'].name]: {
+        main: [
+          [
+            {
+              node: this.nodes['Merge Agent Data'].name,
+              type: 'main',
+              index: 0,
+            },
+          ],
+        ],
+      },
     }
+
+    connections['Merge Trigger'].main[0]?.push({
+      node: 'Get Agent Data',
+      type: 'main',
+      index: 0,
+    })
 
     return {
       name: workflowName,
