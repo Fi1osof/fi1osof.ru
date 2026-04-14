@@ -13,6 +13,7 @@ import { createToolCreateConcept } from './nodes/KB/KBConcept/createConcept'
 import { createToolReadConcepts } from './nodes/KB/KBConcept/readConcepts'
 import { createToolUpdateConcept } from './nodes/KB/KBConcept/updateConcept'
 import { createToolDeleteConcept } from './nodes/KB/KBConcept/deleteConcept'
+import { createToolUpdateProfile } from './nodes/KB/updateProfile'
 import { createToolExecTool } from '../tool-exec-tool/factory'
 import { getExecTools } from './nodes/execTool'
 
@@ -299,6 +300,9 @@ return {
 
     const deleteConceptWorkflow = createToolDeleteConcept(config)
     deleteConceptWorkflow && workflows.push(deleteConceptWorkflow)
+
+    const updateProfileWorkflow = createToolUpdateProfile(config)
+    updateProfileWorkflow && workflows.push(updateProfileWorkflow)
 
     const execToolWorkflow = createToolExecTool({
       agentName: config.agentName,
