@@ -33,19 +33,13 @@ export function getMainAgent({
     model,
     canAccessFileSystem = false,
     hasMemoryRecall = false,
+    systemMessage,
   } = config
 
   const prepareAgentInputCode = fs.readFileSync(
     path.join(__dirname, './prepareAgentInput.js'),
     'utf-8',
   )
-
-  const baseSystemMessage = fs.readFileSync(
-    path.join(__dirname, './system-message.md'),
-    'utf-8',
-  )
-
-  const systemMessage = `${baseSystemMessage}`
 
   const position: [number, number] = [2080, -128]
 
@@ -56,7 +50,9 @@ export function getMainAgent({
     enableStreaming,
     maxIterations,
     model,
-    systemMessage,
+    systemMessage:
+      systemMessage ||
+      fs.readFileSync(path.join(__dirname, './system-message.md'), 'utf-8'),
     hasTools: true,
     position,
   })

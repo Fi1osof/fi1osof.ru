@@ -31,4 +31,5 @@ export type AgentCredentials = {
   imap?: ImapConfig
   hasMemoryRecall?: boolean
   model?: string
+  systemMessage?: string
 } & Record<string, unknown>

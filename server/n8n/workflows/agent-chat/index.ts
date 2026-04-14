@@ -31,6 +31,7 @@ class ChatAgentWorkflow extends AgentWorkflowFactory {
       smtp: _smtp,
       agentName,
       model,
+      systemMessage,
       ...other
     } = agentCreds
 
@@ -47,12 +48,12 @@ class ChatAgentWorkflow extends AgentWorkflowFactory {
       versionId: 'agent-chat-v7',
       credentialId: 'internal-agent-chat-cred',
       credentialName: 'Internal API - agent-chat',
-      systemMessagePath: undefined,
       webhookId: 'agent-chat-webhook',
       instanceId: 'narasim-dev-agent-chat',
       agentNodeType: 'orchestrator',
       model: model || getModel(process.env.AGENT_CHAT_MODEL),
       memorySize,
+      systemMessage,
       ...other,
     }
   }

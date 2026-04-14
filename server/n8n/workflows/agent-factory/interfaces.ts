@@ -25,8 +25,8 @@ export interface AgentFactoryConfig {
   credentialId: string
   /** Internal API credential display name */
   credentialName: string
-  /** Path to system message markdown file */
-  systemMessagePath: string | undefined
+  /** System message */
+  systemMessage: string | undefined
   /** Webhook endpoint ID */
   webhookId: string
   /** n8n instance identifier */

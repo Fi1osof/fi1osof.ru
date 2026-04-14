@@ -955,7 +955,7 @@ return [{
 
   getAgentNodes(
     config: AgentFactoryConfig & {
-      systemMessage: string
+      systemMessage: string | undefined
       prepareAgentInputCode: string
       position: [number, number]
     },
@@ -1038,36 +1038,10 @@ return [{
   getMainAgent(
     config: AgentFactoryConfig,
   ): [NodeType[], ConnectionsType, agentNode: NodeType] {
-    const {
-      // agentId,
-      // agentName,
-      // agentNodeType = 'orchestrator',
-      // enableStreaming = true,
-      // maxIterations = parseInt(process.env.N8N_MAX_ITERATIONS || '10'),
-      // model,
-      // hasTools = true,
-      systemMessagePath,
-    } = config
-
     const prepareAgentInputCode = fs.readFileSync(
       path.join(__dirname, 'nodes/baseNodes/prepareAgentInput.js'),
       'utf-8',
     )
-
-    const baseSystemMessage = fs.readFileSync(
-      path.join(__dirname, 'nodes/baseNodes/base-system-message.md'),
-      'utf-8',
-    )
-
-    const customSystemMessage = systemMessagePath
-      ? fs.readFileSync(systemMessagePath, 'utf-8')
-      : ''
-
-    const systemMessage = `${baseSystemMessage}
-
-# Agent-Specific Instructions
-
-${customSystemMessage}`
 
     return this.getAgentNodes({
       // agentId,
@@ -1078,7 +1052,6 @@ ${customSystemMessage}`
       // model,
       // hasTools,
       ...config,
-      systemMessage,
       prepareAgentInputCode,
       // position: [256, 520],
       position: [112, 304],

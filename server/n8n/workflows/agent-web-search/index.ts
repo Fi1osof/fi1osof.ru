@@ -1,3 +1,4 @@
+import * as fs from 'fs'
 import * as path from 'path'
 import { AgentWorkflowFactory } from '../agent-factory'
 import { AgentFactoryConfig } from '../agent-factory/interfaces'
@@ -9,7 +10,7 @@ class WebSearchAgentWorkflow extends AgentWorkflowFactory {
   }
 
   getConfig(agentCreds: AgentCredentials): AgentFactoryConfig {
-    const { agentName } = agentCreds
+    const { agentName, systemMessage } = agentCreds
 
     return {
       agentName,
@@ -20,7 +21,9 @@ class WebSearchAgentWorkflow extends AgentWorkflowFactory {
       versionId: 'agent-web-search-v1',
       credentialId: 'internal-agent-web-search-cred',
       credentialName: 'Internal API - agent-web-search',
-      systemMessagePath: path.join(__dirname, 'system-message.md'),
+      systemMessage:
+        systemMessage ||
+        fs.readFileSync(path.join(__dirname, 'system-message.md'), 'utf-8'),
       webhookId: 'agent-web-search-chat',
       instanceId: 'narasim-dev-web-search',
       model: 'perplexity/sonar-reasoning-pro',

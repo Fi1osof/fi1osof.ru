@@ -7,7 +7,7 @@ type CreateAgentNodeProps = {
   enableStreaming?: boolean
   maxIterations?: number
   model?: string
-  systemMessage: string
+  systemMessage: string | undefined
   hasTools?: boolean
   position: [number, number]
 }
@@ -43,7 +43,7 @@ export function createAgentNode({
     agentNode.parameters.model = model
 
     const additionalFields = {
-      systemMessage: `=${systemMessage}`,
+      systemMessage: `=${systemMessage ?? ''}`,
       assistantMessages: '={{ $json.assistantMessages }}',
       enableStreaming: '={{ $json.enableStreaming }}',
       streamTechnicalInfo: process.env.STREAM_TECHNICAL_INFO !== 'false',
