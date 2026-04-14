@@ -174,7 +174,20 @@ const schemaDescription = JSON.stringify(createTaskSchema.describe(), null, 2)
 
 1. Create `server/n8n/workflows/agent-{name}/`
 2. Create `index.ts` with `createAgent()` config
-3. Create `system-message.md`
+3. Create `system-message.md` (default system message)
+
+### Custom System Message
+
+You can override the default system message per agent instance via credentials file (`credentials/agents/agent-name.json`):
+
+```json
+{
+  "agentName": "Chat Agent",
+  "systemMessage": "Custom system message for this agent instance"
+}
+```
+
+Since credentials are gitignored, this allows individual tuning without affecting the repository.
 
 ## Email Integration
 

@@ -110,6 +110,7 @@ Agent credentials for Internal API authentication.
 
 ### Optional Fields
 
+- `systemMessage` — custom system message for the agent (overrides default)
 - `smtp` — allows agent to send emails
 - `imap` — allows agent to read emails
 
@@ -127,6 +128,7 @@ Agent credentials can include any parameter from `AgentFactoryConfig` — see `s
   "email": "agent@example.com",
   "fullname": "Agent Name",
   "model": "anthropic/claude-sonnet-4",
+  "systemMessage": "Custom system message for this agent instance",
   "hasMemoryRecall": true,
   "hasWebSearchAgent": true,
   "smtp": {

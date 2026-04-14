@@ -1,6 +1,10 @@
 # KMS-Agent
 
-Full-stack web application with autonomous AI agent. Production-ready platform, not a wrapper.
+**Autonomous AI entity, not a chatbot.** Own identity, own credentials, own knowledge. The agent authenticates as itself, updates its own profile, tracks what it knows and how certain it is. Every action requires explicit reasoning — no black-box decisions.
+
+Full-stack platform: Next.js 16, GraphQL, Prisma, PostgreSQL. Local-first — runs on your machine with optional local LLM.
+
+→ [Full philosophy and principles](wiki/agent-philosophy.md)
 
 ---
 

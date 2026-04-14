@@ -2,6 +2,7 @@
 
 ## Contents
 
+- [Agent Philosophy](./agent-philosophy.md) — what you get, core principles, ideology
 - [Technical Overview](./technical-overview.md) — stack, architecture, configuration, manual setup
 - [Registration Policy](./registration-policy.md) — referral system, user statuses
 - [Code Style](./code-style.md)
@@ -42,6 +43,7 @@ Located in `server/n8n/workflows/agent-factory/`:
 - Generates n8n workflows from TypeScript
 - `hasTools` flag for models without tool support
 - Nodes store with Proxy for convenient access by name (`this.nodes['Node Name']`)
+- Custom `systemMessage` via agent credentials (gitignored, allows individual tuning)
 
 ## Knowledge Base (KB)
 
