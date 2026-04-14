@@ -1,5 +1,7 @@
+import { Prisma } from '@prisma/client'
 import { builder } from '../../../builder'
 import { UserUpdateDataInput, UserWhereUniqueInput } from '../inputs'
+import { hashPassword } from '../helpers/auth'
 
 builder.mutationField('updateUser', (t) =>
   t.prismaField({
@@ -16,7 +18,7 @@ builder.mutationField('updateUser', (t) =>
         throw new Error('Access denied')
       }
 
-      const { status, ...other } = args.data
+      const { status, password, ...other } = args.data
       const { id: userId } = args.where
 
       if (!userId) {
@@ -27,12 +29,15 @@ builder.mutationField('updateUser', (t) =>
         throw new Error('Can not update self account via this method')
       }
 
+      const data: Prisma.UserUpdateInput = {
+        ...other,
+        status: status ?? undefined,
+        password: password ? await hashPassword(password) : undefined,
+      }
+
       return ctx.prisma.user.update({
         ...query,
-        data: {
-          ...other,
-          status: status ?? undefined,
-        },
+        data,
         where: {
           id: userId,
         },

@@ -59,5 +59,6 @@ export const CurrentUserUpdateInput = builder.inputType(
 export const UserUpdateDataInput = builder.inputType('UserUpdateDataInput', {
   fields: (t) => ({
     status: t.field({ type: UserStatusEnum, required: false }),
+    password: t.string(),
   }),
 })
