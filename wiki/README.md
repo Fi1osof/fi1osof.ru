@@ -13,6 +13,7 @@
 - [Mail Server](./mailserver/README.md)
 - [World3D](./world3d/README.md) — multiplayer 3D environment
 - [Local LLM Server](./llama-server/README.md) — llama.cpp with CUDA (requires NVIDIA GPU)
+- [Computer Vision](./computer-vision/README.md) — image recognition with Qwen3.5 vision model
 - [Jinja Templates](./jinja-templates/README.md) — chat templates for LLM
 
 ## Architecture

@@ -152,6 +152,8 @@ services:
       # JSON kwargs for template, e.g. '{"enable_thinking":false}'
       # Note: only set if non-empty, llama-server reads this directly
       - LLAMA_TEMPLATE_KWARGS=${LLAMA_TEMPLATE_KWARGS:-}
+      # Multimodal projection for vision models (format: owner/repo/filename)
+      - LLAMA_MMPROJ=${LLAMA_MMPROJ:-}
     deploy:
       resources:
         reservations:

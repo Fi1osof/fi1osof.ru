@@ -60,7 +60,15 @@ Own your content. Built-in posts with revisions, comments, user profiles. No pla
 
 Runs on your machine. Optional local LLM via llama.cpp (NVIDIA GPU). Your data stays local.
 
-## 🔍 Full Transparency
+## �️ Computer Vision
+
+Local image recognition via Qwen3.5 vision model. Analyze images, charts, diagrams — all running locally on your GPU. No cloud APIs, no data leaving your machine.
+
+- **OpenAI-compatible API** — same `/v1/chat/completions` endpoint
+- **Auto-download** — models fetched from HuggingFace on first run
+- **Base64 input** — send images directly in requests
+
+## � Full Transparency
 
 All state is inspectable: GraphQL playground, Prisma Studio, n8n workflow editor. Nothing hidden.
 
@@ -125,7 +133,8 @@ Start with `google/gemini-3.1-flash-lite-preview` — good quality at minimal co
 
 **Local models:**
 - Minimum: `qwen3 4B`
-- **llama.cpp:** Default `Qwen3.5-0.8B` (testing), recommended `Qwen3-8B`+ for production
+- **llama.cpp:** Default `Qwen3.5-0.8B` (testing), recommended `Qwen3.5-4B`+ for production
+- **Vision:** `Qwen3.5-4B` with `mmproj-F16.gguf` for image recognition
 
 **Required credentials from user:**
 - For OpenRouter: API key

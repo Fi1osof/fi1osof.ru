@@ -6,6 +6,34 @@ MODEL_REPO=$(echo "$LLAMA_MODEL" | cut -d'/' -f1-2)
 MODEL_FILE=$(echo "$LLAMA_MODEL" | cut -d'/' -f3-)
 MODEL_PATH="/models/${MODEL_FILE}"
 
+# LLAMA_MMPROJ format: owner/repo/filename (for vision models)
+MMPROJ_PATH=""
+if [ -n "$LLAMA_MMPROJ" ]; then
+    MMPROJ_REPO=$(echo "$LLAMA_MMPROJ" | cut -d'/' -f1-2)
+    MMPROJ_FILE=$(echo "$LLAMA_MMPROJ" | cut -d'/' -f3-)
+    MMPROJ_PATH="/models/${MMPROJ_FILE}"
+    
+    if [ ! -f "$MMPROJ_PATH" ]; then
+        echo "MMPROJ not found, downloading from HuggingFace: $MMPROJ_REPO/$MMPROJ_FILE"
+        
+        CURL_OPTS="-L --progress-bar -f"
+        if [ -n "$HUGGINGFACE_TOKEN" ]; then
+            CURL_OPTS="$CURL_OPTS -H \"Authorization: Bearer $HUGGINGFACE_TOKEN\""
+        fi
+        
+        TEMP_PATH="${MMPROJ_PATH}.tmp"
+        if eval curl $CURL_OPTS -o "$TEMP_PATH" \
+            "https://huggingface.co/${MMPROJ_REPO}/resolve/main/${MMPROJ_FILE}"; then
+            mv "$TEMP_PATH" "$MMPROJ_PATH"
+            echo "MMPROJ downloaded successfully"
+        else
+            rm -f "$TEMP_PATH"
+            echo "ERROR: Failed to download MMPROJ"
+            exit 1
+        fi
+    fi
+fi
+
 if [ ! -f "$MODEL_PATH" ]; then
     echo "Model not found, downloading from HuggingFace: $MODEL_REPO/$MODEL_FILE"
     
@@ -56,6 +84,12 @@ if [ -n "$LLAMA_TEMPLATE_KWARGS" ] && [ "$LLAMA_TEMPLATE_KWARGS" != "{}" ]; then
     TEMPLATE_KWARGS_FLAG="--chat-template-kwargs $LLAMA_TEMPLATE_KWARGS"
 fi
 
+# Multimodal projection for vision models
+MMPROJ_FLAG=""
+if [ -n "$MMPROJ_PATH" ] && [ -f "$MMPROJ_PATH" ]; then
+    MMPROJ_FLAG="--mmproj $MMPROJ_PATH"
+fi
+
 exec /app/llama-server \
     --model "$MODEL_PATH" \
     --host 0.0.0.0 \
@@ -65,4 +99,5 @@ exec /app/llama-server \
     $VERBOSE_FLAG \
     $JINJA_FLAG \
     $TEMPLATE_FLAG \
-    $TEMPLATE_KWARGS_FLAG
+    $TEMPLATE_KWARGS_FLAG \
+    $MMPROJ_FLAG
