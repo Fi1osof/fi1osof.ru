@@ -1,4 +1,10 @@
-export type ImageSize = 'avatar' | 'thumb' | 'small' | 'middle' | 'big'
+export type ImageSize =
+  | 'avatar'
+  | 'thumb'
+  | 'small'
+  | 'middle'
+  | 'big'
+  | 'origin'
 
 type GetResizedImagePathParams = {
   path: string

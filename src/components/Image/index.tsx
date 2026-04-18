@@ -6,7 +6,12 @@ import { JsonLd } from 'src/components/seo/JsonLd'
 import { useBoolean } from 'src/hooks/useBoolean'
 import { createImageObject } from '../seo/JsonLd/helpers'
 
-export const Image: React.FC<ImageProps> = ({ src, alt, ...props }) => {
+export const Image: React.FC<ImageProps> = ({
+  src,
+  alt,
+  size = 'middle',
+  ...props
+}) => {
   const [isOpen, handleOpen, handleClose] = useBoolean()
 
   const { middle, big } = useMemo(() => {
@@ -16,7 +21,7 @@ export const Image: React.FC<ImageProps> = ({ src, alt, ...props }) => {
     const match = src.match(/^(\/images\/resized\/)([^/]+)\/(.+)$/)
 
     if (match) {
-      middle = `${match[1]}middle/${match[3]}`
+      middle = `${match[1]}${size}/${match[3]}`
       big = `${match[1]}big/${match[3]}`
     }
 
@@ -24,7 +29,7 @@ export const Image: React.FC<ImageProps> = ({ src, alt, ...props }) => {
       middle: middle || src,
       big: big || src,
     }
-  }, [src])
+  }, [src, size])
 
   const imageSchema = useMemo(
     () =>
