@@ -71,7 +71,7 @@ export const Markdown: React.FC<MarkdownProps> = ({ children, ...other }) => {
         remarkPlugins={[remarkGfm]}
         components={components}
         // allowElement={allowElement}
-        rehypePlugins={[rehypeRaw, rehypePrism]}
+        rehypePlugins={[rehypeRaw, [rehypePrism, { ignoreMissing: true }]]}
       >
         {children}
       </ReactMarkdown>
