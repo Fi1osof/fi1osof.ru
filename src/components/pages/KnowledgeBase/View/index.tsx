@@ -16,15 +16,32 @@ import { EnrichedConcept, EnrichedFact } from './interfaces'
 export const KnowledgeBaseView: React.FC = () => {
   const { data: conceptsData } = useConceptsQuery({
     variables: {
+      take: 10,
       orderBy: {
-        createdAt: SortOrder.DESC,
+        createdAt: SortOrder.ASC,
       },
     },
   })
-  const { data: factsData } = useFactsQuery()
-  const { data: participationsData } = useFactParticipationsQuery()
-  const { data: knowledgeSpacesData } = useKnowledgeSpacesQuery()
-  const { data: projectionsData } = useFactProjectionsQuery()
+  const { data: factsData } = useFactsQuery({
+    variables: {
+      take: 10,
+    },
+  })
+  const { data: participationsData } = useFactParticipationsQuery({
+    variables: {
+      take: 10,
+    },
+  })
+  const { data: knowledgeSpacesData } = useKnowledgeSpacesQuery({
+    variables: {
+      take: 10,
+    },
+  })
+  const { data: projectionsData } = useFactProjectionsQuery({
+    variables: {
+      take: 10,
+    },
+  })
 
   const enrichedData = useMemo(() => {
     const concepts = conceptsData?.response || []

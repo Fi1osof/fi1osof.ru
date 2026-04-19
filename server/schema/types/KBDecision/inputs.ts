@@ -1,6 +1,6 @@
 import { builder } from '../../builder'
 import { SortOrder } from '../common'
-import { KBDecisionStatusEnum } from './enums'
+import { KBDecisionStatusEnum } from '../enums'
 
 export const KBDecisionOrderByInput = builder.inputType(
   'KBDecisionOrderByInput',

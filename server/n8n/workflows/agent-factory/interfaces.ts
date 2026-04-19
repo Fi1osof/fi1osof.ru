@@ -67,6 +67,10 @@ export interface AgentFactoryConfig {
   hasKBNodes?: boolean
   /** Enable Experience nodes */
   hasEXNodes?: boolean
+  /** Enable Knowledge Base tools. Default true */
+  hasKBTools?: boolean
+  /** Enable update agent profile tool. Default true */
+  hasUpdateOwnProfileTool?: boolean
   /** Enable Web Search Agent tool */
   hasWebSearchAgent?: boolean
   /** Enable Memory Recall tool (query tool calls history) */

@@ -14,16 +14,25 @@ import { getShellExecuteTool } from './tools/shellExecute'
 import { getUpdateProfileTool } from './tools/updateProfile'
 
 export function getExecTools(config: AgentFactoryConfig): NodeType[] {
-  return [
-    getCreateConceptTool(config),
-    getReadConceptsTool(config),
-    getUpdateConceptTool(config),
-    getDeleteConceptTool(config),
+  const { hasKBTools = true, hasUpdateOwnProfileTool = true } = config
+
+  const tools: Array<NodeType | null | undefined> = [
     getFetchRequestTool(config),
     getWebSearchAgentTool(config),
     getUrlReaderTool(config),
     getGraphqlRequestTool(config),
     getShellExecuteTool(config),
-    getUpdateProfileTool(config),
-  ].filter((n) => !!n)
+
+    ...((hasKBTools && [
+      getCreateConceptTool(config),
+      getReadConceptsTool(config),
+      getUpdateConceptTool(config),
+      getDeleteConceptTool(config),
+    ]) ||
+      []),
+
+    ...((hasUpdateOwnProfileTool && [getUpdateProfileTool(config)]) || []),
+  ]
+
+  return tools.filter((n) => !!n)
 }

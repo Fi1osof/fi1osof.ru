@@ -75,5 +75,8 @@ fragment KBConceptNoNesting on KBConcept {
   name
   description
   createdById
+  code
+  parentId
+  rootId
   content @include(if: $detailedInfo)
 }

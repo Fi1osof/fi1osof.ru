@@ -1,8 +1,5 @@
 import { builder } from '../../builder'
 
-// Import enums first (before inputs that depend on them)
-import './enums'
-
 // Import inputs
 import './inputs'
 
@@ -13,12 +10,8 @@ import './resolvers/createLabel'
 import './resolvers/updateLabel'
 import './resolvers/deleteLabel'
 
-// Export all types
-export * from './enums'
-export * from './inputs'
-
 // Import enum for use in object type
-import { KBLabelRoleEnum } from './enums'
+import { KBLabelRoleEnum } from '../enums'
 
 // KBLabel object type
 builder.prismaObject('KBLabel', {

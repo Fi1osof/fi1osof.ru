@@ -88,10 +88,7 @@ class ChatAgentWorkflow extends AgentWorkflowFactory {
       name: 'Merge Agent Data',
       type: 'n8n-nodes-base.merge',
       typeVersion: 3,
-      position: [
-        mainAgentNode.position[0] - 1168,
-        mainAgentNode.position[1] + 16,
-      ],
+      position: [-980, 480],
       parameters: {
         numberInputs: 2,
       },
@@ -102,10 +99,7 @@ class ChatAgentWorkflow extends AgentWorkflowFactory {
       name: 'Prepare Agent Data',
       type: 'n8n-nodes-base.code',
       typeVersion: 2,
-      position: [
-        mainAgentNode.position[0] - 928,
-        mainAgentNode.position[1] + 16,
-      ],
+      position: [-620, 480],
       parameters: {
         jsCode: `const items = $input.all()
 const agentData = items[0]?.json?.data?.me || null

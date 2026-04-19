@@ -1,6 +1,6 @@
 import { builder } from '../../builder'
 import { SortOrder } from '../common'
-import { KBFactStatusEnum } from './enums'
+import { KBFactStatusEnum } from '../enums'
 
 export const KBFactOrderByInput = builder.inputType('KBFactOrderByInput', {
   fields: (t) => ({

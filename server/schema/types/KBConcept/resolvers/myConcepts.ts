@@ -1,11 +1,12 @@
 import { builder } from '../../../builder'
-import { KBConceptOrderByInput, KBConceptsWhereInput } from '../inputs'
+import { buildKBConceptWhere } from '../helpers/buildWhere'
+import { KBConceptOrderByInput, KBConceptWhereInput } from '../inputs'
 
 builder.queryField('myConcepts', (t) =>
   t.prismaField({
     type: ['KBConcept'],
     args: {
-      where: t.arg({ type: KBConceptsWhereInput }),
+      where: t.arg({ type: KBConceptWhereInput }),
       orderBy: t.arg({ type: KBConceptOrderByInput }),
       skip: t.arg.int(),
       take: t.arg.int(),
@@ -18,12 +19,8 @@ builder.queryField('myConcepts', (t) =>
       return ctx.prisma.kBConcept.findMany({
         ...query,
         where: {
+          ...buildKBConceptWhere(args.where, ctx),
           createdById: ctx.currentUser.id,
-          id: args.where?.ids?.length ? { in: args.where.ids } : undefined,
-          type: args.where?.type ?? undefined,
-          name: args.where?.name
-            ? { contains: args.where.name, mode: 'insensitive' }
-            : undefined,
         },
         skip: args.skip ?? undefined,
         take: args.take ?? undefined,

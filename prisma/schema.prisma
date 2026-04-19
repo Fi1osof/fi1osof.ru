@@ -258,6 +258,12 @@ model KBConcept {
 
   content String? @db.Text
 
+  // External code or identifier (e.g., "7.1" for topic, GUID for item)
+  code String? @db.VarChar(100)
+
+  // Additional structured data (e.g., grade levels [7,8,9], answer options)
+  data Json?
+
   createdById String @db.VarChar(36)
   CreatedBy   User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
 
@@ -265,6 +271,22 @@ model KBConcept {
   FactParticipations KBFactParticipation[]
   IdentityInputs     KBIdentityOperation[] @relation(name: "IdentityInput")
   IdentityOutputs    KBIdentityOperation[] @relation(name: "IdentityOutput")
+
+  // Hierarchy
+  parentId String?     @db.VarChar(36)
+  Parent   KBConcept?  @relation("ConceptTree", fields: [parentId], references: [id])
+  Children KBConcept[] @relation("ConceptTree")
+
+  rootId      String?     @db.VarChar(36)
+  Root        KBConcept?  @relation("ConceptRoot", fields: [rootId], references: [id])
+  Descendants KBConcept[] @relation("ConceptRoot")
+
+  @@unique([rootId, code])
+  @@unique([parentId, code])
+  @@index([parentId])
+  @@index([rootId])
+  @@index([type])
+  @@index([code])
 }
 
 // Label roles define how a name relates to its concept:

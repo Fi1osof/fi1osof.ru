@@ -1,8 +1,5 @@
 import { builder } from '../../builder'
 
-// Import enums first (before inputs that depend on them)
-import './enums'
-
 // Import inputs
 import './inputs'
 
@@ -13,12 +10,8 @@ import './resolvers/createConflict'
 import './resolvers/updateConflict'
 import './resolvers/deleteConflict'
 
-// Export all types
-export * from './enums'
-export * from './inputs'
-
 // Import enum for use in object type
-import { KBConflictStatusEnum } from './enums'
+import { KBConflictStatusEnum } from '../enums'
 
 // KBConflictFact junction table object type
 builder.prismaObject('KBConflictFact', {

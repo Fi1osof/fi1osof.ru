@@ -4,17 +4,17 @@ const mainContext = $('Prepare Context').first().json
 
 const [decompositorItem, agentDataItem, usefulInfoItem] = $input.all()
 
-const decompositorData = decompositorItem?.json || {}
 const { agentData } = agentDataItem?.json || {}
 const usefulInfoData = usefulInfoItem?.json || {}
+const {
+  user,
+  output: decompositorOutput = '',
+  assistantMessages = [],
+  ...other
+} = decompositorItem?.json || {}
 
-// Data from decompositor agent (output contains instructions)
-const decompositorOutput = decompositorData.output || ''
-
-// Data from useful-info agent (if available)
 const usefulInfoOutput = usefulInfoData.output || ''
 
-const assistantMessages = decompositorData.assistantMessages || []
 const combinedAssistantMessages = [...assistantMessages]
 
 if (agentData) {
@@ -45,8 +45,26 @@ if (decompositorOutput || usefulInfoOutput) {
   }
 }
 
+// eslint-disable-next-line no-console
+console.log('user', user)
+
+if (user) {
+  combinedAssistantMessages.push({
+    role: 'assistant',
+    content: `## User profile info
+ 
+    ${JSON.stringify(user, null, 2)}`,
+  })
+} else {
+  combinedAssistantMessages.push({
+    role: 'assistant',
+    content: `## User unauthorized
+    `,
+  })
+}
+
 return {
-  ...decompositorData,
+  ...other,
   assistantMessages: combinedAssistantMessages,
   enableStreaming: mainContext.enableStreaming,
 }

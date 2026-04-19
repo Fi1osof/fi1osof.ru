@@ -1,6 +1,6 @@
 import { builder } from '../../builder'
 import { SortOrder } from '../common'
-import { KBIdentityOperationTypeEnum } from './enums'
+import { KBIdentityOperationTypeEnum } from '../enums'
 
 export const KBIdentityOperationOrderByInput = builder.inputType(
   'KBIdentityOperationOrderByInput',

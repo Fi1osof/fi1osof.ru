@@ -1,6 +1,6 @@
 import { builder } from '../../builder'
 import { SortOrder } from '../common'
-import { KBConflictStatusEnum } from './enums'
+import { KBConflictStatusEnum } from '../enums'
 
 export const KBConflictOrderByInput = builder.inputType(
   'KBConflictOrderByInput',

@@ -1,8 +1,5 @@
 import { builder } from '../../builder'
 
-// Import enums first (before inputs that depend on them)
-import './enums'
-
 // Import inputs
 import './inputs'
 
@@ -13,12 +10,8 @@ import './resolvers/createIdentityOperation'
 import './resolvers/updateIdentityOperation'
 import './resolvers/deleteIdentityOperation'
 
-// Export all types
-export * from './enums'
-export * from './inputs'
-
 // Import enum for use in object type
-import { KBIdentityOperationTypeEnum } from './enums'
+import { KBIdentityOperationTypeEnum } from '../enums'
 
 // KBIdentityOperation object type
 builder.prismaObject('KBIdentityOperation', {

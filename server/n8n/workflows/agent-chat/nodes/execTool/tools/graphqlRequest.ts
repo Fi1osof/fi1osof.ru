@@ -19,7 +19,7 @@ export function getGraphqlRequestTool(
     name: 'GraphQL Request Tool',
     type: '@n8n/n8n-nodes-langchain.toolWorkflow',
     typeVersion: 2.2,
-    position: [2880, 2520],
+    position: [3000, 160],
     parameters: {
       name: 'graphql_request',
       description: `Execute a GraphQL query or mutation against the API. IMPORTANT: All requests are authenticated as ${agentName}, not as the external user.`,

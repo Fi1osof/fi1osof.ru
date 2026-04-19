@@ -1,8 +1,5 @@
 import { builder } from '../../builder'
 
-// Import enums first (before inputs that depend on them)
-import './enums'
-
 // Import inputs
 import './inputs'
 
@@ -14,12 +11,8 @@ import './resolvers/createFactProjection'
 import './resolvers/updateFactProjection'
 import './resolvers/deleteFactProjection'
 
-// Export all types
-export * from './enums'
-export * from './inputs'
-
 // Import enum for use in object type
-import { KBFactProjectionVisibilityEnum } from './enums'
+import { KBFactProjectionVisibilityEnum } from '../enums'
 
 // KBFactProjection object type
 builder.prismaObject('KBFactProjection', {

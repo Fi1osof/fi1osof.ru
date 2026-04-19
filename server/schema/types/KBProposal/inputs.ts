@@ -1,6 +1,6 @@
 import { builder } from '../../builder'
 import { SortOrder } from '../common'
-import { KBProposalStatusEnum } from './enums'
+import { KBProposalStatusEnum } from '../enums'
 
 export const KBProposalOrderByInput = builder.inputType(
   'KBProposalOrderByInput',

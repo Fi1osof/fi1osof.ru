@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import { builder } from '../../../builder'
 import { KBConceptUpdateInput } from '../inputs'
 
@@ -12,6 +13,10 @@ builder.mutationField('updateConcept', (t) =>
       if (!ctx.currentUser) {
         throw new Error('Unauthorized')
       }
+
+      const {
+        data: { data, name, ...other },
+      } = args
 
       // Check if concept exists and belongs to user
       const existingConcept = await ctx.prisma.kBConcept.findFirst({
@@ -29,8 +34,9 @@ builder.mutationField('updateConcept', (t) =>
         ...query,
         where: { id: args.id },
         data: {
-          ...args.data,
-          name: args.data.name ?? undefined,
+          ...other,
+          data: data as Prisma.KBConceptUpdateInput['data'],
+          name: name ?? undefined,
         },
       })
     },

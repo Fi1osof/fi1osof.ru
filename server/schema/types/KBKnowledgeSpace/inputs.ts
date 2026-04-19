@@ -1,6 +1,6 @@
 import { builder } from '../../builder'
 import { SortOrder } from '../common'
-import { KBKnowledgeSpaceTypeEnum } from './enums'
+import { KBKnowledgeSpaceTypeEnum } from '../enums'
 
 export const KBKnowledgeSpaceOrderByInput = builder.inputType(
   'KBKnowledgeSpaceOrderByInput',

@@ -1,6 +1,6 @@
 import { builder } from '../../builder'
 import { SortOrder } from '../common'
-import { KBLabelRoleEnum } from './enums'
+import { KBLabelRoleEnum } from '../enums'
 
 export const KBLabelOrderByInput = builder.inputType('KBLabelOrderByInput', {
   fields: (t) => ({

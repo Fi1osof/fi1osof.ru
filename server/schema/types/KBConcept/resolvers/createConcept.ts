@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import { builder } from '../../../builder'
 import { KBConceptCreateInput } from '../inputs'
 
@@ -12,10 +13,15 @@ builder.mutationField('createConcept', (t) =>
         throw new Error('Unauthorized')
       }
 
+      const {
+        data: { data, ...other },
+      } = args
+
       return ctx.prisma.kBConcept.create({
         ...query,
         data: {
-          ...args.data,
+          ...other,
+          data: data as Prisma.KBConceptCreateInput['data'],
           createdById: ctx.currentUser.id,
         },
       })

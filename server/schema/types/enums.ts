@@ -9,6 +9,7 @@ import {
   KBIdentityOperationType,
   KBKnowledgeSpaceType,
   KBFactProjectionVisibility,
+  Prisma,
 } from '@prisma/client'
 
 // KB Label enums
@@ -63,3 +64,7 @@ export const KBFactProjectionVisibilityEnum = builder.enumType(
     values: Object.values(KBFactProjectionVisibility),
   },
 )
+
+export const QueryModeEnum = builder.enumType('QueryModeEnum', {
+  values: Object.values(Prisma.QueryMode),
+})

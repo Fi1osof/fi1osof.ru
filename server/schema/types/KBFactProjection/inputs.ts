@@ -1,6 +1,6 @@
 import { builder } from '../../builder'
 import { SortOrder } from '../common'
-import { KBFactProjectionVisibilityEnum } from './enums'
+import { KBFactProjectionVisibilityEnum } from '../enums'
 
 export const KBFactProjectionOrderByInput = builder.inputType(
   'KBFactProjectionOrderByInput',

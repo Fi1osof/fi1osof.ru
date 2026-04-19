@@ -1,8 +1,5 @@
 import { builder } from '../../builder'
 
-// Import enums first (before inputs that depend on them)
-import './enums'
-
 // Import inputs
 import './inputs'
 
@@ -13,12 +10,8 @@ import './resolvers/createProposal'
 import './resolvers/updateProposal'
 import './resolvers/deleteProposal'
 
-// Export all types
-export * from './enums'
-export * from './inputs'
-
 // Import enum for use in object type
-import { KBProposalStatusEnum } from './enums'
+import { KBProposalStatusEnum } from '../enums'
 
 // KBProposal object type
 builder.prismaObject('KBProposal', {

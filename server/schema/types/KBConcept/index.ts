@@ -5,16 +5,18 @@ import './inputs'
 
 // Import resolvers
 import './resolvers/concepts'
+import './resolvers/count'
 import './resolvers/myConcepts'
 import './resolvers/myConcept'
 import './resolvers/createConcept'
 import './resolvers/updateConcept'
 import './resolvers/deleteConcept'
+import { KBConceptOrderByInput, KBConceptWhereInput } from './inputs'
+import { conceptsResolver } from './resolvers/concepts'
 
 // Export all types
 export * from './inputs'
 
-// KBConcept object type
 builder.prismaObject('KBConcept', {
   fields: (t) => ({
     id: t.exposeID('id'),
@@ -24,11 +26,28 @@ builder.prismaObject('KBConcept', {
     name: t.exposeString('name'),
     description: t.exposeString('description', { nullable: true }),
     content: t.exposeString('content', { nullable: true }),
+    code: t.exposeString('code'),
+    data: t.expose('data', { type: 'Json', nullable: true }),
     createdById: t.exposeID('createdById'),
     CreatedBy: t.relation('CreatedBy'),
     Labels: t.relation('Labels'),
     FactParticipations: t.relation('FactParticipations'),
     IdentityInputs: t.relation('IdentityInputs'),
     IdentityOutputs: t.relation('IdentityOutputs'),
+    parentId: t.exposeID('parentId'),
+    Parent: t.relation('Parent'),
+    rootId: t.exposeID('rootId'),
+    Root: t.relation('Root'),
+    Children: t.prismaField({
+      type: ['KBConcept'],
+      args: {
+        where: t.arg({ type: KBConceptWhereInput }),
+        orderBy: t.arg({ type: KBConceptOrderByInput }),
+        skip: t.arg.int(),
+        take: t.arg.int(),
+      },
+      resolve: conceptsResolver,
+    }),
+    Descendants: t.relation('Descendants'),
   }),
 })

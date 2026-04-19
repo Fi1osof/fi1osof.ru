@@ -1,6 +1,6 @@
 const nodeCoordinates = {
   'merge-trigger': [-1664, 256],
-  'get-agent-data': [-1344, 144],
+  'get-agent-data': [-1360, 450],
   'prepare-context': [-1092, 256],
   reflection: [-480, 512],
   'fetch-mindlogs': [-1344, 400],
@@ -120,7 +120,7 @@ const nodeCoordinates = {
   'reflection-process': [200, 300],
   'tool-send-mail': [2656, 792],
   'tool-check-mail': [2656, 984],
-  'tool-memory-recall': [2656, 1128],
+  'tool-memory-recall': [3200, 160],
 } as const
 
 export type NodeId = keyof typeof nodeCoordinates

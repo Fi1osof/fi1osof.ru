@@ -106,16 +106,14 @@ export abstract class AgentWorkflowFactory extends WorkflowFactory {
 
     // Create flow-level workflows FIRST (one per flow, not per agent)
     // so they are available in registry before createNestedFlows
-    const { hasGraphqlTool = false, credentialId, credentialName } = fullConfig
+    const { credentialId, credentialName } = fullConfig
 
-    if (hasGraphqlTool) {
-      const toolGraphqlRequest = createToolGraphqlRequest({
-        agentName,
-        credentialId,
-        credentialName,
-      })
-      this.registry.addFlow(toolGraphqlRequest.name, toolGraphqlRequest)
-    }
+    const toolGraphqlRequest = createToolGraphqlRequest({
+      agentName,
+      credentialId,
+      credentialName,
+    })
+    this.registry.addFlow(toolGraphqlRequest.name, toolGraphqlRequest)
 
     // Now create nested flows (they can access flow-level workflows via registry)
     const workflows = this.createNestedFlows(fullConfig)
@@ -473,7 +471,7 @@ export abstract class AgentWorkflowFactory extends WorkflowFactory {
   }
 
   getBaseNodes(config: AgentFactoryConfig) {
-    const { agentId, agentName, hasTools, hasGraphqlTool, memorySize } = config
+    const { agentId, agentName, hasTools, memorySize } = config
 
     const hasMemory = this.hasMemory()
 
@@ -487,13 +485,11 @@ export abstract class AgentWorkflowFactory extends WorkflowFactory {
       JSON.stringify({ agentId }, null, 2),
     )
 
-    const agentDataNode = hasGraphqlTool
-      ? getAgentDataNode({
-          nodeId: `${agentId}-get-agent-data`,
-          agentName,
-          position: getNodeCoordinates('get-agent-data'),
-        })
-      : null
+    const agentDataNode = getAgentDataNode({
+      nodeId: `${agentId}-get-agent-data`,
+      agentName,
+      position: getNodeCoordinates('get-agent-data'),
+    })
 
     const prepareContextNode: NodeType = {
       id: `${agentId}-prepare-context`,
@@ -514,6 +510,11 @@ export abstract class AgentWorkflowFactory extends WorkflowFactory {
 
     if (hasTools && agentDataNode) {
       this.addNode({
+        id: `${agentId}-reflection`,
+        name: 'Reflection',
+        type: 'n8n-nodes-base.executeWorkflow',
+        typeVersion: 1.2,
+        position: getNodeCoordinates('reflection'),
         parameters: {
           workflowId: {
             __rl: true,
@@ -551,11 +552,6 @@ export abstract class AgentWorkflowFactory extends WorkflowFactory {
             convertFieldsToString: false,
           },
         },
-        id: `${agentId}-reflection`,
-        name: 'Reflection',
-        type: 'n8n-nodes-base.executeWorkflow',
-        typeVersion: 1.2,
-        position: getNodeCoordinates('reflection'),
       })
       this.addNode({
         parameters: {},
