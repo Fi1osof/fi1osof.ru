@@ -13,6 +13,15 @@ export const KBConceptOrderByInput = builder.inputType(
   },
 )
 
+export const KBConceptWhereUniqueInput = builder.inputType(
+  'KBConceptWhereUniqueInput',
+  {
+    fields: (t) => ({
+      id: t.id({}),
+    }),
+  },
+)
+
 export const KBConceptWhereInput = builder.inputType('KBConceptWhereInput', {
   fields: (t) => ({
     ids: t.stringList(),

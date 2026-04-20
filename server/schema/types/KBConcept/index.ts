@@ -5,6 +5,7 @@ import './inputs'
 
 // Import resolvers
 import './resolvers/concepts'
+import './resolvers/concept'
 import './resolvers/count'
 import './resolvers/myConcepts'
 import './resolvers/myConcept'

@@ -1,3 +1,12 @@
+query concept(
+  $where: KBConceptWhereUniqueInput!
+  $detailedInfo: Boolean = true
+) {
+  concept(where: $where) {
+    ...KBConcept_
+  }
+}
+
 query myConcepts(
   $where: KBConceptWhereInput
   $orderBy: KBConceptOrderByInput
@@ -38,6 +47,23 @@ query concepts(
   }
 }
 
+query conceptsCount($where: KBConceptWhereInput) {
+  kBConceptsCount(where: $where)
+}
+
+query conceptsConnection(
+  $where: KBConceptWhereInput
+  $orderBy: KBConceptOrderByInput
+  $skip: Int
+  $take: Int
+  $detailedInfo: Boolean = false
+) {
+  concepts(where: $where, orderBy: $orderBy, skip: $skip, take: $take) {
+    ...KBConcept_
+  }
+  kBConceptsCount(where: $where)
+}
+
 mutation createConcept(
   $data: KBConceptCreateInput!
   $detailedInfo: Boolean = true
@@ -48,11 +74,11 @@ mutation createConcept(
 }
 
 mutation updateConcept(
-  $id: String!
+  $where: KBConceptWhereUniqueInput!
   $data: KBConceptUpdateInput!
   $detailedInfo: Boolean = true
 ) {
-  response: updateConcept(id: $id, data: $data) {
+  response: updateConcept(where: $where, data: $data) {
     ...KBConcept_
   }
 }
@@ -65,6 +91,9 @@ mutation deleteConcept($id: String!) {
 
 fragment KBConcept_ on KBConcept {
   ...KBConceptNoNesting
+  CreatedBy {
+    ...UserNoNesting
+  }
 }
 
 fragment KBConceptNoNesting on KBConcept {
