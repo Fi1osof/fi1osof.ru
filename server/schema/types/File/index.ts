@@ -4,24 +4,28 @@ import './resolvers/files'
 import './resolvers/filesCount'
 import './resolvers/file'
 import './resolvers/singleUpload'
+import './resolvers/update'
 
 builder.prismaObject('File', {
   fields: (t) => ({
-    id: t.exposeID('id'),
-    createdAt: t.expose('createdAt', { type: 'DateTime' }),
+    id: t.exposeID('id', {
+      nullable: false,
+    }),
+    createdAt: t.expose('createdAt', { type: 'DateTime', nullable: true }),
     updatedAt: t.expose('updatedAt', { type: 'DateTime', nullable: true }),
     path: t.field({
       type: 'String',
-      nullable: true,
+      nullable: false,
       resolve: ({ path }) => {
-        // return parent.path ? `/uploads/${parent.path}` : null
-        return path?.replace(/^uploads\//, '') || null
+        return path.replace(/^uploads\//, '')
       },
     }),
     filename: t.exposeString('filename'),
     name: t.exposeString('name', { nullable: true }),
-    mimetype: t.exposeString('mimetype'),
-    encoding: t.exposeString('encoding'),
+    description: t.exposeString('description', { nullable: true }),
+    content: t.exposeString('content', { nullable: true }),
+    mimetype: t.exposeString('mimetype', { nullable: false }),
+    // encoding: t.exposeString('encoding'),
     // size: t.exposeFloat('size'),
     rank: t.exposeInt('rank'),
     createdById: t.exposeString('CreatedBy', { nullable: true }),

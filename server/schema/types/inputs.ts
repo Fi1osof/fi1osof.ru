@@ -33,3 +33,25 @@ export const NestedStringNullableFilter: ReturnType<typeof builder.inputType> =
   })
 
 export type StringNullableFilter = typeof StringNullableFilter.$inferInput
+
+// export const StringFilter = builder.inputType('StringFilter', {
+//   fields: (t) => ({
+//     ...stringFilterFields(t),
+//     not: t.field({ type: NestedStringNullableFilter }),
+//   }),
+// })
+
+// export type StringFilter<$PrismaModel = never> = {
+//   equals?: string | StringFieldRefInput<$PrismaModel>
+//   in?: string[] | ListStringFieldRefInput<$PrismaModel>
+//   notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+//   lt?: string | StringFieldRefInput<$PrismaModel>
+//   lte?: string | StringFieldRefInput<$PrismaModel>
+//   gt?: string | StringFieldRefInput<$PrismaModel>
+//   gte?: string | StringFieldRefInput<$PrismaModel>
+//   contains?: string | StringFieldRefInput<$PrismaModel>
+//   startsWith?: string | StringFieldRefInput<$PrismaModel>
+//   endsWith?: string | StringFieldRefInput<$PrismaModel>
+//   mode?: QueryMode
+//   not?: NestedStringFilter<$PrismaModel> | string
+// }

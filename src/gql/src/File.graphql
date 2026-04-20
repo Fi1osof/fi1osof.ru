@@ -1,6 +1,31 @@
+query file($where: FileWhereUniqueInput!) {
+  file(where: $where) {
+    ...FileDetailed
+  }
+}
+
+query files($take: Int, $skip: Int) {
+  files(take: $take, skip: $skip) {
+    ...File_
+  }
+}
+
+query filesConnection($take: Int, $skip: Int) {
+  filesCount
+  files(take: $take, skip: $skip) {
+    ...FileDetailed
+  }
+}
+
 mutation singleUpload($data: SingleUploadInput!) {
   singleUpload(data: $data) {
-    ...File_
+    ...FileDetailed
+  }
+}
+
+mutation updateFile($data: FileUpdateInput!, $where: FileWhereUniqueInput!) {
+  response: updateFile(data: $data, where: $where) {
+    ...FileDetailed
   }
 }
 
@@ -10,8 +35,61 @@ fragment FileNoNesting on File {
   path
   filename
   name
+  description
+  mimetype
 }
 
 fragment File_ on File {
   ...FileNoNesting
 }
+
+fragment FileDetailed on File {
+  ...File_
+  content
+  CreatedBy {
+    ...UserNoNesting
+  }
+}
+
+# query filesConnection($where: FileWhereInput, $skip: Int, $take: Int = 10) {
+#   filesCount(where: $where)
+#   files(where: $where, skip: $skip, take: $take) {
+#     ...File_
+#   }
+# }
+
+# query file($where: FileWhereUniqueInput!) {
+#   file(where: $where) {
+#     ...FileDetailed
+#   }
+# }
+
+# mutation updateFile($data: FileUpdateInput!, $where: FileWhereUniqueInput!) {
+#   response: updateFile(data: $data, where: $where) {
+#     ...File_
+#   }
+# }
+
+# mutation singleUpload($data: SingleUploadInput!) {
+#   singleUpload(data: $data) {
+#     ...File_
+#   }
+# }
+
+# fragment FileNoNesting on File {
+#   id
+#   createdAt
+#   path
+#   filename
+#   name
+#   description
+# }
+
+# fragment File_ on File {
+#   ...FileNoNesting
+# }
+
+# fragment FileDetailed on File {
+#   ...File_
+#   content
+# }

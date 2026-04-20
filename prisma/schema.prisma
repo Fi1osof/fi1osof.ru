@@ -110,20 +110,27 @@ model TelegramAccount {
 }
 
 model File {
-  id        String   @id @default(cuid()) @db.VarChar(36)
-  path      String   @db.Text
-  name      String?  @db.Text
-  filename  String?  @db.Text
-  mimetype  String   @db.Text
-  encoding  String   @db.Text
-  hash      String?  @db.Text
-  size      Decimal?
-  CreatedBy String?  @db.VarChar(36)
-  rank      Int?
-  Gallery   String?  @db.VarChar(36)
+  id   String @id @default(cuid()) @db.VarChar(36)
+  path String @unique @db.Text
+
+  name        String?  @db.Text
+  description String?  @db.Text
+  content     String?  @db.Text
+  filename    String?  @db.Text
+  mimetype    String   @db.Text
+  encoding    String   @db.Text
+  hash        String?  @db.Text
+  size        Decimal?
+  rank        Int?
+
+  // @deprecated
+  Gallery String? @db.VarChar(36)
+
   createdAt DateTime @default(now()) @db.Timestamp(3)
   updatedAt DateTime @default(now()) @updatedAt @db.Timestamp(3)
-  User      User?    @relation(fields: [CreatedBy], references: [id])
+
+  CreatedBy String? @db.VarChar(36)
+  User      User?   @relation(fields: [CreatedBy], references: [id])
 
   @@index([CreatedBy], map: "File_CreatedBy")
 }
