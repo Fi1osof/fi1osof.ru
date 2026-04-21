@@ -1,9 +1,10 @@
 import { ConceptsConnectionQueryVariables } from 'src/gql/generated'
 
-type getConceptsConnectionQueryVariablesProps = {
-  page: number
-  take?: number
-}
+type getConceptsConnectionQueryVariablesProps =
+  Partial<ConceptsConnectionQueryVariables> & {
+    page: number
+    take?: number
+  }
 
 export function getConceptsConnectionQueryVariables({
   page,
