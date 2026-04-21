@@ -24,12 +24,36 @@ export const KBConceptWhereUniqueInput = builder.inputType(
 
 export const KBConceptWhereInput = builder.inputType('KBConceptWhereInput', {
   fields: (t) => ({
-    ids: t.stringList(),
+    ids: t.stringList({
+      deprecationReason: 'Use id instead',
+    }),
+    id: t.field({
+      type: StringNullableFilter,
+    }),
     type: t.field({
       type: StringNullableFilter,
     }),
-    // TODO Add KBConceptWhereNameInput
-    name: t.string(),
+    name: t.field({
+      type: StringNullableFilter,
+    }),
+    description: t.field({
+      type: StringNullableFilter,
+    }),
+    content: t.field({
+      type: StringNullableFilter,
+    }),
+    code: t.field({
+      type: StringNullableFilter,
+    }),
+    createdById: t.field({
+      type: StringNullableFilter,
+    }),
+    parentId: t.field({
+      type: StringNullableFilter,
+    }),
+    rootId: t.field({
+      type: StringNullableFilter,
+    }),
   }),
 })
 

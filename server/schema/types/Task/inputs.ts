@@ -1,6 +1,7 @@
 import { builder } from '../../builder'
 import { TaskStatusEnum } from './index'
 import { SortOrder } from '../common'
+import { StringNullableFilter } from '../inputs'
 
 export const TaskOrderByInput = builder.inputType('TaskOrderByInput', {
   fields: (t) => ({
@@ -16,8 +17,19 @@ export const TaskWhereUniqueInput = builder.inputType('TaskWhereUniqueInput', {
 
 export const TaskWhereInput = builder.inputType('TaskWhereInput', {
   fields: (t) => ({
+    id: t.field({
+      type: StringNullableFilter,
+    }),
+    parentId: t.field({
+      type: StringNullableFilter,
+    }),
+    createdById: t.field({
+      type: StringNullableFilter,
+    }),
+    assigneeId: t.field({
+      type: StringNullableFilter,
+    }),
     status: t.field({ type: TaskStatusEnum }),
-    parentId: t.string(),
     incompletedOnly: t.boolean({ defaultValue: true }),
   }),
 })

@@ -4,19 +4,29 @@ import * as yup from 'yup'
 
 const taskStatusValues = Object.values(TaskStatusEnum)
 
-export const searchTaskSchema: yup.ObjectSchema<MyTasksQueryVariables> = yup
+type SchemaWhereInput = Omit<
+  NonNullable<MyTasksQueryVariables['where']>,
+  'assigneeId' | 'createdById' | 'id' | 'parentId'
+>
+
+const where: yup.ObjectSchema<SchemaWhereInput> = yup.object().shape({
+  status: yup
+    .string()
+    .oneOf(taskStatusValues)
+    .label(`Task status (${taskStatusValues.join(', ')})`),
+  incompletedOnly: yup
+    .boolean()
+    .label('Only incompleted tasks (default: true)'),
+})
+
+type SchemaInput = Omit<MyTasksQueryVariables, 'where'> & {
+  where?: SchemaWhereInput
+}
+
+export const searchTaskSchema: yup.ObjectSchema<SchemaInput> = yup
   .object()
   .shape({
-    where: yup.object().shape({
-      status: yup
-        .string()
-        .oneOf(taskStatusValues)
-        .label(`Task status (${taskStatusValues.join(', ')})`),
-      parentId: yup.string().label('Parent task ID'),
-      incompletedOnly: yup
-        .boolean()
-        .label('Only incompleted tasks (default: true)'),
-    }),
+    where,
     skip: yup.number().label('Number of records to skip'),
     take: yup.number().label('Number of records to return'),
   })

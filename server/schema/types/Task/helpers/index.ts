@@ -1,13 +1,14 @@
 import { TaskStatus, Prisma } from '@prisma/client'
 import { PrismaContext } from 'server/context/interfaces'
+import { TaskWhereInput } from '../inputs'
+import {
+  buildStringFilterWhere,
+  buildStringNullableFilterWhere,
+} from '../../helpers/buildStringNullableFilterWhere'
 
 const COMPLETED_STATUSES = [TaskStatus.Done, TaskStatus.Rejected]
 
-interface TaskWhereArgs {
-  status?: TaskStatus | null
-  parentId?: string | null
-  incompletedOnly?: boolean | null
-}
+type TaskWhereArgs = typeof TaskWhereInput.$inferInput
 
 interface BuildTaskWhereOptions {
   myOnly?: boolean
@@ -18,13 +19,24 @@ export function buildTaskWhere(
   options?: BuildTaskWhereOptions,
   ctx?: PrismaContext,
 ): Prisma.TaskWhereInput {
-  const incompletedOnly = args?.incompletedOnly ?? false
+  const {
+    id,
+    parentId,
+    createdById,
+    assigneeId,
+    incompletedOnly = false,
+    ...other
+  } = args || {}
 
   const where: Prisma.TaskWhereInput = {
+    ...other,
+    id: buildStringFilterWhere(id),
+    createdById: buildStringFilterWhere(createdById),
+    parentId: buildStringNullableFilterWhere(parentId),
+    assigneeId: buildStringNullableFilterWhere(assigneeId),
     status:
       args?.status ??
       (incompletedOnly ? { notIn: COMPLETED_STATUSES } : undefined),
-    parentId: args?.parentId ?? undefined,
   }
 
   if (options?.myOnly) {
