@@ -1,9 +1,10 @@
 import { FilesConnectionQueryVariables } from 'src/gql/generated'
 
-type getFilesConnectionQueryVariablesProps = {
-  page: number
-  take?: number
-}
+type getFilesConnectionQueryVariablesProps =
+  Partial<FilesConnectionQueryVariables> & {
+    page: number
+    take: number | undefined
+  }
 
 export function getFilesConnectionQueryVariables({
   page,
