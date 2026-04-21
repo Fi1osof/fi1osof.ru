@@ -132,7 +132,25 @@ model File {
   CreatedBy String? @db.VarChar(36)
   User      User?   @relation(fields: [CreatedBy], references: [id])
 
+  KBConceptFile KBConceptFile[]
+
   @@index([CreatedBy], map: "File_CreatedBy")
+}
+
+model KBConceptFile {
+  id        String   @id @default(cuid()) @db.VarChar(36)
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+
+  kBConceptId String    @db.VarChar(36)
+  KBConcept   KBConcept @relation(fields: [kBConceptId], references: [id])
+
+  fileId String @db.VarChar(36)
+  File   File   @relation(fields: [fileId], references: [id])
+
+  createdById String? @db.VarChar(36)
+
+  @@unique([kBConceptId, fileId])
+  @@index([createdById])
 }
 
 enum MindLogType {
@@ -287,6 +305,8 @@ model KBConcept {
   rootId      String?     @db.VarChar(36)
   Root        KBConcept?  @relation("ConceptRoot", fields: [rootId], references: [id])
   Descendants KBConcept[] @relation("ConceptRoot")
+
+  KBConceptFile KBConceptFile[]
 
   @@unique([rootId, code])
   @@unique([parentId, code])

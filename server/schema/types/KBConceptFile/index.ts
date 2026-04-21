@@ -1,0 +1,40 @@
+import { builder } from '../../builder'
+
+builder.prismaObject('KBConceptFile', {
+  fields: (t) => ({
+    id: t.exposeID('id'),
+    createdAt: t.expose('createdAt', { type: 'DateTime' }),
+    // updatedAt: t.expose('updatedAt', { type: 'DateTime' }),
+    // type: t.exposeString('type', { nullable: true }),
+    // name: t.exposeString('name'),
+    // description: t.exposeString('description', { nullable: true }),
+    // content: t.exposeString('content', { nullable: true }),
+    // code: t.exposeString('code'),
+    // data: t.expose('data', { type: 'Json', nullable: true }),
+    createdById: t.exposeID('createdById'),
+    // CreatedBy: t.relation('CreatedBy'),
+    fileId: t.exposeID('fileId'),
+    File: t.relation('File'),
+    kBConceptId: t.exposeID('kBConceptId'),
+    KBConcept: t.relation('KBConcept'),
+    // Labels: t.relation('Labels'),
+    // FactParticipations: t.relation('FactParticipations'),
+    // IdentityInputs: t.relation('IdentityInputs'),
+    // IdentityOutputs: t.relation('IdentityOutputs'),
+    // parentId: t.exposeID('parentId'),
+    // Parent: t.relation('Parent'),
+    // rootId: t.exposeID('rootId'),
+    // Root: t.relation('Root'),
+    // Children: t.prismaField({
+    //   type: ['KBConcept'],
+    //   args: {
+    //     where: t.arg({ type: KBConceptWhereInput }),
+    //     orderBy: t.arg({ type: KBConceptOrderByInput }),
+    //     skip: t.arg.int(),
+    //     take: t.arg.int(),
+    //   },
+    //   resolve: conceptsResolver,
+    // }),
+    // Descendants: t.relation('Descendants'),
+  }),
+})
