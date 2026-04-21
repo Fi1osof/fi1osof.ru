@@ -8,21 +8,22 @@ builder.mutationField('createTask', (t) =>
       data: t.arg({ type: TaskCreateInput, required: true }),
     },
     resolve: async (query, _root, args, ctx) => {
-      if (!ctx.currentUser) {
+      const { currentUser, prisma } = ctx
+
+      if (!currentUser) {
         throw new Error('Not authenticated')
       }
 
-      return ctx.prisma.task.create({
+      const {
+        data: { assigneeId, ...other },
+      } = args
+
+      return prisma.task.create({
         ...query,
         data: {
-          title: args.data.title,
-          description: args.data.description ?? undefined,
-          content: args.data.content ?? undefined,
-          startDatePlaning: args.data.startDatePlaning ?? undefined,
-          endDatePlaning: args.data.endDatePlaning ?? undefined,
-          parentId: args.data.parentId ?? undefined,
-          createdById: ctx.currentUser.id,
-          assigneeId: ctx.currentUser.id,
+          ...other,
+          createdById: currentUser.id,
+          assigneeId: assigneeId !== undefined ? assigneeId : currentUser.id,
         },
       })
     },

@@ -9,11 +9,14 @@ builder.mutationField('updateTask', (t) =>
       data: t.arg({ type: TaskUpdateInput, required: true }),
     },
     resolve: async (query, _root, args, ctx) => {
-      if (!ctx.currentUser) {
+      const { currentUser, prisma } = ctx
+
+      if (!currentUser) {
         throw new Error('Not authenticated')
       }
 
       const taskId = args.where.id
+
       if (!taskId) {
         throw new Error('Task ID is required')
       }
@@ -21,7 +24,7 @@ builder.mutationField('updateTask', (t) =>
       const existing = await ctx.prisma.task.findFirst({
         where: {
           id: taskId,
-          assigneeId: ctx.currentUser.id,
+          assigneeId: currentUser.id,
         },
       })
 
@@ -29,18 +32,25 @@ builder.mutationField('updateTask', (t) =>
         throw new Error('Task not found')
       }
 
-      return ctx.prisma.task.update({
+      if (!currentUser.sudo) {
+        if (existing.createdById !== currentUser.id) {
+          throw new Error('Access denied')
+        }
+      }
+
+      const {
+        data: { ...other },
+      } = args
+
+      return prisma.task.update({
         ...query,
-        where: { id: taskId },
+        where: {
+          id: taskId,
+        },
         data: {
+          ...other,
           title: args.data.title ?? undefined,
-          description: args.data.description ?? undefined,
-          content: args.data.content ?? undefined,
           status: args.data.status ?? undefined,
-          startDatePlaning: args.data.startDatePlaning ?? undefined,
-          endDatePlaning: args.data.endDatePlaning ?? undefined,
-          startDate: args.data.startDate ?? undefined,
-          endDate: args.data.endDate ?? undefined,
         },
       })
     },

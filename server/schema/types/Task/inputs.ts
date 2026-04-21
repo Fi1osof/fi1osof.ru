@@ -30,6 +30,7 @@ export const TaskCreateInput = builder.inputType('TaskCreateInput', {
     startDatePlaning: t.field({ type: 'DateTime' }),
     endDatePlaning: t.field({ type: 'DateTime' }),
     parentId: t.string(),
+    assigneeId: t.string(),
   }),
 })
 
@@ -46,5 +47,6 @@ export const TaskUpdateInput = builder.inputType('TaskUpdateInput', {
     endDatePlaning: t.field({ type: 'DateTime' }),
     startDate: t.field({ type: 'DateTime' }),
     endDate: t.field({ type: 'DateTime' }),
+    assigneeId: t.string(),
   }),
 })
