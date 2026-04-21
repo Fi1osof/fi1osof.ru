@@ -2,6 +2,7 @@ import type { User } from '@prisma/client'
 import { prismaClient } from '../prisma'
 import { TokenType, verifyToken } from '../schema/types/User/helpers/auth'
 import { world3dClient } from '../world3d/client'
+import { llmClient } from '../llm/client'
 import { PrismaContext } from './interfaces'
 
 type CreateContextArgs = {
@@ -38,5 +39,6 @@ export async function createContext({
     token,
     req,
     world3dClient,
+    llmClient,
   }
 }

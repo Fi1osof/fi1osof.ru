@@ -77,6 +77,8 @@ const ruleTree = {
     createReaction: isActive,
     createReflex: isActive,
     deleteConcept: isActive,
+    llmCompletion: isSudo,
+    llmChatCompletion: isSudo,
     signPost: isActive,
     world3dObjectCreate: isActive,
   },
