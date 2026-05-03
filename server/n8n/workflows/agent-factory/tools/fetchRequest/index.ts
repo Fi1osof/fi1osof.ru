@@ -39,13 +39,13 @@ export function getFetchRequestNodes(
         {
           name: 'headers',
           description:
-            'Request headers as JSON string, e.g. {"Content-Type": "application/json", "Authorization": "Bearer token"}',
+            'Request headers as object. Could be empty, e.g. {"Content-Type": "application/json", "Authorization": "Bearer token"}',
           type: 'string',
         },
         {
           name: 'body',
           description:
-            'Request body as JSON string for POST/PUT/PATCH requests',
+            'Request body as object for POST/PUT/PATCH requests. Could be empty',
           type: 'string',
         },
       ]),

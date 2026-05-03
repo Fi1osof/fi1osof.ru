@@ -99,7 +99,6 @@ if (mindLogs.length > 0) {
 return [
   {
     json: {
-      chatInput: triggerData.chatInput || '',
       sessionId,
       user: userData,
       agent: agentData,
@@ -108,6 +107,8 @@ return [
       currentDateTime: new Date().toISOString(),
       enableStreaming,
       assistantMessages,
+      chatInput: triggerData.chatInput || '',
+      triggerData,
     },
   },
 ]

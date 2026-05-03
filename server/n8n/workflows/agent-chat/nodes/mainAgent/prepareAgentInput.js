@@ -10,8 +10,16 @@ const {
   user,
   output: decompositorOutput = '',
   assistantMessages = [],
+  triggerData,
   ...other
 } = decompositorItem?.json || {}
+
+const {
+  chatInput: _chatInput,
+  sessionId: _sessionId,
+  token: _token,
+  ...requestParams
+} = triggerData || {}
 
 const usefulInfoOutput = usefulInfoData.output || ''
 
@@ -45,9 +53,6 @@ if (decompositorOutput || usefulInfoOutput) {
   }
 }
 
-// eslint-disable-next-line no-console
-console.log('user', user)
-
 if (user) {
   combinedAssistantMessages.push({
     role: 'assistant',
@@ -59,6 +64,15 @@ if (user) {
   combinedAssistantMessages.push({
     role: 'assistant',
     content: `## User unauthorized
+    `,
+  })
+}
+
+if (requestParams && Object.keys(requestParams).length > 0) {
+  combinedAssistantMessages.push({
+    role: 'assistant',
+    content: `## Request params
+${JSON.stringify(requestParams)}
     `,
   })
 }
