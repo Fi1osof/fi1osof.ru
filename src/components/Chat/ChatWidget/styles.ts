@@ -184,6 +184,14 @@ export const MessageStyled = styled.div<{ $isUser?: boolean }>`
     $isUser
       ? '0 2px 8px rgba(59, 130, 246, 0.25)'
       : '0 1px 3px rgba(0, 0, 0, 0.08)'};
+
+  ${({ $isUser }) =>
+    $isUser &&
+    css`
+      a {
+        color: white;
+      }
+    `}
 `
 
 export const ChatInputContainer = styled.div`
