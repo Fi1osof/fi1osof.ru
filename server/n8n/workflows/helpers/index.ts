@@ -212,7 +212,7 @@ export function getModel(specificModel?: string): string {
   return (
     specificModel ||
     process.env.AGENT_DEFAULT_MODEL ||
-    'anthropic/claude-haiku-4.5'
+    'google/gemini-3.1-flash-lite-preview'
   )
 }
 
