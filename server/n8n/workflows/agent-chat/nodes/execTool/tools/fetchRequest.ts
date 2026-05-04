@@ -23,7 +23,7 @@ export function getFetchRequestTool(
     parameters: {
       name: 'fetch_request',
       description:
-        'Execute HTTP request using fetch. Only external URLs allowed (no localhost/internal IPs). Returns status, statusText and body (JSON is auto-parsed when Content-Type is JSON, otherwise returns raw text).',
+        'Execute HTTP request using fetch. Returns status, statusText and body.',
       workflowId: {
         __rl: true,
         mode: 'name',
