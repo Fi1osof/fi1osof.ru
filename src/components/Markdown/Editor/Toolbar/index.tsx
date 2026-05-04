@@ -2,13 +2,16 @@ import {
   InsertImage,
   UndoRedo,
   BoldItalicUnderlineToggles,
+  StrikeThroughSupSubToggles,
   // CodeToggle,
   CreateLink,
-  // InsertCodeBlock,
+  InsertCodeBlock,
   InsertThematicBreak,
+  InsertTable,
   ListsToggle,
   BlockTypeSelect,
   Separator,
+  DiffSourceToggleWrapper,
   MDXEditorMethods,
 } from '@mdxeditor/editor'
 import { memo } from 'react'
@@ -28,6 +31,7 @@ const MarkdownEditorToolbarComponent: React.FC<
 
       {/* Text formatting */}
       <BoldItalicUnderlineToggles />
+      <StrikeThroughSupSubToggles />
       {/* <CodeToggle /> */}
 
       {/* Structural elements */}
@@ -35,14 +39,16 @@ const MarkdownEditorToolbarComponent: React.FC<
       <ListsToggle />
 
       {/* Insert objects */}
-      {/* <InsertCodeBlock /> */}
+      <InsertCodeBlock />
       <InsertThematicBreak />
+      <InsertTable />
       <CreateLink />
       <InsertImage />
 
       <Separator />
 
-      {/* Custom components */}
+      {/* View mode toggle */}
+      <DiffSourceToggleWrapper>{null}</DiffSourceToggleWrapper>
     </MarkdownEditorToolbarStyled>
   )
 }

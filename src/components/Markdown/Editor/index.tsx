@@ -6,7 +6,7 @@ import {
   thematicBreakPlugin,
   toolbarPlugin,
   MDXEditorMethods,
-  // diffSourcePlugin,
+  diffSourcePlugin,
   directivesPlugin,
   quotePlugin,
   linkPlugin,
@@ -17,6 +17,8 @@ import {
   JsxComponentDescriptor,
   MDXEditorProps,
   RealmPlugin,
+  tablePlugin,
+  markdownShortcutPlugin,
 } from '@mdxeditor/editor'
 
 import '@mdxeditor/editor/style.css'
@@ -103,6 +105,9 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorEditorProps> = ({
           yaml: 'YAML',
         },
       }),
+      tablePlugin(),
+      markdownShortcutPlugin(),
+      diffSourcePlugin({ viewMode: 'rich-text' }),
 
       toolbarPlugin({
         toolbarContents: () => {

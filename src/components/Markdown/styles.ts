@@ -114,6 +114,64 @@ export const markdownStyles = css`
     background: ${theme.colors.gray[50]};
   }
 
+  /* Horizontal rules */
+  hr {
+    border: none;
+    border-top: 1px solid ${theme.colors.border};
+    margin: 2em 0;
+  }
+
+  /* Task lists (checkboxes) */
+  ul.contains-task-list,
+  .task-list-item {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .task-list-item input[type='checkbox'] {
+    margin-right: 0.5em;
+    vertical-align: middle;
+  }
+
+  /* Subscript and Superscript */
+  sub,
+  sup {
+    font-size: 0.75em;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+  }
+
+  sup {
+    top: -0.5em;
+  }
+
+  sub {
+    bottom: -0.25em;
+  }
+
+  /* Footnotes */
+  .footnotes {
+    margin-top: 2em;
+    padding-top: 1em;
+    border-top: 1px solid ${theme.colors.border};
+    font-size: 0.9em;
+    color: ${theme.colors.text.secondary};
+  }
+
+  .footnotes ol {
+    padding-left: 1.5em;
+  }
+
+  .footnote-ref {
+    font-size: 0.75em;
+    vertical-align: super;
+  }
+
+  .footnote-backref {
+    margin-left: 0.25em;
+  }
+
   /* Prism syntax highlighting */
   .token.comment,
   .token.prolog,
