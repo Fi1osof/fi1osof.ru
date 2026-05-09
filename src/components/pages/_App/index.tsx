@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { ApolloProvider } from '@apollo/client/react'
 import { ThemeProvider } from 'styled-components'
 import { theme } from 'src/theme'
+import betterlytics from '@betterlytics/tracker'
 
 import { MainApp, AppProps, withWs } from './interfaces'
 
@@ -23,6 +24,19 @@ import { ChatProvider } from 'src/components/Chat/ChatWidget/context'
 import { SeoHeaders } from 'src/components/seo/SeoHeaders'
 
 export const App: MainApp<AppProps> = ({ Component, pageProps }) => {
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_BETTERLYTICS_SITE_ID) {
+      betterlytics.init(process.env.NEXT_PUBLIC_BETTERLYTICS_SITE_ID, {
+        scriptUrl: process.env.NEXT_PUBLIC_BETTERLYTICS_SCRIPT_URL || undefined,
+        serverUrl: process.env.NEXT_PUBLIC_BETTERLYTICS_SERVER_URL || undefined,
+        enableWebVitals: true,
+        outboundLinksMode: 'full',
+        trackErrors: true,
+        trackConsoleErrors: true,
+      })
+    }
+  }, [])
+
   useScrollPage()
 
   const apolloClient = useApollo(pageProps.initialApolloState, withWs)
