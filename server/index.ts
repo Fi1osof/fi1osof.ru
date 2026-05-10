@@ -95,7 +95,18 @@ async function startServer() {
   if (!apiOnly) {
     // Otherwise, start full server with Next.js
     const next = (await import('next')).default
-    const app = next({ dev })
+    const app = next({
+      dev,
+
+      /**
+       * Disable Turbopack for Next.js custom server due to runtime
+       * module resolution issues with the react-markdown/rehype ecosystem.
+       * Turbopack produced invalid client chunks causing
+       * ReferenceError: boolean is not defined during module evaluation,
+       * while the same code worked correctly with Webpack.
+       */
+      webpack: process.env.NEXT_USE_TURBOPACK !== 'true',
+    })
     const handle = app.getRequestHandler()
 
     await app.prepare()

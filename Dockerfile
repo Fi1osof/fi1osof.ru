@@ -18,6 +18,27 @@ ENV SUDO_PASSWORD $SUDO_PASSWORD
 ARG N8N_ENCRYPTION_KEY
 ENV N8N_ENCRYPTION_KEY $N8N_ENCRYPTION_KEY
 
+
+# ARG GRAPHQL_API_ENDPOINT
+# ENV GRAPHQL_API_ENDPOINT $GRAPHQL_API_ENDPOINT
+
+RUN apk update
+RUN apk add curl sudo git jq mc nmap bash
+
+WORKDIR /app
+
+# Install dependencies
+COPY package*.json ./
+RUN npm ci
+
+# Copy source
+COPY . .
+
+RUN npm run prisma:deploy
+RUN npm run generate
+RUN npm run prisma:seed
+
+
 ARG NEXT_PUBLIC_TELEGRAM_BOT_NAME
 ENV NEXT_PUBLIC_TELEGRAM_BOT_NAME $NEXT_PUBLIC_TELEGRAM_BOT_NAME
 
@@ -51,25 +72,8 @@ ENV NEXT_PUBLIC_BETTERLYTICS_SCRIPT_URL $NEXT_PUBLIC_BETTERLYTICS_SCRIPT_URL
 ARG NEXT_PUBLIC_BETTERLYTICS_SERVER_URL
 ENV NEXT_PUBLIC_BETTERLYTICS_SERVER_URL $NEXT_PUBLIC_BETTERLYTICS_SERVER_URL
 
-
-# ARG GRAPHQL_API_ENDPOINT
-# ENV GRAPHQL_API_ENDPOINT $GRAPHQL_API_ENDPOINT
-
-RUN apk update
-RUN apk add curl sudo git jq mc nmap bash
-
-WORKDIR /app
-
-# Install dependencies
-COPY package*.json ./
-RUN npm ci
-
-# Copy source
-COPY . .
-
-RUN npm run prisma:deploy
-RUN npm run generate
-RUN npm run prisma:seed
+ARG NEXT_USE_TURBOPACK
+ENV NEXT_USE_TURBOPACK $NEXT_USE_TURBOPACK
 
 RUN if [ "$ENV_MODE" = "production" ] ; then yarn build ; fi
 
