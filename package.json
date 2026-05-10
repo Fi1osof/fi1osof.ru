@@ -43,7 +43,22 @@
     "test:server": "dotenv -e .env.test -- cross-env API_ONLY=true tsx watch server/index.ts",
     "test:api": "dotenv -e .env.test -- vitest run -c vitest.api.config.ts",
     "test:api:watch": "dotenv -e .env.test -- vitest -c vitest.api.config.ts",
-    "prepare": "husky"
+    "prepare": "husky",
+    "check:bundle": "npx es-check es2019 '.next/static/**/*.js'"
+  },
+  "browserslist": {
+    "production": [
+      "Safari >= 13",
+      "iOS >= 13",
+      "Chrome >= 80",
+      "Firefox >= 78",
+      "Edge >= 80"
+    ],
+    "development": [
+      "last 2 chrome version",
+      "last 2 firefox version",
+      "last 2 safari version"
+    ]
   },
   "lint-staged": {
     "**/*.{ts,tsx}": [
