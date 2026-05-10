@@ -48,3 +48,9 @@ generated
 tsconfig.tsbuildinfo
 
 .n8n
+
+# Playwright
+/playwright-report/
+/test-results/
+/blob-report/
+/playwright/.cache/

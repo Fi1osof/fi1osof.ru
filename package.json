@@ -44,7 +44,10 @@
     "test:api": "dotenv -e .env.test -- vitest run -c vitest.api.config.ts",
     "test:api:watch": "dotenv -e .env.test -- vitest -c vitest.api.config.ts",
     "prepare": "husky",
-    "check:bundle": "npx es-check es2019 '.next/static/**/*.js'"
+    "check:bundle": "npx es-check es2019 '.next/static/**/*.js'",
+    "e2e": "playwright test",
+    "e2e:webkit": "playwright test --project=webkit",
+    "e2e:report": "playwright show-report"
   },
   "browserslist": {
     "production": [
@@ -131,6 +134,7 @@
     "@graphql-codegen/typescript-apollo-client-helpers": "^3.0.1",
     "@graphql-codegen/typescript-operations": "^5.0.6",
     "@graphql-codegen/typescript-react-apollo": "^4.3.2",
+    "@playwright/test": "^1.59.1",
     "@storybook/addon-docs": "^10.1.7",
     "@storybook/addon-links": "^10.1.7",
     "@storybook/nextjs-vite": "^10.1.7",
