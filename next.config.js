@@ -1,3 +1,8 @@
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+})
+
 /** @type {import('next').NextConfig} */
 // reactStrictMode: false — in dev mode, React Strict Mode causes double rendering of components,
 // leading to duplicate useEffect calls, API requests, and other side effects.
@@ -12,4 +17,4 @@ const nextConfig = {
   allowedDevOrigins: ['site-boilerplate.narasim.dev.localhost'],
 }
 
-module.exports = nextConfig
+module.exports = withBundleAnalyzer(nextConfig)
