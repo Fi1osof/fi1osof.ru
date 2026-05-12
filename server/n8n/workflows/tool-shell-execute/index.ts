@@ -1,4 +1,11 @@
+import * as fs from 'fs'
+import * as path from 'path'
 import { WorkflowBase } from '../interfaces'
+
+const buildCommandCode = fs.readFileSync(
+  path.join(__dirname, 'buildCommand.js'),
+  'utf-8',
+)
 
 const workflow: WorkflowBase = {
   name: 'Tool: Shell Execute',
@@ -27,14 +34,19 @@ const workflow: WorkflowBase = {
       position: [-200, 304],
     },
     {
-      parameters: {},
       type: 'n8n-nodes-base.manualTrigger',
       typeVersion: 1,
-      position: [-200, 504],
+      position: [-350, 510],
       id: 'manual-trigger',
       name: 'Manual Trigger',
+      parameters: {},
     },
     {
+      id: 'set-test-data',
+      name: 'Set Test Data',
+      type: 'n8n-nodes-base.set',
+      typeVersion: 3.4,
+      position: [-144, 512],
       parameters: {
         mode: 'manual',
         duplicateItem: false,
@@ -56,32 +68,40 @@ const workflow: WorkflowBase = {
         },
         options: {},
       },
-      id: 'set-test-data',
-      name: 'Set Test Data',
-      type: 'n8n-nodes-base.set',
-      typeVersion: 3.4,
-      position: [0, 504],
     },
     {
       parameters: {
+        jsCode: buildCommandCode,
+      },
+      id: 'build-command',
+      name: 'Build Command',
+      type: 'n8n-nodes-base.code',
+      typeVersion: 2,
+      position: [100, 304],
+    },
+    {
+      parameters: {
+        executeOnce: true,
         command: '={{ $json.command }}',
-        cwd: '={{ $json.cwd || "/" }}',
       },
       id: 'execute-command',
       name: 'Execute Command',
       type: 'n8n-nodes-base.executeCommand',
       typeVersion: 1,
-      position: [200, 304],
+      position: [300, 304],
     },
   ],
   connections: {
     'Execute Workflow Trigger': {
-      main: [[{ node: 'Execute Command', type: 'main', index: 0 }]],
+      main: [[{ node: 'Build Command', type: 'main', index: 0 }]],
     },
     'Manual Trigger': {
       main: [[{ node: 'Set Test Data', type: 'main', index: 0 }]],
     },
     'Set Test Data': {
+      main: [[{ node: 'Build Command', type: 'main', index: 0 }]],
+    },
+    'Build Command': {
       main: [[{ node: 'Execute Command', type: 'main', index: 0 }]],
     },
   },
