@@ -1,4 +1,4 @@
-FROM node:22-alpine
+FROM node:22-alpine3.22
 
 ARG ENV_MODE
 ENV ENV_MODE $ENV_MODE
@@ -23,7 +23,18 @@ ENV N8N_ENCRYPTION_KEY $N8N_ENCRYPTION_KEY
 # ENV GRAPHQL_API_ENDPOINT $GRAPHQL_API_ENDPOINT
 
 RUN apk update
-RUN apk add curl sudo git jq mc nmap bash
+
+RUN apk update && apk add \
+    curl \
+    sudo \
+    git \
+    jq \
+    mc \
+    nmap \
+    bash \
+    vips \
+    build-base \
+    python3
 
 WORKDIR /app
 
