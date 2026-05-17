@@ -29,6 +29,7 @@ import { Button } from 'src/ui-kit/Button'
 import { ComponentVariant } from 'src/ui-kit/interfaces'
 import { PostBannerStyled } from 'src/components/Post/styles'
 import { useAppContext } from 'src/components/AppContext'
+import { FileUploader, FileUploaderProps } from 'src/components/FileUploader'
 
 const MarkdownEditor = dynamic(
   () => import('src/components/Markdown/Editor').then((r) => r.MarkdownEditor),
@@ -45,6 +46,7 @@ function getDefaultValues(post: PostEditFormProps['post']): FormData {
     description: post?.description ?? '',
     intro: post?.intro ?? '',
     content: post?.content ?? '',
+    image: post?.image ?? '',
     status: post?.status ?? PostStatus.PUBLISHED,
   }
 }
@@ -54,6 +56,7 @@ export const schema: yup.ObjectSchema<FormData> = yup.object().shape({
   description: yup.string(),
   intro: yup.string(),
   content: yup.string().required(),
+  image: yup.string(),
   status: yup
     .mixed<PostStatus>()
     .oneOf(Object.values(PostStatus))
@@ -174,69 +177,101 @@ export const PostEditForm: React.FC<PostEditFormProps> = ({
     ],
   )
 
+  const onChangeImage = useCallback<NonNullable<FileUploaderProps['onChange']>>(
+    (file) => {
+      if (file?.path) {
+        form.setValue('image', file.path, {
+          shouldValidate: true,
+        })
+      }
+    },
+    [form],
+  )
+
   const fieldRenderer = useCallback<
     ControllerProps<
       FormData,
-      'content' | 'description' | 'intro' | 'status' | 'title'
+      'content' | 'description' | 'intro' | 'status' | 'title' | 'image'
     >['render']
-  >(({ field: { name, value, onChange, onBlur }, fieldState: { error } }) => {
-    let label: string
-    const helperText = undefined
-    let EditorComponent:
-      | typeof TextField
-      | typeof MarkdownEditor
-      | React.FC<React.HtmlHTMLAttributes<HTMLSelectElement>> = TextField
+  >(
+    ({ field: { name, value, onChange, onBlur }, fieldState: { error } }) => {
+      let label: string
+      const helperText = undefined
+      let EditorComponent:
+        | typeof TextField
+        | typeof MarkdownEditor
+        | React.FC<{
+            value: string
+          }>
+        | React.FC<React.HtmlHTMLAttributes<HTMLSelectElement>> = TextField
 
-    switch (name) {
-      case 'title':
-        label = 'title'
-        break
-      case 'description':
-        label = 'SEO description'
-        break
-      case 'intro':
-        label = 'Intro'
-        EditorComponent = MarkdownEditor
-        break
-      case 'status':
-        label = 'Status'
+      switch (name) {
+        case 'title':
+          label = 'title'
+          break
+        case 'description':
+          label = 'SEO description'
+          break
+        case 'intro':
+          label = 'Intro'
+          EditorComponent = MarkdownEditor
+          break
+        case 'status':
+          label = 'Status'
 
-        EditorComponent = (
-          props: React.HtmlHTMLAttributes<HTMLSelectElement>,
-        ) => {
-          return (
-            <select {...props}>
-              {Object.values(PostStatus).map((n) => {
-                return (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                )
-              })}
-            </select>
-          )
-        }
-        break
-      case 'content':
-        label = 'Content'
-        EditorComponent = MarkdownEditor
-        break
-    }
+          EditorComponent = (
+            props: React.HtmlHTMLAttributes<HTMLSelectElement>,
+          ) => {
+            return (
+              <select {...props}>
+                {Object.values(PostStatus).map((n) => {
+                  return (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  )
+                })}
+              </select>
+            )
+          }
+          break
+        case 'image':
+          label = 'Image'
 
-    return (
-      <FormControl
-        label={label}
-        helperText={error ? error.message : helperText}
-        error={!!error}
-      >
-        <EditorComponent
-          value={value || ''}
-          onChange={onChange}
-          onBlur={onBlur}
-        />
-      </FormControl>
-    )
-  }, [])
+          EditorComponent = ({ value }: { value: string }) => {
+            return (
+              <>
+                <FileUploader
+                  value={value ? `/images/resized/middle/${value}` : ''}
+                  onChange={onChangeImage}
+                />
+              </>
+            )
+          }
+
+          break
+        case 'content':
+          label = 'Content'
+          EditorComponent = MarkdownEditor
+          break
+      }
+
+      return (
+        <FormControl
+          label={label}
+          helperText={error ? error.message : helperText}
+          error={!!error}
+        >
+          <EditorComponent
+            value={value || ''}
+            onChange={onChange}
+            onBlur={onBlur}
+          />
+        </FormControl>
+      )
+    },
+    [onChangeImage],
+  )
 
   const isActive = currentUser && currentUser.status === UserStatusEnum.ACTIVE
 
@@ -249,6 +284,7 @@ export const PostEditForm: React.FC<PostEditFormProps> = ({
           </PostBannerStyled>
         )}
 
+        <Controller name="image" render={fieldRenderer} />
         <Controller name="title" render={fieldRenderer} />
         <Controller name="description" render={fieldRenderer} />
         {post?.id && <Controller name="status" render={fieldRenderer} />}

@@ -21,6 +21,7 @@ export const PostCreateInput = builder.inputType('PostCreateInput', {
     description: t.string({ required: false }),
     intro: t.string({ required: false }),
     content: t.string({ required: true }),
+    image: t.string({ required: false }),
     status: t.field({ type: PostStatusEnum, required: false }),
     parentId: t.id({
       description: 'Reply',
@@ -34,6 +35,7 @@ export const PostUpdateDataInput = builder.inputType('PostUpdateDataInput', {
     description: t.string({ required: false }),
     intro: t.string({ required: false }),
     content: t.string({ required: false }),
+    image: t.string({ required: false }),
     status: t.field({ type: PostStatusEnum, required: false }),
   }),
 })

@@ -20,6 +20,7 @@ builder.prismaObject('Post', {
     rootId: t.exposeID('rootId'),
     createdAt: t.expose('createdAt', { type: 'DateTime' }),
     updatedAt: t.expose('updatedAt', { type: 'DateTime' }),
+    image: t.exposeID('image'),
     status: t.field({
       type: PostStatusEnum,
       resolve: (post) => post.status,

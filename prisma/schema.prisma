@@ -896,6 +896,7 @@ model Post {
   Revisions   PostRevision[]
 
   // -- Shared content fields (keep in sync with PostRevision) --
+  image       String?    @db.Text
   status      PostStatus @default(draft)
   title       String?    @db.VarChar(512)
   description String?    @db.VarChar(3072)
@@ -919,6 +920,7 @@ model PostRevision {
   Post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   // -- Shared content fields (keep in sync with Post) --
+  image       String?    @db.Text
   status      PostStatus
   title       String?    @db.VarChar(512)
   description String?    @db.VarChar(3072)

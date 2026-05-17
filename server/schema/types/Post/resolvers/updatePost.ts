@@ -48,8 +48,15 @@ builder.mutationField('updatePost', (t) =>
       // IMPORTANT: Keep this list in sync with schema.
       const sharedFields: Pick<
         Prisma.PostRevisionCreateInput,
-        'status' | 'title' | 'description' | 'intro' | 'content' | 'signature'
+        | 'image'
+        | 'status'
+        | 'title'
+        | 'description'
+        | 'intro'
+        | 'content'
+        | 'signature'
       > = {
+        image: post.image,
         status: post.status,
         title: post.title,
         description: post.description,
@@ -61,6 +68,8 @@ builder.mutationField('updatePost', (t) =>
       const updatedPost = await ctx.prisma.post.update({
         where: { id: args.where.id },
         data: {
+          ...args.data,
+          ...sharedFields,
           title: args.data.title ?? undefined,
           description: args.data.description ?? undefined,
           intro: args.data.intro ?? undefined,

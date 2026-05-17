@@ -30,6 +30,7 @@ fragment Post_ on Post {
   id
   createdAt
   updatedAt
+  image
   status
   revision
   title
