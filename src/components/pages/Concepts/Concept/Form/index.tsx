@@ -22,6 +22,7 @@ import { TextField } from 'src/ui-kit/controls/TextField'
 import { FormControl } from 'src/ui-kit/FormControl'
 import { Button } from 'src/ui-kit/Button'
 import { ComponentVariant } from 'src/ui-kit/interfaces'
+import { FileUploader, FileUploaderProps } from 'src/components/FileUploader'
 
 const MarkdownEditor = dynamic(
   () => import('src/components/Markdown/Editor').then((r) => r.MarkdownEditor),
@@ -39,6 +40,7 @@ function getDefaultValues(concept: KbConceptFragment): FormData {
     content: concept?.content ?? '',
     type: concept?.type ?? '',
     code: concept?.code ?? '',
+    image: concept?.image ?? '',
   }
 }
 
@@ -48,6 +50,7 @@ export const schema: yup.ObjectSchema<FormData> = yup.object().shape({
   content: yup.string(),
   type: yup.string(),
   code: yup.string(),
+  image: yup.string(),
   data: yup.mixed(),
   parentId: yup.string(),
   rootId: yup.string(),
@@ -126,54 +129,89 @@ export const ConceptEditForm: React.FC<ConceptEditFormProps> = ({
     [addMessage, concept.id, form, updateConceptMutation, cancelHandler],
   )
 
+  const onChangeImage = useCallback<NonNullable<FileUploaderProps['onChange']>>(
+    (file) => {
+      if (file?.path) {
+        form.setValue('image', file.path, {
+          shouldValidate: true,
+        })
+      }
+    },
+    [form],
+  )
+
   const fieldRenderer = useCallback<
     ControllerProps<
       FormData,
-      'name' | 'description' | 'content' | 'type' | 'code'
+      'name' | 'description' | 'content' | 'type' | 'code' | 'image'
     >['render']
-  >(({ field: { name, value, onChange, onBlur }, fieldState: { error } }) => {
-    let label: string
-    const helperText = undefined
-    let EditorComponent: typeof TextField | typeof MarkdownEditor = TextField
+  >(
+    ({ field: { name, value, onChange, onBlur }, fieldState: { error } }) => {
+      let label: string
+      const helperText = undefined
+      let EditorComponent:
+        | typeof TextField
+        | typeof MarkdownEditor
+        | React.FC<{
+            value: string
+          }> = TextField
 
-    switch (name) {
-      case 'name':
-        label = 'Name'
-        break
-      case 'description':
-        label = 'Description'
-        EditorComponent = MarkdownEditor
-        break
-      case 'content':
-        label = 'Content'
-        EditorComponent = MarkdownEditor
-        break
-      case 'type':
-        label = 'Type'
-        break
-      case 'code':
-        label = 'Code'
-        break
-    }
+      switch (name) {
+        case 'name':
+          label = 'Name'
+          break
+        case 'description':
+          label = 'Description'
+          EditorComponent = MarkdownEditor
+          break
+        case 'content':
+          label = 'Content'
+          EditorComponent = MarkdownEditor
+          break
+        case 'type':
+          label = 'Type'
+          break
+        case 'code':
+          label = 'Code'
+          break
+        case 'image':
+          label = 'Image'
 
-    return (
-      <FormControl
-        label={label}
-        helperText={error ? error.message : helperText}
-        error={!!error}
-      >
-        <EditorComponent
-          value={(value as string) || ''}
-          onChange={onChange}
-          onBlur={onBlur}
-        />
-      </FormControl>
-    )
-  }, [])
+          EditorComponent = ({ value }: { value: string }) => {
+            return (
+              <>
+                <FileUploader
+                  value={value ? `/images/resized/middle/${value}` : ''}
+                  onChange={onChangeImage}
+                />
+              </>
+            )
+          }
+
+          break
+      }
+
+      return (
+        <FormControl
+          label={label}
+          helperText={error ? error.message : helperText}
+          error={!!error}
+        >
+          <EditorComponent
+            value={(value as string) || ''}
+            onChange={onChange}
+            onBlur={onBlur}
+          />
+        </FormControl>
+      )
+    },
+    [onChangeImage],
+  )
 
   return (
     <FormProvider {...form}>
       <ConceptEditFormStyled onSubmit={onSubmit}>
+        <Controller name="image" render={fieldRenderer} />
         <Controller name="name" render={fieldRenderer} />
         <Controller name="type" render={fieldRenderer} />
         <Controller name="code" render={fieldRenderer} />

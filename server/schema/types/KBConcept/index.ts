@@ -28,6 +28,7 @@ builder.prismaObject('KBConcept', {
     description: t.exposeString('description', { nullable: true }),
     content: t.exposeString('content', { nullable: true }),
     code: t.exposeString('code'),
+    image: t.exposeString('image'),
     data: t.expose('data', { type: 'Json', nullable: true }),
     createdById: t.exposeID('createdById'),
     CreatedBy: t.relation('CreatedBy'),

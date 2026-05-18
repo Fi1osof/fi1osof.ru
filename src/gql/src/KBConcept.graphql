@@ -103,6 +103,7 @@ fragment KBConceptNoNesting on KBConcept {
   type
   name
   description
+  image
   createdById
   code
   parentId
