@@ -132,7 +132,7 @@ model File {
   CreatedBy String? @db.VarChar(36)
   User      User?   @relation(fields: [CreatedBy], references: [id])
 
-  KBConceptFile KBConceptFile[]
+  KBConceptFiles KBConceptFile[]
 
   @@index([CreatedBy], map: "File_CreatedBy")
 }
@@ -308,7 +308,7 @@ model KBConcept {
   Root        KBConcept?  @relation("ConceptRoot", fields: [rootId], references: [id])
   Descendants KBConcept[] @relation("ConceptRoot")
 
-  KBConceptFile KBConceptFile[]
+  KBConceptFiles KBConceptFile[]
 
   @@unique([rootId, code])
   @@unique([parentId, code])

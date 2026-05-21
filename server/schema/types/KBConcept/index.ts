@@ -51,6 +51,6 @@ builder.prismaObject('KBConcept', {
       resolve: conceptsResolver,
     }),
     Descendants: t.relation('Descendants'),
-    Files: t.relation('KBConceptFile'),
+    Files: t.relation('KBConceptFiles'),
   }),
 })
