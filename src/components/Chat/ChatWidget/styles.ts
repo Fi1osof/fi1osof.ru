@@ -30,6 +30,12 @@ export const ChatContentContainer = styled.div<ChatContentContainerProps>`
   width: 100%;
   max-width: 100%;
 
+  /* 
+    Это для того, чтобы скролл внутри контейнера был, а не всего вью
+  */
+  height: 100%;
+  overflow: auto;
+
   ${({ $hasMessages }) =>
     $hasMessages
       ? css`

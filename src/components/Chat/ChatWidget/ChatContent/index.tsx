@@ -13,10 +13,13 @@ import { ChatMessageMemo } from '../ChatMessage'
 export const ChatContent: React.FC = () => {
   const { messages, welcomeTitle, welcomeText, showTypingIndicator } =
     useChatContext()
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    const container = messagesContainerRef.current
+    if (container) {
+      container.scrollTop = container.scrollHeight
+    }
   }, [])
 
   useEffect(() => {
@@ -28,7 +31,7 @@ export const ChatContent: React.FC = () => {
   return (
     <ChatContentContainer $hasMessages={hasMessages}>
       {hasMessages ? (
-        <ChatMessages>
+        <ChatMessages ref={messagesContainerRef}>
           {messages.map((msg) => (
             <ChatMessageMemo
               key={msg.id}
@@ -44,7 +47,6 @@ export const ChatContent: React.FC = () => {
               <span />
             </TypingIndicator>
           )}
-          <div ref={messagesEndRef} />
         </ChatMessages>
       ) : (
         <WelcomeMessage>
