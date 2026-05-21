@@ -13,12 +13,6 @@ export const PageButton = styled.button`
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: ${({ theme }) => theme.radii.md};
   background: ${({ theme }) => theme.colors.background};
-  cursor: pointer;
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
 
   &:hover:not(:disabled) {
     background: ${({ theme }) => theme.colors.gray[100]};

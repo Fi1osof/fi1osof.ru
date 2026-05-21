@@ -75,13 +75,7 @@ export const buttonBaseStyles = css<ButtonStyledProps>`
   justify-content: center;
   font-weight: 500;
   border-radius: ${({ theme }) => theme.radii.md};
-  cursor: pointer;
   transition: all ${({ theme }) => theme.transitions.fast};
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
 
   ${({ $variant, theme }) => variantStyles(theme)[$variant]}
   ${({ $size, theme }) => sizeStyles(theme)[$size]}

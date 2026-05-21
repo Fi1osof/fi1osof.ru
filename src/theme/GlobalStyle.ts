@@ -43,9 +43,20 @@ export const GlobalStyle = createGlobalStyle`
     }
   }
 
+  input {
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+  }
+
   button {
     &:enabled {
       cursor: pointer;
+    }
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.7;
     }
   }
 

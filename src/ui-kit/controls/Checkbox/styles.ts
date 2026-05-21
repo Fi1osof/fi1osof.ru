@@ -17,11 +17,6 @@ export const CheckboxInput = styled.input`
   accent-color: ${({ theme }) => theme.colors.primary};
 
   ${focusRingStyles}
-
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
-  }
 `
 
 export const CheckboxLabel = styled.span`

@@ -1,7 +1,7 @@
 import { css } from 'styled-components'
 
 // Re-export common styles for controls
-export { focusRingStyles, disabledStyles } from '../styles'
+export { focusRingStyles } from '../styles'
 
 /**
  * Base styles for text-input-like controls (Input, Textarea, Select, DatePicker)
@@ -33,7 +33,5 @@ export const controlBaseStyles = css`
 
   &:disabled {
     background: ${({ theme }) => theme.backgrounds.page};
-    cursor: not-allowed;
-    opacity: 0.6;
   }
 `

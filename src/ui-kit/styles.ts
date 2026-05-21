@@ -33,13 +33,3 @@ export const focusRingStyles = css`
     outline-offset: 2px;
   }
 `
-
-/**
- * Disabled state styles
- */
-export const disabledStyles = css`
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-`
