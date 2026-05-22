@@ -1,9 +1,17 @@
 import { builder } from '../../../builder'
-import type { LLMCompletionOutput } from '../interfaces'
-import type { LLMClientChatMessage } from '../../../../llm/client/interfaces'
+import type {
+  LLMClientChatMessage,
+  LLMResponse,
+} from '../../../../llm/client/interfaces'
+import { LlmProvider, LlmModel } from '../../../../llm/client/interfaces'
 import { PrismaContext } from 'server/context/interfaces'
 import { InferArgs } from '../../helpers/types'
-import { LLMChatMessageRoleEnum, LLMCompletionOutputType } from '../types'
+import {
+  LLMChatMessageRoleEnum,
+  LLMResponseType,
+  LlmProviderEnum,
+  LlmModelEnum,
+} from '../types'
 
 const LLMChatMessageContentPartInputType = builder.inputType(
   'LLMChatMessageContentPartInput',
@@ -46,6 +54,8 @@ const LLMChatMessageInputType = builder.inputType('LLMChatMessageInput', {
 
 const LLMChatCompletionInputType = builder.inputType('LLMChatCompletionInput', {
   fields: (t) => ({
+    provider: t.field({ type: LlmProviderEnum, required: true }),
+    model: t.field({ type: LlmModelEnum, required: true }),
     messages: t.field({ type: [LLMChatMessageInputType], required: true }),
     maxTokens: t.int(),
     temperature: t.float(),
@@ -66,9 +76,11 @@ export const llmChatCompletionResolver = async (
   _root: unknown,
   args: LLMChatCompletionArgs,
   ctx: PrismaContext,
-): Promise<LLMCompletionOutput> => {
+): Promise<LLMResponse> => {
   const { llmClient } = ctx
   const input = args.input
+  const provider = input?.provider as LlmProvider
+  const model = input?.model as LlmModel
   const messages = input?.messages ?? []
   const maxTokens = input?.maxTokens
   const temperature = input?.temperature
@@ -115,35 +127,18 @@ export const llmChatCompletionResolver = async (
     return base
   })
 
-  const response = await llmClient.chatCompletion({
+  return llmClient.chatCompletion(provider, model, {
     messages: clientMessages,
     max_tokens: maxTokens ?? undefined,
     temperature: temperature ?? undefined,
     top_p: topP ?? undefined,
     stop: stop ?? undefined,
   })
-
-  const choice = response.choices[0]
-
-  const text =
-    typeof choice?.message?.content === 'string' ? choice.message.content : ''
-
-  return {
-    text,
-    finishReason: choice?.finish_reason ?? 'unknown',
-    usage: response.usage
-      ? {
-          promptTokens: response.usage.prompt_tokens,
-          completionTokens: response.usage.completion_tokens,
-          totalTokens: response.usage.total_tokens,
-        }
-      : undefined,
-  }
 }
 
 builder.mutationField('llmChatCompletion', (t) =>
   t.field({
-    type: LLMCompletionOutputType,
+    type: LLMResponseType,
     nullable: false,
     args: llmChatCompletionArgs(t),
     resolve: llmChatCompletionResolver,

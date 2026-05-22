@@ -1,11 +1,14 @@
 import { builder } from '../../../builder'
-import type { LLMCompletionOutput } from '../interfaces'
+import type { LLMResponse } from '../../../../llm/client/interfaces'
+import { LlmProvider, LlmModel } from '../../../../llm/client/interfaces'
 import { PrismaContext } from 'server/context/interfaces'
 import { InferArgs } from '../../helpers/types'
-import { LLMCompletionOutputType } from '../types'
+import { LLMResponseType, LlmProviderEnum, LlmModelEnum } from '../types'
 
 const LLMCompletionInputType = builder.inputType('LLMCompletionInput', {
   fields: (t) => ({
+    provider: t.field({ type: LlmProviderEnum, required: true }),
+    model: t.field({ type: LlmModelEnum, required: true }),
     prompt: t.string({ required: true }),
     maxTokens: t.int(),
     temperature: t.float(),
@@ -26,41 +29,29 @@ export const llmCompletionResolver = async (
   _root: unknown,
   args: LLMCompletionArgs,
   ctx: PrismaContext,
-): Promise<LLMCompletionOutput> => {
+): Promise<LLMResponse> => {
   const { llmClient } = ctx
   const input = args.input
+  const provider = input?.provider as LlmProvider
+  const model = input?.model as LlmModel
   const prompt = input?.prompt ?? ''
   const maxTokens = input?.maxTokens
   const temperature = input?.temperature
   const topP = input?.topP
   const stop = input?.stop
 
-  const response = await llmClient.completion({
+  return llmClient.completion(provider, model, {
     prompt,
     max_tokens: maxTokens ?? undefined,
     temperature: temperature ?? undefined,
     top_p: topP ?? undefined,
     stop: stop ?? undefined,
   })
-
-  const choice = response.choices[0]
-
-  return {
-    text: choice?.text ?? '',
-    finishReason: choice?.finish_reason ?? 'unknown',
-    usage: response.usage
-      ? {
-          promptTokens: response.usage.prompt_tokens,
-          completionTokens: response.usage.completion_tokens,
-          totalTokens: response.usage.total_tokens,
-        }
-      : undefined,
-  }
 }
 
 builder.mutationField('llmCompletion', (t) =>
   t.field({
-    type: LLMCompletionOutputType,
+    type: LLMResponseType,
     nullable: false,
     args: llmCompletionArgs(t),
     resolve: llmCompletionResolver,
