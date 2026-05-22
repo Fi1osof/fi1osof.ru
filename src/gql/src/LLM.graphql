@@ -1,0 +1,29 @@
+mutation llmImageGeneration($input: LLMImageGenerationInput!) {
+  llmImageGeneration(input: $input) {
+    ...LLMResponse_
+  }
+}
+
+fragment LLMResponse_ on LLMResponse {
+  choices {
+    index
+    message {
+      role
+      content
+      images {
+        imageUrl
+      }
+    }
+  }
+  usage {
+    totalTokens
+    promptTokens
+    completionTokens
+    cost
+    costDetails {
+      upstreamInferenceCompletionsCost
+      upstreamInferenceCost
+      upstreamInferencePromptCost
+    }
+  }
+}

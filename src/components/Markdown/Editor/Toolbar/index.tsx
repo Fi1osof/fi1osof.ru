@@ -16,6 +16,7 @@ import {
 } from '@mdxeditor/editor'
 import { memo } from 'react'
 import { MarkdownEditorToolbarStyled } from './styles'
+import { InsertGeneratedImage } from './InsertGeneratedImage'
 
 type MarkdownEditorToolbarProps = {
   editor: MDXEditorMethods | null
@@ -44,6 +45,7 @@ const MarkdownEditorToolbarComponent: React.FC<
       <InsertTable />
       <CreateLink />
       <InsertImage />
+      <InsertGeneratedImage />
 
       <Separator />
 

@@ -124,3 +124,19 @@ export const LoadingOverlayStyled = styled.div`
     font-weight: 500;
   }
 `
+
+export const GeneratorSectionStyled = styled.div`
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`
+
+export const GeneratorActionsStyled = styled.div`
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+  z-index: 11;
+`
