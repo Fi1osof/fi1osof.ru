@@ -102,11 +102,11 @@ class ChatAgentWorkflow extends AgentWorkflowFactory {
       position: [-620, 480],
       parameters: {
         jsCode: `const items = $input.all()
-const agentData = items[0]?.json?.data?.me || null
+const {me, ...agentData} = items[0]?.json?.data || {}
 const mindLogs = items[1]?.json?.data?.response || []
 
 return {
-  agentData,
+  agentData: {...me, ...agentData},
   mindLogs,
 }`,
       },

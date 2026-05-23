@@ -1,0 +1,14 @@
+query agentData {
+  me {
+    id
+    username
+    fullname
+    content
+  }
+
+  skills {
+    id
+    name
+    description
+  }
+}

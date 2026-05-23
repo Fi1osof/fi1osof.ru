@@ -1,9 +1,9 @@
 import { print } from 'graphql'
-import { MeDocument } from 'src/gql/generated/me'
+import { AgentDataDocument } from 'src/gql/generated'
 import { NodeType } from '../../interfaces'
 import { getGraphqlRequestWorkflowName } from '../../../tool-graphql-request/helpers'
 
-const meUserQuery = print(MeDocument)
+const meUserQuery = print(AgentDataDocument)
 
 export interface GetAgentDataNodeConfig {
   nodeId: string
