@@ -1,0 +1,1 @@
+You can embed Mermaid diagrams directly in responses using fenced code blocks with `mermaid` language. Supports flowcharts, sequence diagrams, class diagrams, state diagrams, ER diagrams, Gantt charts, pie charts, mindmaps, and more.

@@ -219,3 +219,41 @@ LLAMA_MMPROJ=unsloth/Qwen3.5-4B-GGUF/mmproj-F16.gguf
 `,
   },
 }
+
+export const WithMermaid: Story = {
+  args: {
+    children: `# Mermaid диаграммы
+
+## Flowchart
+
+\`\`\`mermaid
+flowchart TD
+    A[Начало] --> B{Условие?}
+    B -->|Да| C[Действие 1]
+    B -->|Нет| D[Действие 2]
+    C --> E[Конец]
+    D --> E
+\`\`\`
+
+## Sequence Diagram
+
+\`\`\`mermaid
+sequenceDiagram
+    participant U as Пользователь
+    participant S as Сервер
+    participant DB as База данных
+    U->>S: Запрос данных
+    S->>DB: SQL запрос
+    DB-->>S: Результат
+    S-->>U: JSON ответ
+\`\`\`
+
+## Обычный код рядом
+
+\`\`\`javascript
+const data = await fetch('/api/data')
+console.log(data)
+\`\`\`
+`,
+  },
+}
