@@ -3,10 +3,6 @@ import {
   useSingleUploadMutation,
   FileFragment,
   useLlmImageGenerationMutation,
-  LlmProvider,
-  LlmModel,
-  LlmImageGenerationAspectRatioInput,
-  LlmImageGenerationImageSizeInput,
 } from 'src/gql/generated'
 import {
   FileUploaderStyled,
@@ -15,12 +11,10 @@ import {
   RemoveButtonStyled,
   ErrorMessageStyled,
   LoadingOverlayStyled,
-  GeneratorSectionStyled,
   GeneratorActionsStyled,
 } from './styles'
-import { Textarea } from 'src/ui-kit/controls/Textarea'
-import { useSnackbar } from 'src/ui-kit/Snackbar'
 import { Button } from 'src/ui-kit/Button'
+import { ImageGenerator } from './Generator'
 
 const ACCEPTED_IMAGE_TYPES = [
   'image/jpeg',
@@ -49,9 +43,9 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
   const [isDragging, setIsDragging] = useState(false)
 
   const [uploadFile, { loading }] = useSingleUploadMutation()
+
   const [generateImage, { loading: generating }] =
     useLlmImageGenerationMutation()
-  const { addMessage } = useSnackbar() || {}
 
   const [prompt, setPrompt] = useState('')
   const [generatedBase64, setGeneratedBase64] = useState<string | null>(null)
@@ -153,38 +147,6 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
     },
     [onChange],
   )
-
-  const handleGenerate = useCallback(() => {
-    if (!prompt.trim()) {
-      return
-    }
-
-    generateImage({
-      variables: {
-        input: {
-          provider: LlmProvider.OPENROUTER,
-          model: LlmModel.GEMINI3_1_FLASH_IMAGE,
-          prompt,
-          aspectRatio: LlmImageGenerationAspectRatioInput.ASPECTRATIO_16_9,
-          imageSize: LlmImageGenerationImageSizeInput.IMAGESIZE_1K,
-        },
-      },
-    })
-      .then((r) => {
-        const imageUrl = r.data?.llmImageGeneration.choices
-          .at(0)
-          ?.message.images?.at(0)?.imageUrl
-
-        if (imageUrl) {
-          setGeneratedBase64(imageUrl)
-        }
-      })
-      .catch((error) => {
-        addMessage?.(
-          (error as Error | undefined)?.message || 'Generation error',
-        )
-      })
-  }, [prompt, generateImage, addMessage])
 
   const handleSaveGenerated = useCallback(async () => {
     if (!generatedBase64) {
@@ -291,26 +253,14 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
         </DropZoneStyled>
       )}
 
-      <GeneratorSectionStyled>
-        <Textarea
-          value={prompt}
-          onChange={useCallback(
-            (e: React.ChangeEvent<HTMLTextAreaElement>) =>
-              setPrompt(e.currentTarget.value),
-            [],
-          )}
-          placeholder="Describe the image to generate..."
-          disabled={disabled || isLoading}
-        />
-        <div>
-          <Button
-            onClick={handleGenerate}
-            disabled={!prompt.trim() || isLoading}
-          >
-            {generating ? 'Generating...' : 'Generate image'}
-          </Button>
-        </div>
-      </GeneratorSectionStyled>
+      <ImageGenerator
+        disabled={disabled}
+        generateImage={generateImage}
+        generating={generating}
+        prompt={prompt}
+        setGeneratedBase64={setGeneratedBase64}
+        setPrompt={setPrompt}
+      />
 
       {error && <ErrorMessageStyled>{error}</ErrorMessageStyled>}
     </FileUploaderStyled>

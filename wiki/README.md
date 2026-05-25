@@ -16,6 +16,7 @@
 - [LLM Client](./llm-client/README.md) — direct LLM access via GraphQL and TypeScript
 - [Skills](./skills/README.md) — file-based agent skills catalog with optional executables
 - [Computer Vision](./computer-vision/README.md) — image recognition with Qwen3.5 vision model
+- [Image Generation](./image-generation/README.md) — AI-powered image generation via LLM
 - [Jinja Templates](./jinja-templates/README.md) — chat templates for LLM
 
 ## Architecture

@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React, { Dispatch, SetStateAction, useCallback, useMemo } from 'react'
 import { LlmImageGenerationAspectRatioInput } from 'src/gql/generated'
 import {
@@ -94,8 +93,6 @@ type ImageGenerationAspectRatioProps = {
 export const ImageGenerationAspectRatio: React.FC<
   ImageGenerationAspectRatioProps
 > = ({ aspectRatio, aspectRatioSetter, ...other }) => {
-  console.log('aspectRatio', aspectRatio)
-
   const onClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       const value = event.currentTarget.value

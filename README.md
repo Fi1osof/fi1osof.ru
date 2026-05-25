@@ -60,7 +60,7 @@ Own your content. Built-in posts with revisions, comments, user profiles. No pla
 
 Runs on your machine. Optional local LLM via llama.cpp (NVIDIA GPU). Your data stays local.
 
-## �️ Computer Vision
+## 🖥️ Computer Vision
 
 Local image recognition via Qwen3.5 vision model. Analyze images, charts, diagrams — all running locally on your GPU. No cloud APIs, no data leaving your machine.
 
@@ -68,7 +68,23 @@ Local image recognition via Qwen3.5 vision model. Analyze images, charts, diagra
 - **Auto-download** — models fetched from HuggingFace on first run
 - **Base64 input** — send images directly in requests
 
-## � Full Transparency
+## 🎨 AI Image Generation
+
+Generate images directly in the FileUploader component using LLM-powered image generation. Describe what you need, and the system creates the image for you.
+
+- **Integrated workflow** — generate, preview, and save images in one place
+- **LLM-powered** — uses Gemini 3.1 Flash Image model via OpenRouter
+- **Configurable** — set aspect ratio (16:9) and resolution (1K)
+- **User-controlled** — generate, review, then save or cancel
+
+**Configuration:**
+- Set `NEXT_PUBLIC_ALLOW_GENERATE_IMAGES=true` in `docker/.env` to enable
+- Requires OpenRouter API key configured
+- Currently available only for active users
+
+**⚠️ Feature availability:** Image generation and direct LLM resolver are currently enabled only for active users.
+
+## 🔍 Full Transparency
 
 All state is inspectable: GraphQL playground, Prisma Studio, n8n workflow editor. Nothing hidden.
 

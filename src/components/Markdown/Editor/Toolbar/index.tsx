@@ -1,5 +1,5 @@
 import {
-  InsertImage,
+  // InsertImage,
   UndoRedo,
   BoldItalicUnderlineToggles,
   StrikeThroughSupSubToggles,
@@ -44,7 +44,7 @@ const MarkdownEditorToolbarComponent: React.FC<
       <InsertThematicBreak />
       <InsertTable />
       <CreateLink />
-      <InsertImage />
+      {/* <InsertImage /> */}
       <InsertGeneratedImage />
 
       <Separator />

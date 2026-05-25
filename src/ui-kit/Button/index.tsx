@@ -11,10 +11,11 @@ export const Button: React.FC<ButtonProps> = ({
   variant = ComponentVariant.PRIMARY,
   size = ComponentSize.MD,
   children,
+  type = 'button',
   ...props
 }) => {
   return (
-    <ButtonStyled $variant={variant} $size={size} {...props}>
+    <ButtonStyled $variant={variant} $size={size} type={type} {...props}>
       {children}
     </ButtonStyled>
   )

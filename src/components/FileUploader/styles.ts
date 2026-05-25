@@ -125,13 +125,6 @@ export const LoadingOverlayStyled = styled.div`
   }
 `
 
-export const GeneratorSectionStyled = styled.div`
-  margin-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-`
-
 export const GeneratorActionsStyled = styled.div`
   position: absolute;
   bottom: 10px;
