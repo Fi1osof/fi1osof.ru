@@ -3,8 +3,8 @@ import { TopUpRequestPayload } from '../inputs'
 import {
   createTopUpOffer,
   getRecipientAddress,
-  USDT_CONTRACT_ADDRESS,
-  ARBITRUM_CHAIN_ID,
+  getUsdtContractAddress,
+  getChainId,
 } from '../helpers/topUp'
 
 builder.mutationField('requestTopUp', (t) =>
@@ -23,8 +23,8 @@ builder.mutationField('requestTopUp', (t) =>
       return {
         message,
         recipientAddress,
-        usdtContractAddress: USDT_CONTRACT_ADDRESS,
-        chainId: ARBITRUM_CHAIN_ID,
+        usdtContractAddress: getUsdtContractAddress(),
+        chainId: getChainId(),
       }
     },
   }),

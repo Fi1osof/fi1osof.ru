@@ -5,7 +5,7 @@ import {
   verifySignature,
   verifyUsdtTransaction,
   getRecipientAddress,
-  ARBITRUM_CHAIN_ID,
+  getChainId,
 } from '../helpers/topUp'
 import { upsertBalance } from '../helpers/upsertBalance'
 import { Prisma } from '@prisma/client'
@@ -44,8 +44,9 @@ builder.mutationField('topUpBalance', (t) =>
       }
 
       // Check if transaction was already used
+      const chainId = getChainId()
       const existingEthTx = await prisma.ethTransaction.findUnique({
-        where: { chainId_txHash: { chainId: ARBITRUM_CHAIN_ID, txHash } },
+        where: { chainId_txHash: { chainId, txHash } },
       })
       if (existingEthTx) {
         throw new Error('Transaction already used')
@@ -77,7 +78,7 @@ builder.mutationField('topUpBalance', (t) =>
 
       const EthTransactionData: Prisma.EthTransactionCreateWithoutTransactionInput =
         {
-          chainId: ARBITRUM_CHAIN_ID,
+          chainId,
           txHash,
           from: txResult.from,
           to: recipientAddress,

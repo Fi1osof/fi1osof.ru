@@ -1,9 +1,28 @@
 import Web3 from 'web3'
 
-export const ARBITRUM_CHAIN_ID = 42161
-export const ARBITRUM_RPC_URL = 'https://arb1.arbitrum.io/rpc'
-export const USDT_CONTRACT_ADDRESS =
-  '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9'
+export function getChainId(): number {
+  const chainId = process.env.CRYPTO_CHAIN_ID
+  if (!chainId) {
+    throw new Error('CRYPTO_CHAIN_ID env is empty')
+  }
+  return parseInt(chainId, 10)
+}
+
+export function getRpcUrl(): string {
+  const rpcUrl = process.env.CRYPTO_RPC_URL
+  if (!rpcUrl) {
+    throw new Error('CRYPTO_RPC_URL env is empty')
+  }
+  return rpcUrl
+}
+
+export function getUsdtContractAddress(): string {
+  const address = process.env.CRYPTO_USDT_CONTRACT_ADDRESS
+  if (!address) {
+    throw new Error('CRYPTO_USDT_CONTRACT_ADDRESS env is empty')
+  }
+  return address
+}
 
 export function getRecipientAddress(): string {
   const address = process.env.PAYMENT_RECIPIENT_ADDRESS
@@ -58,7 +77,7 @@ export async function verifyUsdtTransaction(
   expectedRecipient: string,
 ): Promise<TransactionVerificationResult> {
   try {
-    const web3 = new Web3(ARBITRUM_RPC_URL)
+    const web3 = new Web3(getRpcUrl())
 
     // Throttling: wait some seconds before proceeding
     await new Promise((resolve) => setTimeout(resolve, 5000))
@@ -79,7 +98,7 @@ export async function verifyUsdtTransaction(
     const transferLog = receipt.logs.find(
       (log) =>
         log.address &&
-        log.address.toLowerCase() === USDT_CONTRACT_ADDRESS.toLowerCase() &&
+        log.address.toLowerCase() === getUsdtContractAddress().toLowerCase() &&
         log.topics &&
         log.topics[0] === transferTopic,
     )

@@ -18,7 +18,8 @@ import { ComponentVariant } from 'src/ui-kit/interfaces'
 import { transactionsRefreshQueriesList } from '../Transactions/interfaces'
 import { MetaMaskAuth } from 'src/components/Auth/MetaMaskAuth'
 
-const ARBITRUM_CHAIN_ID = 42161
+const CRYPTO_CHAIN_ID = process.env.NEXT_PUBLIC_CRYPTO_CHAIN_ID
+const CRYPTO_CHAIN_ID_HEX = process.env.NEXT_PUBLIC_CRYPTO_CHAIN_ID_HEX
 
 type BalanceProps = {
   currentUser: MeUserFragment
@@ -70,10 +71,14 @@ export const Balance: React.FC<BalanceProps> = ({ currentUser }) => {
         method: 'eth_chainId',
       })) as string
 
-      if (parseInt(chainId, 16) !== ARBITRUM_CHAIN_ID) {
+      if (
+        CRYPTO_CHAIN_ID &&
+        CRYPTO_CHAIN_ID_HEX &&
+        parseInt(chainId, 16) !== parseInt(CRYPTO_CHAIN_ID, 10)
+      ) {
         await window.ethereum.request({
           method: 'wallet_switchEthereumChain',
-          params: [{ chainId: '0xa4b1' }],
+          params: [{ chainId: CRYPTO_CHAIN_ID_HEX }],
         })
       }
 

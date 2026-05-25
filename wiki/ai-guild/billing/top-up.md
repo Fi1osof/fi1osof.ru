@@ -100,8 +100,8 @@ After sending transaction, frontend shows "Verifying transaction on blockchain..
 
 Environment variables:
 - `PAYMENT_RECIPIENT_ADDRESS` — platform address for receiving USDT
-
-Constants in `helpers/topUp.ts`:
-- `ARBITRUM_CHAIN_ID = 42161`
-- `ARBITRUM_RPC_URL = 'https://arb1.arbitrum.io/rpc'`
-- `USDT_CONTRACT_ADDRESS = '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9'`
+- `CRYPTO_CHAIN_ID` — blockchain network ID (e.g., 42161 for Arbitrum)
+- `CRYPTO_RPC_URL` — RPC endpoint for blockchain verification
+- `CRYPTO_USDT_CONTRACT_ADDRESS` — USDT token contract address
+- `NEXT_PUBLIC_CRYPTO_CHAIN_ID` — chain ID for frontend (decimal)
+- `NEXT_PUBLIC_CRYPTO_CHAIN_ID_HEX` — chain ID for frontend (hex, for wallet switching)
