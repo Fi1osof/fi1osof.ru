@@ -41,12 +41,12 @@ export const InsertGeneratedImage: React.FC = () => {
     <>
       <InsertGeneratedImageButtonStyled
         onClick={handleOpen}
-        title="Сгенерировать изображение"
+        title="Generate image"
       >
         {iconComponentFor('add_photo')}
       </InsertGeneratedImageButtonStyled>
 
-      <Modal isOpen={isOpen} onClose={handleClose} title="Добавить изображение">
+      <Modal isOpen={isOpen} onClose={handleClose} title="Add image">
         <FileUploader onChange={handleImageSelect} />
       </Modal>
     </>

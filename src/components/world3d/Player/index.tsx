@@ -17,12 +17,12 @@ import { DebugAvatarGeometry } from '../components/debug/DebugAvatarGeometry'
 import { DebugOverlay } from '../components/debug/DebugOverlay'
 import { useAppContext } from 'src/components/AppContext'
 
-const TURN_SPEED = 2.5 // Скорость поворота (радиан/сек)
+const TURN_SPEED = 2.5 // Turn speed (radians/sec)
 const MOUSE_SENSITIVITY = 0.005
-const MIN_PITCH = -Math.PI / 6 // Минимальный pitch (смотрим вверх)
-const MAX_PITCH = Math.PI / 3 // Максимальный pitch (смотрим вниз)
+const MIN_PITCH = -Math.PI / 6 // Minimum pitch (looking up)
+const MAX_PITCH = Math.PI / 3 // Maximum pitch (looking down)
 
-// Базовые скорости из анализа анимаций (units/sec)
+// Base speeds from animation analysis (units/sec)
 const WALK_SPEED = 3.5248
 const RUN_SPEED = 11.6508
 const JUMP_FORCE = 5
@@ -63,9 +63,9 @@ type PlayerProps = {
 }
 
 /**
- * Компонент игрока с физикой и анимациями.
- * Использует RigidBody для физического тела и CapsuleCollider для коллизий.
- * Анимации загружаются из отдельных GLB файлов и применяются к модели.
+ * Player component with physics and animations.
+ * Uses RigidBody for physical body and CapsuleCollider for collisions.
+ * Animations are loaded from separate GLB files and applied to the model.
  */
 export const Player: React.FC<PlayerProps> = ({
   debug,
@@ -95,36 +95,36 @@ export const Player: React.FC<PlayerProps> = ({
   }, [initialObject?.matrix])
 
   // === Refs ===
-  // rigidBodyRef — ссылка на физическое тело Rapier для управления скоростью и позицией
+  // rigidBodyRef — reference to Rapier physical body for controlling speed and position
   const rigidBodyRef = useRef<RapierRigidBody>(null)
-  // rigidBodyGroupRef — группа-обёртка внутри RigidBody, к ней применяется визуальный поворот
+  // rigidBodyGroupRef — wrapper group inside RigidBody, visual rotation is applied to it
   const rigidBodyGroupRef = useRef<Group>(null)
-  // avatarRef — группа с 3D моделью персонажа
+  // avatarRef — group with 3D character model
   const avatarRef = useRef<Group>(null)
-  // headRef — точка "головы" для AudioListener
+  // headRef — "head" point for AudioListener
   const headRef = useRef<Group>(null)
 
   // === State ===
-  // Централизованное состояние игрока через reducer (анимация, debug позиция)
+  // Centralized player state via reducer (animation, debug position)
   const [state, dispatch] = usePlayerReducer()
-  // Угол поворота персонажа (в ref для мгновенного обновления в useFrame)
+  // Character rotation angle (in ref for instant update in useFrame)
   const rotationRef = useRef(initialYaw)
-  // Флаг для однократного разворота на 180° при нажатии S
+  // Flag for single 180° turn when pressing S
   const wasBackwardRef = useRef(false)
-  // Вертикальный угол камеры (pitch) — управляется мышкой
+  // Vertical camera angle (pitch) — controlled by mouse
   const cameraPitchRef = useRef(0.2)
   const [cameraPitch, setCameraPitch] = useState(0.2)
-  // Горизонтальный угол камеры (yaw) — дополнительный поворот относительно аватара
+  // Horizontal camera angle (yaw) — additional rotation relative to avatar
   const [cameraYaw, setCameraYaw] = useState(0)
-  // Флаг для отслеживания зажатия мыши
+  // Flag for tracking mouse hold
   const isDragging = useRef(false)
 
   // === Input ===
-  // Получение состояния клавиш (WASD, Shift, Space)
+  // Get key state (WASD, Shift, Space)
   const [, getKeys] = useKeyboardControls()
   const { gl } = useThree()
 
-  // === Обработка мыши ===
+  // === Mouse handling ===
   useEffect(() => {
     const canvas = gl.domElement
 
@@ -143,10 +143,10 @@ export const Player: React.FC<PlayerProps> = ({
         return
       }
 
-      // Горизонталь: движение мыши влево -> поворот аватара влево
+      // Horizontal: mouse movement left -> avatar rotation left
       rotationRef.current -= e.movementX * MOUSE_SENSITIVITY
 
-      // Вертикаль: тянем вниз -> камера опускается (смотрим вверх)
+      // Vertical: drag down -> camera lowers (looking up)
       cameraPitchRef.current += e.movementY * MOUSE_SENSITIVITY
       cameraPitchRef.current = Math.max(
         MIN_PITCH,
@@ -244,22 +244,22 @@ export const Player: React.FC<PlayerProps> = ({
     }
   }, [audioListenerRef])
 
-  // Вектор направления движения (переиспользуется каждый кадр)
+  // Movement direction vector (reused every frame)
   const direction = new Vector3()
 
   /**
-   * Основной игровой цикл — вызывается каждый кадр.
-   * Обрабатывает ввод, обновляет физику и состояние анимации.
+   * Main game loop — called every frame.
+   * Handles input, updates physics and animation state.
    */
   useFrame((_, delta) => {
     if (!rigidBodyRef.current) {
       return
     }
 
-    // --- Чтение ввода ---
+    // --- Read input ---
     const { forward, backward, left, right, run, jump } = getKeys()
 
-    // --- Получение текущего состояния физики ---
+    // --- Get current physics state ---
     const velocity = rigidBodyRef.current.linvel()
     const position = rigidBodyRef.current.translation()
 
@@ -277,41 +277,41 @@ export const Player: React.FC<PlayerProps> = ({
       return
     }
 
-    // --- Расчёт скорости ---
+    // --- Calculate speed ---
     const speed = run ? RUN_SPEED : WALK_SPEED
 
-    // --- Обработка поворота (A/D) ---
-    // A — поворот влево (увеличение угла)
+    // --- Handle rotation (A/D) ---
+    // A — turn left (increase angle)
     if (left) {
       rotationRef.current += TURN_SPEED * delta
     }
-    // D — поворот вправо (уменьшение угла)
+    // D — turn right (decrease angle)
     if (right) {
       rotationRef.current -= TURN_SPEED * delta
     }
 
-    // --- Обработка разворота (S) ---
-    // При нажатии S — разворот на 180° (персонаж идёт на камеру)
+    // --- Handle turn (S) ---
+    // When pressing S — 180° turn (character walks towards camera)
     if (backward && !forward && !wasBackwardRef.current) {
       rotationRef.current += Math.PI
       wasBackwardRef.current = true
     }
-    // При отпускании S — сброс флага для следующего разворота
+    // When releasing S — reset flag for next turn
     if (!backward) {
       wasBackwardRef.current = false
     }
 
-    // Обновляем yaw камеры: при движении назад — поворот на 180°
+    // Update camera yaw: when moving backward — 180° rotation
     const newCameraYaw = backward && !forward ? Math.PI : 0
     if (newCameraYaw !== cameraYaw) {
       setCameraYaw(newCameraYaw)
     }
 
-    // --- Расчёт направления движения ---
-    // W или S — движение вперёд в направлении взгляда персонажа
+    // --- Calculate movement direction ---
+    // W or S — move forward in character's looking direction
     const isMovingForward = forward || backward
     if (isMovingForward) {
-      // Вектор движения: sin/cos от угла поворота * скорость
+      // Movement vector: sin/cos of rotation angle * speed
       direction.set(
         Math.sin(rotationRef.current) * speed,
         0,
@@ -321,14 +321,14 @@ export const Player: React.FC<PlayerProps> = ({
       direction.set(0, 0, 0)
     }
 
-    // --- Применение скорости к физическому телу ---
-    // Сохраняем вертикальную скорость (гравитация/прыжок)
+    // --- Apply speed to physical body ---
+    // Preserve vertical speed (gravity/jump)
     rigidBodyRef.current.setLinvel(
       { x: direction.x, y: velocity.y, z: direction.z },
       true,
     )
 
-    // --- Обработка прыжка ---
+    // --- Handle jump ---
     const isOnGround = position.y < 1.1
     if (jump && isOnGround) {
       rigidBodyRef.current.setLinvel(
@@ -337,7 +337,7 @@ export const Player: React.FC<PlayerProps> = ({
       )
     }
 
-    // --- Определение анимации ---
+    // --- Determine animation ---
     let newAnimation: AnimationName = 'idle'
     if (!isOnGround) {
       newAnimation = 'jump'
@@ -346,13 +346,13 @@ export const Player: React.FC<PlayerProps> = ({
     }
     dispatch({ type: 'SET_ANIMATION', payload: newAnimation })
 
-    // --- Применение визуального поворота ---
-    // Поворачиваем группу (аватар + камера) в направлении движения
+    // --- Apply visual rotation ---
+    // Rotate group (avatar + camera) in movement direction
     if (rigidBodyGroupRef.current) {
       rigidBodyGroupRef.current.rotation.y = rotationRef.current
     }
 
-    // --- Отправка состояния на сервер мультиплеера ---
+    // --- Send state to multiplayer server ---
     const canSendPlayerState = !!sendPlayerState && !!user?.id
 
     if (canSendPlayerState) {
@@ -377,7 +377,7 @@ export const Player: React.FC<PlayerProps> = ({
 
   return (
     <>
-      {/* Физическое тело игрока — динамический RigidBody с капсульным коллайдером */}
+      {/* Player physical body — dynamic RigidBody with capsule collider */}
       <RigidBody
         ref={rigidBodyRef}
         colliders={false}
@@ -388,12 +388,12 @@ export const Player: React.FC<PlayerProps> = ({
         enabledRotations={[false, false, false]}
         linearDamping={0.5}
       >
-        {/* Группа-обёртка для отслеживания визуального объекта RigidBody */}
+        {/* Wrapper group for tracking RigidBody visual object */}
         <group ref={rigidBodyGroupRef}>
           {/* Head group — AudioListener attachment point.
-             rotation={[0, Math.PI, 0]} — разворот на 180° для корректной
-             ориентации AudioListener. Без этого лево-право инвертированы,
-             т.к. модель аватара создана с "передом" в +Z, а Three.js ожидает -Z. */}
+             rotation={[0, Math.PI, 0]} — 180° rotation for correct
+             AudioListener orientation. Without this left-right is inverted,
+             because avatar model is created with "front" in +Z, while Three.js expects -Z. */}
           <group
             ref={headRef}
             position={[0, 2.1, 0]}
@@ -407,21 +407,21 @@ export const Player: React.FC<PlayerProps> = ({
               </mesh>
             )}
           </group>
-          {/* Капсульный коллайдер для физических столкновений */}
+          {/* Capsule collider for physical collisions */}
           <CapsuleCollider args={[0.5, 0.5]} position={[0, 1, 0]} />
-          {/* Wireframe mesh для визуализации границ коллайдера (отладка) */}
+          {/* Wireframe mesh for visualizing collider bounds (debug) */}
 
           {debug && <DebugCapsuleGeometry />}
 
-          {/* Группа для аватара — вращается при движении */}
+          {/* Group for avatar — rotates during movement */}
           <group ref={avatarRef} position={[0, 0, 0]}>
             <Avatar animation={state.animation} />
           </group>
-          {/* Камера третьего лица — дочерний объект RigidBody */}
+          {/* Third person camera — child object of RigidBody */}
           <ThirdPersonCamera pitch={cameraPitch} yaw={cameraYaw} />
         </group>
       </RigidBody>
-      {/* HTML overlay для отображения координат (отладка) */}
+      {/* HTML overlay for displaying coordinates (debug) */}
       {debug && (
         <DebugOverlay
           title="Avatar coords"
@@ -436,7 +436,7 @@ export const Player: React.FC<PlayerProps> = ({
           </>
         </DebugOverlay>
       )}
-      {/* Компонент отладки — отображает направления объектов */}
+      {/* Debug component — displays object directions */}
       {debug && (
         <DebugAvatarGeometry
           rigidBodyRef={rigidBodyGroupRef}

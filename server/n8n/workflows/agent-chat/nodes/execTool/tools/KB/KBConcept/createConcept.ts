@@ -18,7 +18,7 @@ export function getCreateConceptTool(
     parameters: {
       name: 'create_concept',
       description:
-        'Используй самостоятельно и автоматически, чтобы сохранить любую полезную информацию. Можно разбивать на несколько концептов',
+        'Use independently and automatically to save any useful information. Can be split into multiple concepts',
       workflowId: {
         __rl: true,
         mode: 'name',
@@ -29,10 +29,10 @@ export function getCreateConceptTool(
         value: {
           targetWorkflow: `Tool: Create Concept (${agentName})`,
           reasoning: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('reasoning', '${reasoningTitle}', 'string') }}`,
-          type: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('type', 'Тип концепта на твое усмотрение', 'string') }}`,
-          name: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('name', 'Название концепта', 'string') }}`,
-          description: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('description', 'Описание концепта', 'string') }}`,
-          content: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('content', 'Содержимое концепта (опционально)', 'string') }}`,
+          type: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('type', 'Concept type at your discretion', 'string') }}`,
+          name: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('name', 'Concept name', 'string') }}`,
+          description: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('description', 'Concept description', 'string') }}`,
+          content: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('content', 'Concept content (optional)', 'string') }}`,
         },
         matchingColumns: [],
         schema: [

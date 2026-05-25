@@ -1,8 +1,8 @@
-# Пополнение баланса
+# Balance Top-Up
 
-Пользователь пополняет баланс, отправляя USDT в сети Arbitrum и верифицируя транзакцию.
+User tops up balance by sending USDT on Arbitrum network and verifying the transaction.
 
-## Схема процесса
+## Process Diagram
 
 ```
 Frontend                          Backend                         Blockchain
@@ -28,80 +28,80 @@ Frontend                          Backend                         Blockchain
    │◄─ Balance ──────────────────────┤                                │
 ```
 
-## Логика бэкенда
+## Backend Logic
 
-### 1. Запрос на пополнение (`requestTopUp` mutation)
-- Возвращает статичное сообщение-оферту, адрес получателя, адрес контракта USDT, chainId
-- Не требует аргументов (сумма определяется по факту транзакции)
+### 1. Top-up Request (`requestTopUp` mutation)
+- Returns static offer message, recipient address, USDT contract address, chainId
+- Requires no arguments (amount is determined by actual transaction)
 
-### 2. Пополнение баланса (`topUpBalance` mutation)
+### 2. Balance Top-up (`topUpBalance` mutation)
 
 **Input**: `message`, `signature`, `txHash`
 
-**Шаги валидации**:
-1. Проверка аутентификации пользователя
-2. Проверка наличия привязанного EthAccount
-3. Проверка что `message` совпадает с серверной офертой
-4. Проверка подписи соответствует ETH-адресу пользователя
-5. Проверка что `EthTransaction` не существует для `[chainId, txHash]`
-6. Верификация транзакции через Arbitrum RPC:
-   - Транзакция существует и успешна
-   - Найден USDT Transfer event
-   - Получатель совпадает с адресом платформы
-   - Сумма > 0
-   - Отправитель совпадает с ETH-аккаунтом пользователя
+**Validation steps**:
+1. Check user authentication
+2. Check for linked EthAccount
+3. Check that `message` matches server offer
+4. Check that signature matches user's ETH address
+5. Check that `EthTransaction` doesn't exist for `[chainId, txHash]`
+6. Verify transaction via Arbitrum RPC:
+   - Transaction exists and is successful
+   - USDT Transfer event found
+   - Recipient matches platform address
+   - Amount > 0
+   - Sender matches user's ETH account
 
-**При успехе**:
-1. Создаётся `EthTransaction` со всеми данными блокчейна + подписанное сообщение
-2. Создаётся `Transaction` связанный с `EthTransaction`
-3. Увеличивается `Balance.amount` на сумму из транзакции
+**On success**:
+1. Create `EthTransaction` with all blockchain data + signed message
+2. Create `Transaction` linked to `EthTransaction`
+3. Increase `Balance.amount` by transaction amount
 
-## Ключевые файлы
+## Key Files
 
-- `server/schema/types/ai-guild/Balance/resolvers/topUpBalance.ts` — основная мутация
-- `server/schema/types/ai-guild/Balance/resolvers/requestTopUp.ts` — возврат оферты
-- `server/schema/types/ai-guild/Balance/helpers/topUp.ts` — хелперы верификации и текст оферты
-- `src/components/pages/Users/User/View/CurrentUserData/Balance/index.tsx` — фронтенд
+- `server/schema/types/ai-guild/Balance/resolvers/topUpBalance.ts` — main mutation
+- `server/schema/types/ai-guild/Balance/resolvers/requestTopUp.ts` — offer return
+- `server/schema/types/ai-guild/Balance/helpers/topUp.ts` — verification helpers and offer text
+- `src/components/pages/Users/User/View/CurrentUserData/Balance/index.tsx` — frontend
 
-## Важные проектные решения
+## Important Design Decisions
 
-### Зачем сохранять message/signature?
-Подписанное сообщение служит **доказательством намерения пользователя**. Это критично для:
-- Покупок контрактов с конкретными условиями
-- Разрешения споров
-- Аудита
+### Why save message/signature?
+Signed message serves as **proof of user intent**. This is critical for:
+- Contract purchases with specific conditions
+- Dispute resolution
+- Audit
 
-Поле `message` содержит статичный текст оферты:
+The `message` field contains static offer text:
 ```
-Соглашение о пополнении баланса
+Balance Top-Up Agreement
 
-Подписывая это сообщение, вы соглашаетесь со следующими условиями:
+By signing this message, you agree to the following terms:
 
-1. Вы покупаете внутреннюю валюту платформы (Coins) по курсу 1:1 USDT.
-2. Оплата должна быть произведена в USDT в сети Arbitrum.
-3. Монеты будут зачислены на ваш счёт после верификации транзакции.
-4. Монеты могут использоваться только в рамках платформы и не подлежат возврату.
-5. Это односторонняя транзакция, которая не может быть отменена.
+1. You are purchasing the platform's internal currency (Coins) at a 1:1 USDT rate.
+2. Payment must be made in USDT on the Arbitrum network.
+3. Coins will be credited to your account after transaction verification.
+4. Coins can only be used within the platform and are non-refundable.
+5. This is a one-way transaction that cannot be cancelled.
 ```
 
-### Зачем chainId в уникальном constraint?
-Один и тот же `txHash` теоретически может существовать в разных EVM-сетях. Хотя это маловероятно, constraint `[chainId, txHash]` гарантирует корректность. Текущая реализация использует Arbitrum (`chainId: 42161`).
+### Why chainId in unique constraint?
+The same `txHash` can theoretically exist in different EVM networks. Although unlikely, constraint `[chainId, txHash]` guarantees correctness. Current implementation uses Arbitrum (`chainId: 42161`).
 
-### Почему убран setTimeout на фронтенде?
-Предыдущая реализация ждала 15 секунд перед вызовом `topUpBalance`. Это убрано потому что:
-1. Бэкенд верифицирует транзакцию в блокчейне — если ещё не подтверждена, вернёт ошибку
-2. Пользователь может повторить попытку если транзакция не подтверждена
-3. Исключается риск закрытия страницы пользователем во время ожидания
+### Why remove setTimeout on frontend?
+Previous implementation waited 15 seconds before calling `topUpBalance`. This was removed because:
+1. Backend verifies transaction on blockchain — if not yet confirmed, returns error
+2. User can retry if transaction is not confirmed
+3. Risk of user closing page during waiting is eliminated
 
-### Статусное сообщение на фронтенде
-После отправки транзакции, фронтенд показывает "Verifying transaction on blockchain..." под полем ввода, чтобы показать что обработка идёт на бэкенде.
+### Status message on frontend
+After sending transaction, frontend shows "Verifying transaction on blockchain..." below input field to indicate processing on backend.
 
-## Конфигурация
+## Configuration
 
-Переменные окружения:
-- `PAYMENT_RECIPIENT_ADDRESS` — адрес платформы для получения USDT
+Environment variables:
+- `PAYMENT_RECIPIENT_ADDRESS` — platform address for receiving USDT
 
-Константы в `helpers/topUp.ts`:
+Constants in `helpers/topUp.ts`:
 - `ARBITRUM_CHAIN_ID = 42161`
 - `ARBITRUM_RPC_URL = 'https://arb1.arbitrum.io/rpc'`
 - `USDT_CONTRACT_ADDRESS = '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9'`

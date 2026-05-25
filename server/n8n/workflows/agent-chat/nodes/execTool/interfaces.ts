@@ -1,2 +1,1 @@
-export const reasoningTitle =
-  'Коротко аргументируй использование этого инструмента'
+export const reasoningTitle = 'Briefly argue the use of this tool'

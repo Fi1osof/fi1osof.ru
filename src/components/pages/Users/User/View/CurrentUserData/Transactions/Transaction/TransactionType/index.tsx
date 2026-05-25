@@ -11,11 +11,11 @@ interface TransactionTypeProps {
 const getTransactionTypeName = (type: TransactionType): string => {
   switch (type) {
     case TransactionType.TRANSFERIN:
-      return 'Пополнение'
+      return 'Top-up'
     case TransactionType.TRANSFEROUT:
-      return 'Перевод'
+      return 'Transfer'
     case TransactionType.TOPUP:
-      return 'Пополнение баланса'
+      return 'Balance top-up'
   }
 }
 

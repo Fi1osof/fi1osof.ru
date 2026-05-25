@@ -1,5 +1,5 @@
 /**
- * Отладка, чтобы видеть позицию объекта
+ * Debug to see object position
  */
 export const DebugCapsuleGeometry: React.FC = () => {
   return (

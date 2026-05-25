@@ -18,7 +18,7 @@ export function getDeleteConceptTool(
     parameters: {
       name: 'delete_concept',
       description:
-        'Удаляет концепт из базы знаний. Используй для удаления устаревшей или неверной информации',
+        'Deletes a concept from the knowledge base. Use to remove outdated or incorrect information',
       workflowId: {
         __rl: true,
         mode: 'name',
@@ -29,7 +29,7 @@ export function getDeleteConceptTool(
         value: {
           targetWorkflow: `Tool: Delete Concept (${agentName})`,
           reasoning: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('reasoning', '${reasoningTitle}', 'string') }}`,
-          id: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('id', 'ID концепта для удаления', 'string') }}`,
+          id: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('id', 'Concept ID to delete', 'string') }}`,
         },
         matchingColumns: [],
         schema: [

@@ -13,15 +13,15 @@ export function getRecipientAddress(): string {
   return address
 }
 
-const TOP_UP_OFFER_MESSAGE = `Соглашение о пополнении баланса
+const TOP_UP_OFFER_MESSAGE = `Balance Top-Up Agreement
 
-Подписывая это сообщение, вы соглашаетесь со следующими условиями:
+By signing this message, you agree to the following terms:
 
-1. Вы покупаете внутреннюю валюту платформы (Coins) по курсу 1:1 USDT.
-2. Оплата должна быть произведена в USDT в сети Arbitrum.
-3. Монеты будут зачислены на ваш счёт после верификации транзакции.
-4. Монеты могут использоваться только в рамках платформы и не подлежат возврату.
-5. Это односторонняя транзакция, которая не может быть отменена.`
+1. You are purchasing the platform's internal currency (Coins) at a 1:1 USDT rate.
+2. Payment must be made in USDT on the Arbitrum network.
+3. Coins will be credited to your account after transaction verification.
+4. Coins can only be used within the platform and are non-refundable.
+5. This is a one-way transaction that cannot be cancelled.`
 
 export function createTopUpOffer(): string {
   return TOP_UP_OFFER_MESSAGE

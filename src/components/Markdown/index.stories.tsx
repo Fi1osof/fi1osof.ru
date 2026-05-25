@@ -29,61 +29,61 @@ export const EmptyField: Story = {
 
 export const WithFormattedText: Story = {
   args: {
-    children: `# Форматированный текст
+    children: `# Formatted Text
 
-**Жирный текст**, *курсив* и ~~зачеркнутый текст~~.
+**Bold text**, *italic* and ~~strikethrough text~~.
 
-## Списки
+## Lists
 
-### Маркированный список:
-- Пункт 1
-- Пункт 2
-  - Вложенный пункт
-- Пункт 3
+### Bulleted list:
+- Item 1
+- Item 2
+  - Nested item
+- Item 3
 
-### Нумерованный список:
-1. Первый пункт
-2. Второй пункт
-3. Третий пункт
+### Numbered list:
+1. First item
+2. Second item
+3. Third item
 `,
   },
 }
 
 export const WithLinks: Story = {
   args: {
-    children: `# Ссылки
+    children: `# Links
 
-[Обычная ссылка](https://example.com)
+[Regular link](https://example.com)
 
-[Ссылка с текстом при наведении](https://example.com "Пример подсказки")
+[Link with hover text](https://example.com "Example tooltip")
 
-## Специальные ссылки:
+## Special links:
 
-Телефон: [+7 (999) 123-45-67](tel:+79991234567)
+Phone: [+7 (999) 123-45-67](tel:+79991234567)
 
 Email: [example@example.com](mailto:example@example.com)
 
-## Внутренние ссылки:
+## Internal links:
 
-[Ссылка на другую страницу](/about)
+[Link to another page](/about)
 `,
   },
 }
 
 export const WithCustomDirectives: Story = {
   args: {
-    children: `# Пользовательские директивы
+    children: `# Custom Directives
 
 :::note
-Это примечание с важной информацией
+This is a note with important information
 :::
 
 :::warning
-Предупреждение! Обратите внимание на это.
+Warning! Pay attention to this.
 :::
 
 :::info
-Полезная информация для пользователя.
+Useful information for the user.
 :::
 `,
   },
@@ -91,7 +91,7 @@ export const WithCustomDirectives: Story = {
 
 export const WithReactComponents: Story = {
   args: {
-    children: `# С React-компонентами
+    children: `# With React Components
  
 `,
   },
@@ -99,100 +99,100 @@ export const WithReactComponents: Story = {
 
 export const WithTable: Story = {
   args: {
-    children: `# Таблицы
+    children: `# Tables
 
-## Простая таблица
+## Simple table
 
-| Имя | Возраст | Город |
+| Name | Age | City |
 | --- | ------- | ----- |
-| Анна | 25 | Москва |
-| Иван | 30 | Санкт-Петербург |
-| Мария | 27 | Казань |
+| Anna | 25 | Moscow |
+| Ivan | 30 | Saint Petersburg |
+| Maria | 27 | Kazan |
 
-## Таблица с выравниванием
+## Table with alignment
 
-| Левое | Центр | Правое |
+| Left | Center | Right |
 | :--- | :---: | ---: |
-| текст | текст | текст |
-| длинный текст | короткий | 123 |
+| text | text | text |
+| long text | short | 123 |
 `,
   },
 }
 
 export const WithStrikethroughSubSup: Story = {
   args: {
-    children: `# Зачёркивание и индексы
+    children: `# Strikethrough and Subscripts/Superscripts
 
-~~Зачёркнутый текст~~
+~~Strikethrough text~~
 
-Формула воды: H<sub>2</sub>O
+Water formula: H<sub>2</sub>O
 
 E = mc<sup>2</sup>
 
-Комбинация: ~~старый~~ **новый** текст с H<sub>2</sub>O
+Combination: ~~old~~ **new** text with H<sub>2</sub>O
 `,
   },
 }
 
 export const WithTaskList: Story = {
   args: {
-    children: `# Список задач
+    children: `# Task List
 
-- [x] Задача 1 выполнена
-- [x] Задача 2 выполнена
-- [ ] Задача 3 в процессе
-- [ ] Задача 4 не начата
+- [x] Task 1 completed
+- [x] Task 2 completed
+- [ ] Task 3 in progress
+- [ ] Task 4 not started
 
-## Вложенные задачи
+## Nested tasks
 
-- [x] Основная задача
-  - [x] Подзадача 1
-  - [ ] Подзадача 2
-- [ ] Другая задача
+- [x] Main task
+  - [x] Subtask 1
+  - [ ] Subtask 2
+- [ ] Another task
 `,
   },
 }
 
 export const WithHorizontalRule: Story = {
   args: {
-    children: `# Горизонтальные линии
+    children: `# Horizontal Rules
 
-Текст до линии
+Text before line
 
 ---
 
-Текст после линии
+Text after line
 
 ***
 
-Ещё один раздел
+Another section
 `,
   },
 }
 
 export const ComplexExample: Story = {
   args: {
-    children: `# Комплексный пример
+    children: `# Complex Example
 
-## Текст и форматирование
+## Text and formatting
 
-Это обычный текст с **жирным** и *курсивным* форматированием.
+This is regular text with **bold** and *italic* formatting.
 
-~~Зачёркнутый текст~~ и формула H<sub>2</sub>O с E = mc<sup>2</sup>
+~~Strikethrough text~~ and formula H<sub>2</sub>O with E = mc<sup>2</sup>
 
-> Это цитата с [ссылкой](https://example.com)
+> This is a quote with [link](https://example.com)
 
 ---
 
-## Таблица
+## Table
 
-| Имя | Возраст | Город |
+| Name | Age | City |
 | :--- | :---: | ---: |
-| Анна | 25 | Москва |
-| Иван | 30 | Санкт-Петербург |
-| Мария | 27 | Казань |
+| Anna | 25 | Moscow |
+| Ivan | 30 | Saint Petersburg |
+| Maria | 27 | Kazan |
 
-## Код
+## Code
 
 \`\`\`javascript
 function hello() {
@@ -200,15 +200,15 @@ function hello() {
 }
 \`\`\`
 
-## Изображение
+## Image
 
-![Пример изображения](https://via.placeholder.com/150)
+![Example image](https://via.placeholder.com/150)
 
-## Список с задачами
+## Task list
 
-- [x] Задача 1 выполнена
-- [ ] Задача 2 в процессе
-- [ ] Задача 3 не начата
+- [x] Task 1 completed
+- [ ] Task 2 in progress
+- [ ] Task 3 not started
 
 ---
 
@@ -222,16 +222,16 @@ LLAMA_MMPROJ=unsloth/Qwen3.5-4B-GGUF/mmproj-F16.gguf
 
 export const WithMermaid: Story = {
   args: {
-    children: `# Mermaid диаграммы
+    children: `# Mermaid Diagrams
 
 ## Flowchart
 
 \`\`\`mermaid
 flowchart TD
-    A[Начало] --> B{Условие?}
-    B -->|Да| C[Действие 1]
-    B -->|Нет| D[Действие 2]
-    C --> E[Конец]
+    A[Start] --> B{Condition?}
+    B -->|Yes| C[Action 1]
+    B -->|No| D[Action 2]
+    C --> E[End]
     D --> E
 \`\`\`
 
@@ -239,16 +239,16 @@ flowchart TD
 
 \`\`\`mermaid
 sequenceDiagram
-    participant U as Пользователь
-    participant S as Сервер
-    participant DB as База данных
-    U->>S: Запрос данных
-    S->>DB: SQL запрос
-    DB-->>S: Результат
-    S-->>U: JSON ответ
+    participant U as User
+    participant S as Server
+    participant DB as Database
+    U->>S: Data request
+    S->>DB: SQL query
+    DB-->>S: Result
+    S-->>U: JSON response
 \`\`\`
 
-## Обычный код рядом
+## Regular code nearby
 
 \`\`\`javascript
 const data = await fetch('/api/data')

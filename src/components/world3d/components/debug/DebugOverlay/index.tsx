@@ -17,8 +17,8 @@ type DebugOverlayProps = React.PropsWithChildren & {
 }
 
 /**
- * Компонент отладки — отображает направления объектов через React.createPortal.
- * Показывает forward direction для: мира, RigidBody, аватара, камеры.
+ * Debug component — displays object directions via React.createPortal.
+ * Shows forward direction for: world, RigidBody, avatar, camera.
  */
 export const DebugOverlay: React.FC<DebugOverlayProps> = ({
   children,

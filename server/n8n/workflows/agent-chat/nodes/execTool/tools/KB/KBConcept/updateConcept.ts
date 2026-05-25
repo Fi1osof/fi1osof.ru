@@ -18,7 +18,7 @@ export function getUpdateConceptTool(
     parameters: {
       name: 'update_concept',
       description:
-        'Обновляет существующий концепт. Используй для исправления или дополнения информации',
+        'Updates an existing concept. Use to correct or supplement information',
       workflowId: {
         __rl: true,
         mode: 'name',
@@ -29,11 +29,11 @@ export function getUpdateConceptTool(
         value: {
           targetWorkflow: `Tool: Update Concept (${agentName})`,
           reasoning: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('reasoning', '${reasoningTitle}', 'string') }}`,
-          id: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('id', 'ID концепта для обновления', 'string') }}`,
-          type: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('type', 'Новый тип концепта (опционально)', 'string') }}`,
-          name: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('name', 'Новое название концепта (опционально)', 'string') }}`,
-          description: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('description', 'Новое описание концепта (опционально)', 'string') }}`,
-          content: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('content', 'Новое содержимое концепта (опционально)', 'string') }}`,
+          id: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('id', 'Concept ID to update', 'string') }}`,
+          type: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('type', 'New concept type (optional)', 'string') }}`,
+          name: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('name', 'New concept name (optional)', 'string') }}`,
+          description: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('description', 'New concept description (optional)', 'string') }}`,
+          content: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('content', 'New concept content (optional)', 'string') }}`,
         },
         matchingColumns: [],
         schema: [

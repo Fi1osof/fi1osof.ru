@@ -46,24 +46,22 @@ export const SendTransfer: React.FC<SendTransferProps> = ({
 
       const amountNum = parseFloat(amount)
       if (!amountNum || amountNum <= 0) {
-        setError('Введите корректную сумму')
+        setError('Enter a valid amount')
         return
       }
 
       const currentBalance = currentUser?.Balance?.amount ?? 0
       if (amountNum > currentBalance) {
-        setError('Недостаточно средств')
+        setError('Insufficient funds')
         return
       }
 
       if (!recipient.id) {
-        setError('Неверный получатель')
+        setError('Invalid recipient')
         return
       }
 
-      const confirm = window.confirm(
-        `Отправить перевод на сумму ${amountNum} монет?`,
-      )
+      const confirm = window.confirm(`Send transfer for ${amountNum} coins?`)
 
       if (!confirm) {
         return
@@ -82,12 +80,12 @@ export const SendTransfer: React.FC<SendTransferProps> = ({
         })
 
         if (result.data?.createTransfer) {
-          setSuccess(`Успешно отправлено ${amountNum} Coins!`)
+          setSuccess(`Successfully sent ${amountNum} Coins!`)
           setAmount('')
           setTitle('')
         }
       } catch (err) {
-        setError((err as Error).message || 'Перевод не удался')
+        setError((err as Error).message || 'Transfer failed')
       }
     },
     [amount, title, recipient.id, currentUser?.Balance?.amount, createTransfer],
@@ -109,25 +107,22 @@ export const SendTransfer: React.FC<SendTransferProps> = ({
     [],
   )
 
-  const recipientName =
-    recipient.fullname || recipient.username || 'Пользователь'
+  const recipientName = recipient.fullname || recipient.username || 'User'
 
   return process.env.NEXT_PUBLIC_CRYPTO_ENABLED === 'true' && balance ? (
     <SendTransferStyled>
       <Balance currentUser={currentUser} />
 
-      <SendTransferHeaderStyled>
-        Отправить перевод пользователю
-      </SendTransferHeaderStyled>
+      <SendTransferHeaderStyled>Send transfer to user</SendTransferHeaderStyled>
 
       <SendTransferFormStyled onSubmit={handleSubmit}>
         <SendTransferFieldStyled>
-          <SendTransferLabelStyled>Кому</SendTransferLabelStyled>
+          <SendTransferLabelStyled>To</SendTransferLabelStyled>
           <SendTransferInputStyled type="text" value={recipientName} disabled />
         </SendTransferFieldStyled>
 
         <SendTransferFieldStyled>
-          <SendTransferLabelStyled>Сумма (Coins)</SendTransferLabelStyled>
+          <SendTransferLabelStyled>Amount (Coins)</SendTransferLabelStyled>
           <SendTransferInputStyled
             type="number"
             placeholder="0"
@@ -140,12 +135,10 @@ export const SendTransfer: React.FC<SendTransferProps> = ({
         </SendTransferFieldStyled>
 
         <SendTransferFieldStyled>
-          <SendTransferLabelStyled>
-            Комментарий (необязательно)
-          </SendTransferLabelStyled>
+          <SendTransferLabelStyled>Comment (optional)</SendTransferLabelStyled>
           <SendTransferInputStyled
             type="text"
-            placeholder="Для чего этот перевод?"
+            placeholder="What is this transfer for?"
             value={title}
             onChange={onChangeTitle}
             disabled={loading}
@@ -163,7 +156,7 @@ export const SendTransfer: React.FC<SendTransferProps> = ({
             disabled={loading || !amount}
             variant={ComponentVariant.PRIMARY}
           >
-            {loading ? 'Отправка...' : 'Отправить'}
+            {loading ? 'Sending...' : 'Send'}
           </Button>
         </SendTransferActionsStyled>
       </SendTransferFormStyled>

@@ -1,25 +1,25 @@
 # AI Guild Platform
 
-Бизнес-логика и специфичные фичи платформы AI Guild.
+Business logic and specific features of the AI Guild platform.
 
-## Разделы
+## Sections
 
-- [Биллинг](./billing/README.md) — Баланс, транзакции, платежи
+- [Billing](./billing/README.md) — Balance, transactions, payments
 
-## Ключевые сущности
+## Key Entities
 
-### Аутентификация
-- **EthAccount** — Ethereum-аккаунт пользователя (MetaMask). Связан с User (1:1)
-- **TelegramAccount** — Telegram-аккаунт пользователя. Связан с User (1:1)
+### Authentication
+- **EthAccount** — User's Ethereum account (MetaMask). Linked to User (1:1)
+- **TelegramAccount** — User's Telegram account. Linked to User (1:1)
 
-### Система баланса пользователя
-- **Balance** — Баланс пользователя в коинах (1 USDT = 1 Coin)
-- **Transaction** — Внутренняя запись транзакции (пополнение, перевод)
-- **EthTransaction** — Запись блокчейн-транзакции с криптографическим подтверждением
+### User Balance System
+- **Balance** — User balance in coins (1 USDT = 1 Coin)
+- **Transaction** — Internal transaction record (top-up, transfer)
+- **EthTransaction** — Blockchain transaction record with cryptographic confirmation
 
-### Prisma модели
-- `EthAccount` — связан с User (1:1), хранит Ethereum-адрес
-- `TelegramAccount` — связан с User (1:1), хранит данные Telegram-профиля
-- `Balance` — связан с User (1:1)
-- `Transaction` — связан с Balance и опционально с EthTransaction
-- `EthTransaction` — хранит данные блокчейн-транзакции + подписанное сообщение как доказательство
+### Prisma Models
+- `EthAccount` — linked to User (1:1), stores Ethereum address
+- `TelegramAccount` — linked to User (1:1), stores Telegram profile data
+- `Balance` — linked to User (1:1)
+- `Transaction` — linked to Balance and optionally to EthTransaction
+- `EthTransaction` — stores blockchain transaction data + signed message as proof

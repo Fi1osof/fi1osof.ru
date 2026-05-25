@@ -41,7 +41,7 @@ export const TelegramAuthForm: React.FC<TelegramAuthFormProps> = ({
       buttonSize,
     }
 
-    // Подключаем скрипт Telegram login
+    // Load Telegram login script
     const script = document.createElement('script')
     script.src = 'https://telegram.org/js/telegram-widget.js?7'
     script.async = true
@@ -53,7 +53,7 @@ export const TelegramAuthForm: React.FC<TelegramAuthFormProps> = ({
 
     container.appendChild(script)
 
-    // Чистим при размонтировании
+    // Cleanup on unmount
     return () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (window as any).onTelegramAuth
@@ -89,7 +89,7 @@ export const TelegramAuthForm: React.FC<TelegramAuthFormProps> = ({
           }
         })
       } catch (error) {
-        addMessage?.((error as Error).message || 'Ошибка выполнения запроса', {
+        addMessage?.((error as Error).message || 'Request execution error', {
           variant: 'error',
         })
       }

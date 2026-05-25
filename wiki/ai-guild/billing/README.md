@@ -1,63 +1,63 @@
-# Система биллинга
+# Billing System
 
-Баланс пользователя и обработка платежей для платформы AI Guild.
+User balance and payment processing for the AI Guild platform.
 
-## Обзор
+## Overview
 
-Пользователи могут пополнять баланс через USDT в сети Arbitrum. Система верифицирует блокчейн-транзакции и зачисляет коины на баланс пользователя.
+Users can top up balance via USDT on Arbitrum network. The system verifies blockchain transactions and credits coins to user balance.
 
-## Разделы
+## Sections
 
-- [Пополнение баланса](./top-up.md) — Пополнение через MetaMask
-- [Внутренние переводы](./internal-transfers.md) — Переводы между пользователями
+- [Balance Top-Up](./top-up.md) — Top-up via MetaMask
+- [Internal Transfers](./internal-transfers.md) — Transfers between users
 
-## Модели данных
+## Data Models
 
 ### Balance
-Баланс пользователя в коинах. Один баланс на пользователя.
+User balance in coins. One balance per user.
 
 ```
 Balance
-├── amount: Float (текущий баланс)
-├── userId: String (уникальный, 1:1 с User)
+├── amount: Float (current balance)
+├── userId: String (unique, 1:1 with User)
 └── Transactions: Transaction[]
 ```
 
 ### Transaction
-Внутренняя запись транзакции для изменений баланса.
+Internal transaction record for balance changes.
 
 ```
 Transaction
 ├── type: TopUp | TransferOut | TransferIn
 ├── amount: Float
-├── title: String (опциональное описание)
+├── title: String (optional description)
 ├── userId: String
 ├── balanceId: String
-└── ethTransactionId: String? (связь с блокчейн-транзакцией)
+└── ethTransactionId: String? (link to blockchain transaction)
 ```
 
 ### EthTransaction
-Запись Ethereum-транзакции с криптографическим подтверждением.
+Ethereum transaction record with cryptographic confirmation.
 
 ```
 EthTransaction
-├── chainId: Int (идентификатор сети, например 42161 для Arbitrum)
-├── txHash: String (хеш блокчейн-транзакции)
-├── from: String (адрес отправителя)
-├── to: String (адрес получателя)
-├── amount: Float (сумма в USDT)
-├── blockNumber: Int? (номер блока для отслеживания подтверждений)
-├── message: String (текст оферты — доказательство намерения)
-├── signature: String (криптографическая подпись пользователя)
+├── chainId: Int (network identifier, e.g. 42161 for Arbitrum)
+├── txHash: String (blockchain transaction hash)
+├── from: String (sender address)
+├── to: String (recipient address)
+├── amount: Float (amount in USDT)
+├── blockNumber: Int? (block number for tracking confirmations)
+├── message: String (offer text — proof of intent)
+├── signature: String (user's cryptographic signature)
 └── userId: String
 ```
 
-**Уникальный constraint**: `[chainId, txHash]` — один и тот же txHash может существовать в разных сетях.
+**Unique constraint**: `[chainId, txHash]` — the same txHash can exist in different networks.
 
-## Важные замечания
+## Important Notes
 
-1. **Сохранение подписи**: `message` и `signature` хранятся в EthTransaction как доказательство того, что пользователь согласился с условиями платежа. Это критично для покупок контрактов с условиями.
+1. **Signature storage**: `message` and `signature` are stored in EthTransaction as proof that user agreed to payment terms. This is critical for contract purchases with conditions.
 
-2. **Учёт сети**: `chainId` обязателен, потому что один и тот же `txHash` теоретически может существовать в разных EVM-сетях. Уникальность обеспечивается в рамках конкретной сети.
+2. **Network consideration**: `chainId` is required because the same `txHash` can theoretically exist in different EVM networks. Uniqueness is ensured within a specific network.
 
-3. **Номер блока**: Сохраняется для возможного отслеживания подтверждений, хотя текущая реализация верифицирует транзакцию один раз при отправке.
+3. **Block number**: Stored for possible confirmation tracking, though current implementation verifies transaction once on submission.

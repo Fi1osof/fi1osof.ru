@@ -29,10 +29,10 @@ export const Transactions: React.FC = () => {
   return (
     process.env.NEXT_PUBLIC_CRYPTO_ENABLED === 'true' && (
       <TransactionsStyled>
-        <TransactionsHeaderStyled>Транзакции</TransactionsHeaderStyled>
+        <TransactionsHeaderStyled>Transactions</TransactionsHeaderStyled>
 
         {transactions.length === 0 && !loading ? (
-          <TransactionsEmptyStyled>Пока нет транзакций</TransactionsEmptyStyled>
+          <TransactionsEmptyStyled>No transactions yet</TransactionsEmptyStyled>
         ) : (
           <TransactionsListStyled>
             {transactions.map((node) => (

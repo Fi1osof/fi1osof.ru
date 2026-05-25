@@ -55,14 +55,14 @@ export const GetReferrerToken: React.FC = () => {
         <GetReferrerTokenRowStyled>
           <GetReferrerTokenTextStyled>{token}</GetReferrerTokenTextStyled>
           <Button onClick={onClickCopy} value={token}>
-            Скопировать токен
+            Copy token
           </Button>
           <Button
             onClick={onClickCopy}
             value={`${global.window.origin}/signup?${GET_PARAM_REFERRERTOKEN_NAME}=${token}`}
             variant={ComponentVariant.SUCCESS}
           >
-            Скопировать ссылку
+            Copy link
           </Button>
         </GetReferrerTokenRowStyled>
       )}

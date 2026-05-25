@@ -23,7 +23,7 @@ export function getReadConceptsTool(
     parameters: {
       name: 'read_concepts',
       description:
-        'Читает все имеющиеся знания. Используй когда надо узнать что ты знаешь и умеешь',
+        'Reads all available knowledge. Use when you need to know what you know and can do',
       workflowId: {
         __rl: true,
         mode: 'name',
@@ -34,8 +34,8 @@ export function getReadConceptsTool(
         value: {
           targetWorkflow: `Tool: Read Concepts (${agentName})`,
           reasoning: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('reasoning', '${reasoningTitle}', 'string') }}`,
-          ids: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('ids', 'Список ID концептов для фильтрации. Указывай только для выборки конкретных концептов. В других случаях передавай пустую строку', 'string') }}`,
-          detailedInfo: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('detailedInfo', 'Получить полную информацию включая content. Указывай true только при выборке конкретных концептов по ids. Иначе передавай false', 'boolean') }}`,
+          ids: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('ids', 'List of concept IDs for filtering. Specify only for selecting specific concepts. In other cases pass an empty string', 'string') }}`,
+          detailedInfo: `={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('detailedInfo', 'Get full information including content. Specify true only when selecting specific concepts by ids. Otherwise pass false', 'boolean') }}`,
         },
         matchingColumns: [],
         schema: [

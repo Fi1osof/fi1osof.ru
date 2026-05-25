@@ -63,8 +63,7 @@ export const ImageGenerator: React.FC = () => {
         })
         .catch((error) => {
           addMessage?.(
-            (error as Error | undefined)?.message ||
-              'Ошибка выполнения запроса',
+            (error as Error | undefined)?.message || 'Request execution error',
           )
         })
 

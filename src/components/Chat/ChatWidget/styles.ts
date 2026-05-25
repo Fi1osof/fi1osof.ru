@@ -31,7 +31,7 @@ export const ChatContentContainer = styled.div<ChatContentContainerProps>`
   max-width: 100%;
 
   /* 
-    Это для того, чтобы скролл внутри контейнера был, а не всего вью
+    This is so the scroll is inside the container, not the entire view
   */
   height: 100%;
   overflow: auto;

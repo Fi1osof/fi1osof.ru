@@ -15,13 +15,13 @@ const ANIMATION_PATHS = {
   jump: `${lft_models_pth}/avatars/animations/jump.glb`,
 }
 
-// Модификатор скорости — умножает базовые скорости анимаций и timeScale
+// Speed modifier — multiplies base animation speeds and timeScale
 const SPEED_MULTIPLIER = 1
 
 /**
- * Удаляет root motion из анимации — убирает position track для Hips bone.
- * Это нужно, чтобы анимация не двигала модель относительно RigidBody,
- * а движение контролировалось только физикой.
+ * Removes root motion from animation — removes position track for Hips bone.
+ * This is needed so animation doesn't move model relative to RigidBody,
+ * and movement is controlled only by physics.
  */
 function removeRootMotion(clip: AnimationClip): AnimationClip {
   const newTracks = clip.tracks.filter((track) => {
@@ -100,7 +100,7 @@ export const Avatar: React.FC<AvatarProps> = ({ animation, scale = 0.6 }) => {
       Object.values(actions).forEach((action) => action?.fadeOut(0.2))
       const action = actions[animation]
       action?.reset().fadeIn(0.2).play()
-      // Ускоряем анимацию пропорционально модификатору скорости
+      // Speed up animation proportionally to speed modifier
       if (action && (animation === 'walk' || animation === 'run')) {
         action.timeScale = SPEED_MULTIPLIER
       }

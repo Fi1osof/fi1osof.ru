@@ -2,11 +2,11 @@ import { useReducer } from 'react'
 import { AnimationName } from '../../interfaces'
 
 /**
- * Состояние игрока.
- * - animation: текущая анимация (idle, walk, run, jump)
- * - rotation: угол поворота персонажа в радианах (0 = смотрит вдоль +Z)
- * - wasBackward: флаг для однократного разворота на 180° при нажатии S
- * - debugPosition: позиция для отладочного overlay
+ * Player state.
+ * - animation: current animation (idle, walk, run, jump)
+ * - rotation: character rotation angle in radians (0 = looking along +Z)
+ * - wasBackward: flag for single 180° turn when pressing S
+ * - debugPosition: position for debug overlay
  */
 interface PlayerState {
   animation: AnimationName
@@ -16,12 +16,12 @@ interface PlayerState {
 }
 
 /**
- * Действия для управления состоянием игрока.
- * - SET_ANIMATION: смена анимации (игнорируется если уже активна)
- * - TURN_LEFT/TURN_RIGHT: поворот персонажа на заданный угол (A/D клавиши)
- * - REVERSE: разворот на 180° при нажатии S (срабатывает однократно)
- * - RESET_BACKWARD: сброс флага wasBackward при отпускании S
- * - SET_DEBUG_POSITION: обновление позиции для отладки
+ * Actions for controlling player state.
+ * - SET_ANIMATION: change animation (ignored if already active)
+ * - TURN_LEFT/TURN_RIGHT: rotate character by given angle (A/D keys)
+ * - REVERSE: 180° turn when pressing S (triggers once)
+ * - RESET_BACKWARD: reset wasBackward flag when releasing S
+ * - SET_DEBUG_POSITION: update position for debug
  */
 type PlayerAction =
   | { type: 'SET_ANIMATION'; payload: AnimationName }
@@ -39,41 +39,41 @@ const initialPlayerState: PlayerState = {
 }
 
 /**
- * Reducer для управления состоянием игрока.
- * Чистая функция — не мутирует state, возвращает новый объект при изменениях.
+ * Reducer for controlling player state.
+ * Pure function — doesn't mutate state, returns new object on changes.
  */
 function playerReducer(state: PlayerState, action: PlayerAction): PlayerState {
   switch (action.type) {
-    // Смена анимации — пропускаем если уже активна (избегаем лишних ре-рендеров)
+    // Change animation — skip if already active (avoid unnecessary re-renders)
     case 'SET_ANIMATION':
       if (state.animation === action.payload) {
         return state
       }
       return { ...state, animation: action.payload }
 
-    // Поворот влево — увеличиваем угол (против часовой стрелки)
+    // Turn left — increase angle (counter-clockwise)
     case 'TURN_LEFT':
       return { ...state, rotation: state.rotation + action.payload }
 
-    // Поворот вправо — уменьшаем угол (по часовой стрелке)
+    // Turn right — decrease angle (clockwise)
     case 'TURN_RIGHT':
       return { ...state, rotation: state.rotation - action.payload }
 
-    // Разворот на 180° — срабатывает только один раз при зажатии S
+    // 180° turn — triggers only once when holding S
     case 'REVERSE':
       if (state.wasBackward) {
         return state
       }
       return { ...state, rotation: state.rotation + Math.PI, wasBackward: true }
 
-    // Сброс флага разворота — при отпускании S
+    // Reset turn flag — when releasing S
     case 'RESET_BACKWARD':
       if (!state.wasBackward) {
         return state
       }
       return { ...state, wasBackward: false }
 
-    // Обновление позиции для отладочного overlay
+    // Update position for debug overlay
     case 'SET_DEBUG_POSITION':
       return { ...state, debugPosition: action.payload }
 
@@ -83,8 +83,8 @@ function playerReducer(state: PlayerState, action: PlayerAction): PlayerState {
 }
 
 /**
- * Хук для управления состоянием игрока через reducer.
- * Возвращает [state, dispatch] — текущее состояние и функцию отправки действий.
+ * Hook for controlling player state via reducer.
+ * Returns [state, dispatch] — current state and action dispatch function.
  */
 export function usePlayerReducer() {
   return useReducer(playerReducer, initialPlayerState)

@@ -142,11 +142,6 @@ export const generateSitemapUsers = async (
   return generateSitemapXML(xmlData, props)
 }
 
-/**
- * Обрабатывает запрос для генерации sitemap
- * @param type тип sitemap (cities или companies)
- * @param res объект ответа Express
- */
 export const generateSitemap = async (req: Request, res: Response) => {
   res.header('Content-Type', 'application/xml')
 

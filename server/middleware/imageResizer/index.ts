@@ -7,7 +7,7 @@ import { parseBackgroundColor } from './helpers/parseBackgroundColor'
 import { resizeImg } from './helpers/resizeImg'
 
 /**
- * Ресайз картинок
+ * Resize image
  */
 export const imageResizerMiddleware: RequestHandler = async (
   req,

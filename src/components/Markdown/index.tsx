@@ -15,13 +15,13 @@ import { Mermaid } from 'src/components/Mermaid'
 import { MarkdownStyled } from './styles'
 
 /**
- * Начиная с 9 версии ремарк стал обнулять тел и мейлто ссылки.
+ * Since version 9, remark has been nullifying tel and mailto links.
  * https://github.com/remarkjs/react-markdown/issues/829
  */
 const urlTransform: UrlTransform = (url, _name, _node) => {
   const fixed = defaultUrlTransform(url)
 
-  // если схема tel/mailto — пропускаем как есть
+  // if scheme is tel/mailto — pass as is
   if (url.startsWith('tel:') || url.startsWith('mailto:')) {
     return url
   }

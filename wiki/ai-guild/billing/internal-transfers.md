@@ -1,19 +1,19 @@
-# Внутренние переводы
+# Internal Transfers
 
-Система переводов Coins между пользователями внутри платформы.
+System for transferring Coins between users within the platform.
 
-## Обзор
+## Overview
 
-Пользователи могут переводить Coins друг другу без взаимодействия с блокчейном. Это внутренние операции платформы.
+Users can transfer Coins to each other without blockchain interaction. These are internal platform operations.
 
-## Модель данных
+## Data Model
 
-### Transaction (для переводов)
+### Transaction (for transfers)
 
-При переводе создаются **две связанные транзакции**:
+When transferring, **two related transactions** are created:
 
 ```
-TransferOut (отправитель)          TransferIn (получатель)
+TransferOut (sender)              TransferIn (receiver)
 ├── type: TransferOut              ├── type: TransferIn
 ├── amount: -100                   ├── amount: +100
 ├── userId: sender.id              ├── userId: receiver.id
@@ -21,48 +21,48 @@ TransferOut (отправитель)          TransferIn (получатель)
 └── Children: [TransferIn]         └── parentId: TransferOut.id
 ```
 
-**Связь Parent/Children:**
-- `TransferOut` — родительская транзакция
-- `TransferIn` — дочерняя транзакция с `parentId` указывающим на `TransferOut`
+**Parent/Children relationship:**
+- `TransferOut` — parent transaction
+- `TransferIn` — child transaction with `parentId` pointing to `TransferOut`
 
-## Процесс перевода
+## Transfer Process
 
-1. Пользователь открывает профиль получателя
-2. Нажимает "Send Transfer"
-3. Вводит сумму и опциональный комментарий
-4. Подтверждает перевод
+1. User opens recipient's profile
+2. Clicks "Send Transfer"
+3. Enters amount and optional comment
+4. Confirms transfer
 
-### Серверная логика
+### Server Logic
 
 ```
 createTransfer(toUserId, amount, title)
 │
-├── Проверить авторизацию
-├── Проверить существование получателя
-├── Проверить toUserId != currentUserId
-├── Проверить баланс отправителя >= amount
+├── Check authorization
+├── Check recipient exists
+├── Check toUserId != currentUserId
+├── Check sender balance >= amount
 │
 └── Prisma transaction:
-    ├── Создать TransferOut (amount: -amount)
-    ├── Создать TransferIn (amount: +amount, parentId: outTx.id)
-    ├── Upsert Balance получателя
-    ├── Уменьшить баланс отправителя
-    └── Увеличить баланс получателя
+    ├── Create TransferOut (amount: -amount)
+    ├── Create TransferIn (amount: +amount, parentId: outTx.id)
+    ├── Upsert recipient Balance
+    ├── Decrease sender balance
+    └── Increase recipient balance
 ```
 
-## Важные замечания
+## Important Notes
 
-1. **Атомарность**: Все операции выполняются в одной Prisma-транзакции. Если что-то падает — откатывается всё.
+1. **Atomicity**: All operations are executed in a single Prisma transaction. If anything fails — everything is rolled back.
 
-2. **Upsert баланса**: У получателя может не быть записи Balance (если он никогда не пополнял). Используем upsert.
+2. **Balance upsert**: Recipient may not have a Balance record (if they never topped up). We use upsert.
 
-3. **Проверка баланса**: Всегда на сервере. Фронту не доверяем.
+3. **Balance check**: Always on the server. We don't trust the frontend.
 
-4. **Нельзя себе**: Перевод самому себе запрещён.
+4. **No self-transfer**: Transfer to self is prohibited.
 
 ## GraphQL API
 
-### Мутации
+### Mutations
 
 ```graphql
 mutation CreateTransfer($toUserId: String!, $amount: Float!, $title: String) {
@@ -80,7 +80,7 @@ mutation CreateTransfer($toUserId: String!, $amount: Float!, $title: String) {
 }
 ```
 
-### Запросы
+### Queries
 
 ```graphql
 query MyTransactions($skip: Int, $take: Int) {

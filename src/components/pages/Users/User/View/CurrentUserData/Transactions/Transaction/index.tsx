@@ -51,7 +51,7 @@ export const Transaction: React.FC<TransactionProps> = ({ node }) => {
         }
         {counterparty && (
           <TransactionUserStyled>
-            {isPositive ? 'От' : 'Кому'}: {counterparty}
+            {isPositive ? 'From' : 'To'}: {counterparty}
           </TransactionUserStyled>
         )}
         <FormattedDate value={node.createdAt} format="dateTimeMedium" />

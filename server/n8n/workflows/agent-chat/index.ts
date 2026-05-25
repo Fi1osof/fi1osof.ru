@@ -79,7 +79,7 @@ class ChatAgentWorkflow extends AgentWorkflowFactory {
       this.addNode(graphqlToolNode)
     }
 
-    // Exec Tools - прокси для вызова инструментов с обоснованием
+    // Exec Tools - proxy for calling tools with reasoning
     const execTools = getExecTools(config)
     this.addNodes(execTools)
 
