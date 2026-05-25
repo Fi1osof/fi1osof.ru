@@ -2,7 +2,9 @@ const response = $input.first().json
 
 // Escape curly braces to prevent n8n template parsing. Replaced with utf symbols
 function escapeForN8n(str) {
-  if (!str) {return ''}
+  if (!str) {
+    return ''
+  }
   return str.replace(/\{/g, '⦃').replace(/\}/g, '⦄').replace(/:/g, '꞉')
 }
 
