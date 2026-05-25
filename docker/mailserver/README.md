@@ -4,22 +4,30 @@ Docker-mailserver configuration for the platform.
 
 ## Quick Start
 
-1. Start the mailserver:
+1. Configure `.env`:
+   ```bash
+   MAIL_HOSTNAME=mail.example.com
+   MAIL_DOMAIN=example.com
+   # Dev: MAIL_RELAY_HOST=[mailhog]:1025
+   # Prod: leave empty for direct delivery
+   ```
+
+2. Start the mailserver:
    ```bash
    docker compose up -d mailserver
    ```
 
-2. Add an email account:
+3. Add an email account:
    ```bash
    ./mailserver/setup.sh email add user@example.com
    ```
 
-3. Generate DKIM keys:
+4. Generate DKIM keys (requires account first):
    ```bash
    ./mailserver/setup.sh config dkim
    ```
 
-4. Configure DNS records (see below)
+5. Configure DNS records (see below)
 
 ## Directory Structure
 
@@ -50,6 +58,17 @@ mailserver/
 
 # DKIM
 ./mailserver/setup.sh config dkim
+
+# Test sending (inside container)
+swaks --to test@example.com --from user@domain.com --server localhost:587 \
+  --auth LOGIN --auth-user user@domain.com --auth-password 'password' \
+  --header "Subject: Test" --body "Test message"
+
+# Check mail queue
+postqueue -p
+
+# Clear mail queue
+postsuper -d ALL
 ```
 
 ## DNS Records
@@ -60,7 +79,7 @@ For each domain, add these DNS records:
 |------|------|-------|
 | MX | @ | mail.yourdomain.com (priority 10) |
 | A | mail | YOUR_SERVER_IP |
-| TXT | @ | v=spf1 mx -all |
+| TXT | @ | v=spf1 mx ip4:SERVER_IP -all |
 | TXT | _dmarc | v=DMARC1; p=quarantine; rua=mailto:postmaster@yourdomain.com |
 | TXT | mail._domainkey | (from DKIM key generation) |
 

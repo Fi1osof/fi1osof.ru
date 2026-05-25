@@ -22,12 +22,12 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
-CONTAINER_NAME="mailserver"
+SERVICE_NAME="mailserver"
 
-if ! docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
-    echo "Error: Container '${CONTAINER_NAME}' is not running."
+if ! docker compose -f "$PROJECT_ROOT/docker-compose.yml" ps --status running --format '{{.Service}}' 2>/dev/null | grep -q "^${SERVICE_NAME}$"; then
+    echo "Error: Service '${SERVICE_NAME}' is not running."
     echo "Start it with: docker compose up -d mailserver"
     exit 1
 fi
 
-docker exec -it "${CONTAINER_NAME}" setup "$@"
+docker compose -f "$PROJECT_ROOT/docker-compose.yml" exec "${SERVICE_NAME}" setup "$@"

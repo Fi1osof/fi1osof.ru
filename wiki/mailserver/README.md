@@ -29,8 +29,19 @@ Located in `docker/.env`:
 
 ```bash
 ## Mail Server (docker-mailserver)
+# FQDN for the mail server (required for prod)
+MAIL_HOSTNAME=mail.example.com
+# Primary mail domain
+MAIL_DOMAIN=example.com
+
+# Relay host (dev: mailhog, prod: empty for direct delivery)
+# Dev:
+MAIL_RELAY_HOST=[mailhog]:1025
+# Prod: leave empty or don't set
+# MAIL_RELAY_HOST=
+
 # Send-only mode (no accounts required, no IMAP/POP3)
-MAIL_SMTP_ONLY=1
+MAIL_SMTP_ONLY=0
 # Allow sending from docker network without auth
 MAIL_PERMIT_DOCKER=connected-networks
 
@@ -40,10 +51,7 @@ MAIL_PERMIT_DOCKER=connected-networks
 MAILSERVER_CONFIG_PATH=/app/mailserver-config
 
 # Optional settings:
-# MAIL_HOSTNAME=mail.example.com       # FQDN for the mail server
-# MAIL_DOMAIN=example.com              # Primary mail domain
 # MAIL_SSL_TYPE=letsencrypt            # SSL type: letsencrypt, manual, self-signed
-# DEFAULT_RELAY_HOST=[mailhog]:1025    # Relay for dev (mailhog)
 ```
 
 ### Full Mode (Default)
@@ -133,6 +141,22 @@ The path to config is controlled by `MAILSERVER_CONFIG_PATH` env var:
 - `server/n8n/workflows/tool-send-mail/mailboxManager.ts` — automatic mailbox creation
 - `server/n8n/workflows/agent-factory/tools/sendMail/` — send mail tool node
 - `server/n8n/workflows/agent-factory/tools/checkMail/` — check mail tool node
+
+## Testing
+
+```bash
+# Test sending (inside container)
+docker compose exec mailserver swaks \
+  --to test@example.com --from user@domain.com --server localhost:587 \
+  --auth LOGIN --auth-user user@domain.com --auth-password 'password' \
+  --header "Subject: Test" --body "Test message"
+
+# Check mail queue
+docker compose exec mailserver postqueue -p
+
+# Clear mail queue
+docker compose exec mailserver postsuper -d ALL
+```
 
 ## Next Steps
 

@@ -86,7 +86,7 @@ services:
       - SSL_TYPE=${MAIL_SSL_TYPE:-}
       - PERMIT_DOCKER=${MAIL_PERMIT_DOCKER:-connected-networks}
       - POSTFIX_INET_PROTOCOLS=ipv4
-      - DEFAULT_RELAY_HOST=[${MAIL_RELAY_HOST:-mailhog}]:${MAIL_RELAY_PORT:-1025}
+      - DEFAULT_RELAY_HOST=${MAIL_RELAY_HOST:-}
     cap_add:
       - NET_ADMIN
       - SYS_PTRACE
