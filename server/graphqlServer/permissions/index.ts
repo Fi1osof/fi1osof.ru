@@ -82,6 +82,7 @@ const ruleTree = {
     llmImageGeneration: isSudo,
     signPost: isActive,
     world3dObjectCreate: isActive,
+    sendMail: isSudo,
   },
 } satisfies PermissionsRuleTree
 
