@@ -29,8 +29,5 @@ providers:
     watch: true
 
 log:
-  level: INFO
+  level: ERROR
   filePath: /var/log/traefik/traefik.log
-
-accessLog:
-  filePath: /var/log/traefik/access.log
