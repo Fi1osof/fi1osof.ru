@@ -55,7 +55,7 @@ const createComponents = ({
       return null
     }
 
-    return <Image src={src} alt={alt ?? ''} {...props} />
+    return <Image src={String(src)} alt={alt ?? ''} {...props} />
   },
   pre: ({ node, children, ...props }) => {
     const codeElement = node?.children?.[0]

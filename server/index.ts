@@ -112,7 +112,7 @@ async function startServer() {
     await app.prepare()
 
     // Next.js handles everything else
-    server.get('*', (req, res) => {
+    server.get('{*path}', (req, res) => {
       return handle(req, res)
     })
   }

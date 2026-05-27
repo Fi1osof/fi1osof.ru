@@ -75,7 +75,6 @@ export const VoiceAudioSource: React.FC<VoiceAudioSourceProps> = ({
 
     // Connect MediaStream as audio source via Web Audio API
     const source = audioContext.createMediaStreamSource(stream)
-    // @ts-expect-error — Three.js PositionalAudio.setNodeSource accepts AudioNode
     positionalAudio.setNodeSource(source)
 
     setAudio(positionalAudio)

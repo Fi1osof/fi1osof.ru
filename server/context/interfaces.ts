@@ -1,4 +1,4 @@
-import { ExpressContextFunctionArgument } from '@as-integrations/express4'
+import { ExpressContextFunctionArgument } from '@as-integrations/express5'
 import type { PrismaClient, Token, User } from '@prisma/client'
 import type { World3dClient } from '../world3d/client'
 import type { LLMClient } from '../llm/client'
