@@ -28,7 +28,7 @@ builder.mutationField('updateFile', (t) =>
         throw new Error('File not found')
       }
 
-      if (existingFile.CreatedBy !== currentUser.id && !currentUser.sudo) {
+      if (existingFile.createdById !== currentUser.id && !currentUser.sudo) {
         throw new Error('Can not edit alien file')
       }
 

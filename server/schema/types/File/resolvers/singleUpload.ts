@@ -65,7 +65,7 @@ builder.mutationField('singleUpload', (t) =>
           path: writeResult.path.replace(/^\.\//, ''),
           size,
           name: name ?? undefined,
-          User: {
+          CreatedBy: {
             connect: {
               id: currentUser.id,
             },

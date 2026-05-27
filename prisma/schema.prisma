@@ -129,12 +129,12 @@ model File {
   createdAt DateTime @default(now()) @db.Timestamp(3)
   updatedAt DateTime @default(now()) @updatedAt @db.Timestamp(3)
 
-  CreatedBy String? @db.VarChar(36)
-  User      User?   @relation(fields: [CreatedBy], references: [id])
+  createdById String? @db.VarChar(36)
+  CreatedBy   User?   @relation(fields: [createdById], references: [id])
 
   KBConceptFiles KBConceptFile[]
 
-  @@index([CreatedBy], map: "File_CreatedBy")
+  @@index([createdById], map: "File_CreatedBy")
 }
 
 model KBConceptFile {

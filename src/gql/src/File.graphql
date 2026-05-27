@@ -47,6 +47,7 @@ fragment FileNoNesting on File {
   name
   description
   mimetype
+  createdById
 }
 
 fragment File_ on File {

@@ -28,8 +28,8 @@ builder.prismaObject('File', {
     // encoding: t.exposeString('encoding'),
     // size: t.exposeFloat('size'),
     rank: t.exposeInt('rank'),
-    createdById: t.exposeString('CreatedBy', { nullable: true }),
-    CreatedBy: t.relation('User', { nullable: true }),
+    createdById: t.exposeString('createdById', { nullable: true }),
+    CreatedBy: t.relation('CreatedBy', { nullable: true }),
     KBConcepts: t.relation('KBConceptFiles'),
   }),
 })
