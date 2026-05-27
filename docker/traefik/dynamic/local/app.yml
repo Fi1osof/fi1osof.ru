@@ -1,5 +1,12 @@
 http:
   routers:
+    static:
+      rule: 'PathRegexp(`^.*\.(js|css|woff2?|ttf|eot|svg|ico|png|jpg|jpeg|gif|webp|avif)$`)'
+      entryPoints:
+        - web
+      service: varnish
+      priority: 100
+
     n8n-webhook:
       rule: 'PathPrefix(`/webhook`)'
       entryPoints:
@@ -72,3 +79,8 @@ http:
       loadBalancer:
         servers:
           - url: 'http://world3d:4100'
+
+    varnish:
+      loadBalancer:
+        servers:
+          - url: 'http://varnish:80'

@@ -7,7 +7,7 @@
 - **Database**: PostgreSQL + Prisma ORM 6
 - **Auth**: JWT
 - **AI Engine**: n8n (code-first workflows, custom AgentOrchestrator node)
-- **Infrastructure**: Docker, Traefik, docker-mailserver, llama.cpp (optional local LLM)
+- **Infrastructure**: Docker, Traefik, Varnish, docker-mailserver, llama.cpp (optional local LLM)
 
 ## Project Structure
 
@@ -34,7 +34,8 @@
 ├── docker/                       # Infrastructure
 │   ├── mailserver/               # SMTP/IMAP server
 │   ├── supabase/                 # PostgreSQL + pgAdmin
-│   └── traefik/                  # Reverse proxy (production)
+│   ├── traefik/                  # Reverse proxy
+│   └── varnish/                  # Static assets cache
 ├── credentials/                  # n8n credentials (gitignored)
 └── wiki/                         # Documentation
 ```
@@ -52,6 +53,7 @@
 | **Testing** | Vitest for unit + API tests, Storybook for components |
 | **Docker** | Multi-stage builds, dev + prod configurations |
 | **Mail Server** | Full SMTP/IMAP with docker-mailserver |
+| **Varnish Cache** | Static assets caching with per-host isolation |
 
 ### Knowledge Base (KB)
 

@@ -15,7 +15,30 @@ traefik/
 ├── certs/                   # SSL certificates (gitignored)
 ├── logs/                    # Traefik logs (gitignored)
 └── auth/                    # Auth files (gitignored)
+
+../varnish/
+├── default.vcl              # Varnish cache configuration
+└── .gitignore
 ```
+
+## Varnish Cache
+
+Static assets (js, css, fonts, images) are cached via Varnish for better performance.
+
+**Routing**: Traefik routes static files to Varnish using `PathRegexp`:
+```yaml
+static:
+  rule: 'PathRegexp(`^.*\.(js|css|woff2?|ttf|eot|svg|ico|png|jpg|jpeg|gif|webp|avif)$`)'
+  service: varnish
+```
+
+**Cache features**:
+- 7-day TTL for static assets
+- Per-host cache isolation (multi-domain support)
+- Cookies stripped from static requests
+- `X-Cache` header shows HIT/MISS status
+
+**Disable caching** for specific files by setting `Cache-Control: no-store` in your app.
 
 ## Configuration
 

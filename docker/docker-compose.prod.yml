@@ -7,6 +7,9 @@ services:
       - 80:80
       - 443:443
 
+  varnish:
+    restart: unless-stopped
+
   app:
     restart: unless-stopped
     build:

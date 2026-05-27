@@ -68,6 +68,17 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - 'traefik.enable=true'
+
+  varnish:
+    image: varnish:7.4
+    volumes:
+      - ./varnish/default.vcl:/etc/varnish/default.vcl:ro
+      - varnish-cache:/var/lib/varnish
+    command: >-
+      -s ${VARNISH_STORAGE:-file,/var/lib/varnish/cache,2G}
+    expose:
+      - '80'
+
   mailserver:
     image: ghcr.io/docker-mailserver/docker-mailserver:latest
     hostname: ${MAIL_HOSTNAME:-mail.localhost}
@@ -172,3 +183,6 @@ services:
 networks:
   default:
     name: ${NETWORK_NAME:-agicms-default}
+
+volumes:
+  varnish-cache:
