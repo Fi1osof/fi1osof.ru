@@ -1,9 +1,5 @@
 import { Page } from '../_App/interfaces'
-import {
-  PostsConnectionDocument,
-  PostsConnectionQuery,
-  PostsConnectionQueryVariables,
-} from 'src/gql/generated'
+import { PostsConnectionDocument } from 'src/gql/generated'
 import { PostsPageProps } from './interfaces'
 import { getPostsConnectionQueryVariables } from './helpers'
 import { getCurrentUser } from 'src/helpers/getCurrentUser'
@@ -18,10 +14,7 @@ export const postsPageGetInitialProps: Page<PostsPageProps>['getInitialProps'] =
 
     const currentUser = getCurrentUser(apolloClient)
 
-    await apolloClient.query<
-      PostsConnectionQuery,
-      PostsConnectionQueryVariables
-    >({
+    await apolloClient.query({
       query: PostsConnectionDocument,
       variables: getPostsConnectionQueryVariables({
         page,

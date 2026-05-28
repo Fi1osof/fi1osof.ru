@@ -1,6 +1,6 @@
 import { Page } from '../../_App/interfaces'
 import { UserPageProps } from './interfaces'
-import { UserDocument, UserQuery, UserQueryVariables } from 'src/gql/generated'
+import { UserDocument } from 'src/gql/generated'
 import { getUserQueryVariables } from './helpers'
 
 export const userPageGetInitialProps: Page<UserPageProps>['getInitialProps'] =
@@ -11,7 +11,7 @@ export const userPageGetInitialProps: Page<UserPageProps>['getInitialProps'] =
     const variables = getUserQueryVariables(userId)
 
     const user = userId
-      ? await apolloClient.query<UserQuery, UserQueryVariables>({
+      ? await apolloClient.query({
           query: UserDocument,
           variables,
         })

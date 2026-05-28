@@ -39,7 +39,7 @@ export const SendTransfer: React.FC<SendTransferProps> = ({
   const [createTransfer, { loading }] = useCreateTransferMutation()
 
   const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
+    async (e: React.SubmitEvent) => {
       e.preventDefault()
       setError(null)
       setSuccess(null)

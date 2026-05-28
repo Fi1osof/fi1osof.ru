@@ -56,17 +56,17 @@ interface VoiceChatDebugState {
 
 interface DebugVoiceChatOverlayProps {
   /** Peer connections map ref from useVoiceChat */
-  peersRef: React.MutableRefObject<Map<string, PeerState>>
+  peersRef: React.RefObject<Map<string, PeerState>>
   /** Local microphone stream ref from useVoiceChat */
-  localStreamRef: React.MutableRefObject<MediaStream | null>
+  localStreamRef: React.RefObject<MediaStream | null>
   /** Whether microphone is muted */
   isMuted: boolean
   /** Remote audio streams from useVoiceChat */
   remoteStreams: Map<string, MediaStream>
   /** WebSocket ref from useMultiplayer */
-  wsRef: React.MutableRefObject<WebSocket | null>
+  wsRef: React.RefObject<WebSocket | null>
   /** TURN credentials ref from useMultiplayer */
-  turnCredentialsRef: React.MutableRefObject<{ urls: string[] } | null>
+  turnCredentialsRef: React.RefObject<{ urls: string[] } | null>
 }
 
 const WS_STATE_NAMES: Record<number, string> = {

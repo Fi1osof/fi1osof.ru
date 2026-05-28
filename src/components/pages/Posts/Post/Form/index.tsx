@@ -100,7 +100,7 @@ export const PostEditForm: React.FC<PostEditFormProps> = ({
   })
 
   const onSubmit = useCallback(
-    (event: React.FormEvent) => {
+    (event: React.SubmitEvent) => {
       event.preventDefault()
 
       form

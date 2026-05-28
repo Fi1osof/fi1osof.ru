@@ -53,7 +53,7 @@ type PlayerProps = {
   /** Callback to send local player state to multiplayer server (called every frame, internally throttled) */
   sendPlayerState?: (state: LocalPlayerState) => void
   /** Ref to expose the AudioListener instance for external control (e.g. world mute) */
-  audioListenerRef: React.MutableRefObject<AudioListener | null>
+  audioListenerRef: React.RefObject<AudioListener | null>
   /** Pending self state from server — position to sync to */
   pendingSelfState?: SelfStateData | null
   /** Callback to clear pending self state after applying */

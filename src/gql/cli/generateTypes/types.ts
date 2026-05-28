@@ -222,8 +222,13 @@ async function generateTypesFromMap() {
         },
       },
       'typescript-operations',
-      'typescript-react-apollo',
-      // "typescript-apollo-client-helpers",
+      {
+        'typescript-react-apollo': {
+          documentMode: 'documentNode',
+          documentNodeImport:
+            '@graphql-typed-document-node/core#TypedDocumentNode',
+        },
+      },
     ],
     preset: 'near-operation-file',
     presetConfig: {

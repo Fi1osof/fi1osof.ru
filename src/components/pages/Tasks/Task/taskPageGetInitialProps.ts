@@ -1,6 +1,6 @@
 import { Page } from '../../_App/interfaces'
 import { TaskPageProps } from './interfaces'
-import { TaskDocument, TaskQuery, TaskQueryVariables } from 'src/gql/generated'
+import { TaskDocument } from 'src/gql/generated'
 import { getTaskQueryVariables } from '../helpers'
 
 export const taskPageGetInitialProps: Page<TaskPageProps>['getInitialProps'] =
@@ -11,7 +11,7 @@ export const taskPageGetInitialProps: Page<TaskPageProps>['getInitialProps'] =
     const variables = getTaskQueryVariables(taskId)
 
     const task = taskId
-      ? await apolloClient.query<TaskQuery, TaskQueryVariables>({
+      ? await apolloClient.query({
           query: TaskDocument,
           variables,
         })

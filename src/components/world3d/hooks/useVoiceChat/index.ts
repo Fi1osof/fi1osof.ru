@@ -21,13 +21,13 @@ interface UseVoiceChatOptions {
   /** Local player ID (userId) — used for deterministic offer ordering to prevent glare */
   localPlayerId: string | null
   /** WebSocket ref from useMultiplayer — used for signaling */
-  wsRef: React.MutableRefObject<WebSocket | null>
+  wsRef: React.RefObject<WebSocket | null>
   /** Callback ref to subscribe to signaling messages from useMultiplayer */
-  onSignalingMessageRef: React.MutableRefObject<
+  onSignalingMessageRef: React.RefObject<
     ((msg: SignalingMessage) => void) | null
   >
   /** TURN credentials ref from useMultiplayer */
-  turnCredentialsRef: React.MutableRefObject<TurnCredentials | null>
+  turnCredentialsRef: React.RefObject<TurnCredentials | null>
   /** List of remote player IDs currently visible (from remotePlayers Map keys) */
   remotePlayerIds: string[]
 }

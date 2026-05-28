@@ -49,7 +49,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
   const [signupMutation] = useSignupMutation({})
 
   const onSubmit = useCallback(
-    (e: React.FormEvent) => {
+    (e: React.SubmitEvent) => {
       e.preventDefault()
 
       form.trigger().then(async (isValid) => {

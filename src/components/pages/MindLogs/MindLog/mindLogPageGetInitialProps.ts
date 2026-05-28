@@ -1,10 +1,6 @@
 import { Page } from '../../_App/interfaces'
 import { MindLogPageProps } from './interfaces'
-import {
-  MindLogDocument,
-  MindLogQuery,
-  MindLogQueryVariables,
-} from 'src/gql/generated'
+import { MindLogDocument } from 'src/gql/generated'
 import { getMindLogQueryVariables } from '../helpers'
 
 export const mindLogPageGetInitialProps: Page<MindLogPageProps>['getInitialProps'] =
@@ -15,7 +11,7 @@ export const mindLogPageGetInitialProps: Page<MindLogPageProps>['getInitialProps
     const variables = getMindLogQueryVariables(mindLogId)
 
     const mindLog = mindLogId
-      ? await apolloClient.query<MindLogQuery, MindLogQueryVariables>({
+      ? await apolloClient.query({
           query: MindLogDocument,
           variables,
         })

@@ -68,7 +68,7 @@ export const FileEditForm: React.FC<FileEditFormProps> = ({
   })
 
   const onSubmit = useCallback(
-    (event: React.FormEvent) => {
+    (event: React.SubmitEvent) => {
       event.preventDefault()
 
       form

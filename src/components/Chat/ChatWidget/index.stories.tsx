@@ -28,7 +28,7 @@ export default meta
 const PreventDefault: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const handleSubmit = useCallback((e: React.FormEvent) => {
+  const handleSubmit = useCallback((e: React.SubmitEvent) => {
     e.preventDefault()
   }, [])
   return <ChatForm onSubmit={handleSubmit}>{children}</ChatForm>

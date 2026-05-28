@@ -1,10 +1,6 @@
 import { Page } from '../../_App/interfaces'
 import { WorkLogPageProps } from './interfaces'
-import {
-  TaskWorkLogDocument,
-  TaskWorkLogQuery,
-  TaskWorkLogQueryVariables,
-} from 'src/gql/generated'
+import { TaskWorkLogDocument } from 'src/gql/generated'
 import { getWorkLogQueryVariables } from '../helpers'
 
 export const workLogPageGetInitialProps: Page<WorkLogPageProps>['getInitialProps'] =
@@ -15,7 +11,7 @@ export const workLogPageGetInitialProps: Page<WorkLogPageProps>['getInitialProps
     const variables = getWorkLogQueryVariables(workLogId)
 
     const workLog = workLogId
-      ? await apolloClient.query<TaskWorkLogQuery, TaskWorkLogQueryVariables>({
+      ? await apolloClient.query({
           query: TaskWorkLogDocument,
           variables,
         })

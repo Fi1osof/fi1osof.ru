@@ -44,7 +44,7 @@ export const SignInForm: React.FC<SignInFormProps> = ({
   const [signinMutation] = useSigninMutation({})
 
   const onSubmit = useCallback(
-    (e: React.FormEvent) => {
+    (e: React.SubmitEvent) => {
       e.preventDefault()
 
       form.trigger().then(async (isValid) => {

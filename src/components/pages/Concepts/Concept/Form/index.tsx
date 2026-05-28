@@ -78,7 +78,7 @@ export const ConceptEditForm: React.FC<ConceptEditFormProps> = ({
   })
 
   const onSubmit = useCallback(
-    (event: React.FormEvent) => {
+    (event: React.SubmitEvent) => {
       event.preventDefault()
 
       form

@@ -1,10 +1,6 @@
 import { Page } from '../_App/interfaces'
 import { MindLogsPageProps } from './interfaces'
-import {
-  MindLogsWithCountDocument,
-  MindLogsWithCountQuery,
-  MindLogsWithCountQueryVariables,
-} from 'src/gql/generated'
+import { MindLogsWithCountDocument } from 'src/gql/generated'
 import { getMindLogsWithCountQueryVariables } from './helpers'
 
 const PAGE_SIZE = 20
@@ -19,10 +15,7 @@ export const mindLogsPageGetInitialProps: Page<MindLogsPageProps>['getInitialPro
 
     const variables = getMindLogsWithCountQueryVariables(page, PAGE_SIZE)
 
-    await apolloClient.query<
-      MindLogsWithCountQuery,
-      MindLogsWithCountQueryVariables
-    >({
+    await apolloClient.query({
       query: MindLogsWithCountDocument,
       variables,
     })

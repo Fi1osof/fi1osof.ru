@@ -68,7 +68,7 @@ export const ChatInputForm: React.FC = () => {
   )
 
   const handleFormSubmit = useCallback(
-    (e: React.FormEvent) => {
+    (e: React.SubmitEvent) => {
       e.preventDefault()
       const message = inputValue.trim()
       if (message && !isLoading) {

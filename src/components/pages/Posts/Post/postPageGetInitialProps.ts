@@ -1,6 +1,6 @@
 import { Page } from '../../_App/interfaces'
 import { PostPageProps } from './interfaces'
-import { PostDocument, PostQuery, PostQueryVariables } from 'src/gql/generated'
+import { PostDocument } from 'src/gql/generated'
 
 export const postPageGetInitialProps: Page<PostPageProps>['getInitialProps'] =
   async ({ query, apolloClient }) => {
@@ -8,7 +8,7 @@ export const postPageGetInitialProps: Page<PostPageProps>['getInitialProps'] =
       typeof query.id === 'string' && query.id ? query.id : undefined
 
     const post = postId
-      ? await apolloClient.query<PostQuery, PostQueryVariables>({
+      ? await apolloClient.query({
           query: PostDocument,
           variables: {
             where: {

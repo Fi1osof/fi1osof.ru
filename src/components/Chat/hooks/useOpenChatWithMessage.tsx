@@ -8,7 +8,7 @@ export function useOpenChatWithMessage() {
     (
       event:
         | React.MouseEvent<HTMLButtonElement>
-        | React.FormEvent<HTMLFormElement>,
+        | React.SubmitEvent<HTMLFormElement>,
     ) => {
       event.preventDefault()
       event.stopPropagation()

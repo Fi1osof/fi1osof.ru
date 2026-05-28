@@ -1,10 +1,6 @@
 import { Page } from '../_App/interfaces'
 import { WorkLogsPageProps } from './interfaces'
-import {
-  TaskWorkLogsWithCountDocument,
-  TaskWorkLogsWithCountQuery,
-  TaskWorkLogsWithCountQueryVariables,
-} from 'src/gql/generated'
+import { TaskWorkLogsWithCountDocument } from 'src/gql/generated'
 import { getWorkLogsWithCountQueryVariables } from './helpers'
 
 const PAGE_SIZE = 20
@@ -19,10 +15,7 @@ export const workLogsPageGetInitialProps: Page<WorkLogsPageProps>['getInitialPro
 
     const variables = getWorkLogsWithCountQueryVariables(page, PAGE_SIZE)
 
-    await apolloClient.query<
-      TaskWorkLogsWithCountQuery,
-      TaskWorkLogsWithCountQueryVariables
-    >({
+    await apolloClient.query({
       query: TaskWorkLogsWithCountDocument,
       variables,
     })

@@ -58,7 +58,7 @@ export const UserEditForm: React.FC<UserEditFormProps> = ({
   const inRequest = updateUserInRequest
 
   const onSubmit = useCallback(
-    (event: React.FormEvent) => {
+    (event: React.SubmitEvent) => {
       event.preventDefault()
 
       form
