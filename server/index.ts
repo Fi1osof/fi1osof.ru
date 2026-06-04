@@ -57,6 +57,9 @@ async function startServer() {
 
   const server = express()
 
+  // Trust proxy headers (X-Forwarded-Proto, X-Forwarded-For) from Traefik
+  server.set('trust proxy', true)
+
   // Proxy to n8n (webhook, webhook-test, mcp)
   const n8nUrl = process.env.N8N_URL || 'http://localhost:5678'
   const n8nProxy = createProxyMiddleware({

@@ -1,86 +1,66 @@
+tls:
+  certificates:
+    - certFile: /etc/traefik/certs/localhost.crt
+      keyFile: /etc/traefik/certs/localhost.key
+
 http:
   routers:
-    # static:
+    # static-https:
     #   rule: 'PathRegexp(`^.*\.(js|css|woff2?|ttf|eot|svg|ico|png|jpg|jpeg|gif|webp|avif)$`)'
     #   entryPoints:
-    #     - web
+    #     - websecure
     #   service: varnish
     #   priority: 100
+    #   tls: {}
 
-    n8n-webhook:
+    n8n-webhook-https:
       rule: 'PathPrefix(`/webhook`)'
       entryPoints:
-        - web
+        - websecure
       service: n8n
       priority: 100
+      tls: {}
 
-    n8n-webhook-test:
+    n8n-webhook-test-https:
       rule: 'PathPrefix(`/webhook-test`)'
       entryPoints:
-        - web
+        - websecure
       service: n8n
       priority: 100
+      tls: {}
 
-    n8n-mcp:
+    n8n-mcp-https:
       rule: 'PathPrefix(`/mcp`)'
       entryPoints:
-        - web
+        - websecure
       service: n8n
       priority: 100
+      tls: {}
 
-    n8n:
+    n8n-https:
       rule: 'Host(`n8n.localhost`)'
       entryPoints:
-        - web
+        - websecure
       service: n8n
       priority: 100
+      tls: {}
 
-    app:
+    app-https:
       rule: 'PathPrefix(`/`)'
       entryPoints:
-        - web
+        - websecure
       middlewares:
         - compress
       service: app
       priority: 1
+      tls: {}
 
-    world3d:
+    world3d-https:
       rule: 'PathPrefix(`/world3d-service`)'
       entryPoints:
-        - web
+        - websecure
       middlewares:
         - world3d-strip-prefix
       service: world3d
       priority: 100
-
-  middlewares:
-    compress:
-      compress:
-        excludedContentTypes:
-          - text/event-stream
-
-    world3d-strip-prefix:
-      stripPrefix:
-        prefixes:
-          - '/world3d-service'
-
-  services:
-    app:
-      loadBalancer:
-        servers:
-          - url: 'http://app:3000'
-
-    n8n:
-      loadBalancer:
-        servers:
-          - url: 'http://app:5678'
-
-    world3d:
-      loadBalancer:
-        servers:
-          - url: 'http://world3d:4100'
-
-    varnish:
-      loadBalancer:
-        servers:
-          - url: 'http://varnish:80'
+      tls: {}
