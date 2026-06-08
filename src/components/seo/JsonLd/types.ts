@@ -88,6 +88,37 @@ export interface BreadcrumbListSchema {
   }[]
 }
 
+export interface LocalBusinessSchema {
+  '@type': 'LocalBusiness'
+  name: string
+  url?: string
+  logo?: string
+  image?: string
+  description?: string
+  telephone?: string | string[]
+  email?: string | string[]
+  address?: {
+    '@type': 'PostalAddress'
+    streetAddress?: string
+    addressLocality?: string
+    addressRegion?: string
+    postalCode?: string
+    addressCountry?: string
+  }
+  geo?: {
+    '@type': 'GeoCoordinates'
+    latitude: number
+    longitude: number
+  }
+  openingHoursSpecification?: {
+    '@type': 'OpeningHoursSpecification'
+    dayOfWeek: string[]
+    opens: string
+    closes: string
+  }[]
+  priceRange?: string
+}
+
 export type SchemaType =
   | (WithContext<'ImageObject'> & ImageObjectSchema)
   | (WithContext<'Article'> & ArticleSchema)
@@ -98,3 +129,4 @@ export type SchemaType =
   | (WithContext<'BreadcrumbList'> & BreadcrumbListSchema)
   | (WithContext<'Person'> & PersonSchema)
   | (WithContext<'Organization'> & OrganizationSchema)
+  | (WithContext<'LocalBusiness'> & LocalBusinessSchema)

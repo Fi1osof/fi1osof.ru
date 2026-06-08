@@ -9,6 +9,7 @@ import {
   OrganizationSchema,
   BreadcrumbListSchema,
   WithContext,
+  LocalBusinessSchema,
 } from './types'
 
 export const createImageObject = (
@@ -86,4 +87,12 @@ export const createBreadcrumbList = (
     name: item.name,
     item: item.url,
   })),
+})
+
+export const createLocalBusiness = (
+  data: Omit<LocalBusinessSchema, '@type'>,
+): WithContext<'LocalBusiness'> & LocalBusinessSchema => ({
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  ...data,
 })
