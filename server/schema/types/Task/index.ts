@@ -23,13 +23,15 @@ export const TaskStatusEnum = builder.enumType('TaskStatusEnum', {
 // Task object type
 builder.prismaObject('Task', {
   fields: (t) => ({
-    id: t.exposeID('id'),
-    createdAt: t.expose('createdAt', { type: 'DateTime' }),
-    updatedAt: t.expose('updatedAt', { type: 'DateTime' }),
-    title: t.exposeString('title'),
+    id: t.exposeID('id', {
+      nullable: false,
+    }),
+    createdAt: t.expose('createdAt', { type: 'DateTime', nullable: false }),
+    updatedAt: t.expose('updatedAt', { type: 'DateTime', nullable: false }),
+    title: t.exposeString('title', { nullable: false }),
     description: t.exposeString('description', { nullable: true }),
     content: t.exposeString('content', { nullable: true }),
-    status: t.expose('status', { type: TaskStatusEnum }),
+    status: t.expose('status', { type: TaskStatusEnum, nullable: false }),
     startDatePlaning: t.expose('startDatePlaning', {
       type: 'DateTime',
       nullable: true,

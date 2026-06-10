@@ -10,12 +10,7 @@ import {
   TaskStatusFilterClearButton,
 } from './styles'
 
-const ALL_STATUSES: TaskStatusEnum[] = [
-  TaskStatusEnum.NEW,
-  TaskStatusEnum.PROGRESS,
-  TaskStatusEnum.DONE,
-  TaskStatusEnum.REJECTED,
-]
+const ALL_STATUSES: TaskStatusEnum[] = Object.values(TaskStatusEnum)
 
 const buildFilterUrl = (
   router: ReturnType<typeof useRouter>,

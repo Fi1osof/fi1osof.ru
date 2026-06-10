@@ -5,6 +5,9 @@ export const PopoverWrapper = styled.div`
   display: inline-block;
 `
 
+/**
+ * @deprecated
+ */
 export const PopoverTrigger = styled.button`
   display: inline-flex;
   align-items: center;

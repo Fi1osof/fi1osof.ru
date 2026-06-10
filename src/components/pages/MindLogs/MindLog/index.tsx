@@ -17,28 +17,14 @@ export const MindLogPage: Page<MindLogPageProps> = ({ mindLogId }) => {
 
   const mindLog = response.data?.response
 
-  if (response.loading) {
-    return (
-      <MindLogPageStyled>
-        <p>Loading...</p>
-      </MindLogPageStyled>
-    )
-  }
-
-  if (!mindLog) {
-    return (
-      <MindLogPageStyled>
-        <p>Mind log not found</p>
-      </MindLogPageStyled>
-    )
-  }
-
   return (
     <>
-      <SeoHeaders title={`Mind Log: ${mindLog.type}`} />
-      <MindLogPageStyled>
-        <MindLogCard mindLog={mindLog} />
-      </MindLogPageStyled>
+      <SeoHeaders title={`Mind Log: ${mindLog?.type}`} noindex nofollow />
+      {mindLog && (
+        <MindLogPageStyled>
+          <MindLogCard mindLog={mindLog} />
+        </MindLogPageStyled>
+      )}
     </>
   )
 }

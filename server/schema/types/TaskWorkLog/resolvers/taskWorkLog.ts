@@ -9,10 +9,16 @@ builder.queryField('taskWorkLog', (t) =>
       where: t.arg({ type: TaskWorkLogWhereUniqueInput, required: true }),
     },
     resolve: async (query, _root, args, ctx) => {
+      const workLogId = args.where.id
+
+      if (!workLogId) {
+        throw new Error('WorkLog ID is required')
+      }
+
       return ctx.prisma.taskWorkLog.findUnique({
         ...query,
         where: {
-          id: args.where.id,
+          id: workLogId,
         },
       })
     },

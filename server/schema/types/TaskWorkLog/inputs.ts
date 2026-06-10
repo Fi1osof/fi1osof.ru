@@ -14,7 +14,7 @@ export const TaskWorkLogWhereUniqueInput = builder.inputType(
   'TaskWorkLogWhereUniqueInput',
   {
     fields: (t) => ({
-      id: t.string({ required: true }),
+      id: t.string({ required: false }),
     }),
   },
 )
@@ -34,6 +34,15 @@ export const TaskWorkLogCreateInput = builder.inputType(
     fields: (t) => ({
       taskId: t.string({ required: true }),
       content: t.string({ required: true }),
+    }),
+  },
+)
+
+export const TaskWorkLogUpdateInput = builder.inputType(
+  'TaskWorkLogUpdateInput',
+  {
+    fields: (t) => ({
+      content: t.string(),
     }),
   },
 )

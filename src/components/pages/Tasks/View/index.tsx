@@ -14,7 +14,6 @@ type TasksViewProps = {
 
 export const TasksView: React.FC<TasksViewProps> = ({
   tasks,
-  loading,
   currentPage,
   totalPages,
 }) => {
@@ -24,21 +23,13 @@ export const TasksView: React.FC<TasksViewProps> = ({
 
       <TaskStatusFilter />
 
-      {loading && tasks.length === 0 ? (
-        <p>Loading...</p>
-      ) : tasks.length > 0 ? (
-        <>
-          <TasksViewGridStyled>
-            {tasks.map((task) => (
-              <TaskCard key={task.id} task={task} />
-            ))}
-          </TasksViewGridStyled>
+      <TasksViewGridStyled>
+        {tasks.map((task) => (
+          <TaskCard key={task.id} task={task} />
+        ))}
+      </TasksViewGridStyled>
 
-          <Pagination currentPage={currentPage} totalPages={totalPages} />
-        </>
-      ) : (
-        <p>No tasks found</p>
-      )}
+      <Pagination currentPage={currentPage} totalPages={totalPages} />
     </TasksViewStyled>
   )
 }

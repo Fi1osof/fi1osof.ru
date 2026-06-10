@@ -1,11 +1,12 @@
 import { builder } from '../../../builder'
-import { TaskWorkLogWhereUniqueInput } from '../inputs'
+import { TaskWorkLogUpdateInput, TaskWorkLogWhereUniqueInput } from '../inputs'
 
-builder.mutationField('deleteTaskWorkLog', (t) =>
+builder.mutationField('updateTaskWorkLog', (t) =>
   t.prismaField({
     type: 'TaskWorkLog',
     args: {
       where: t.arg({ type: TaskWorkLogWhereUniqueInput, required: true }),
+      data: t.arg({ type: TaskWorkLogUpdateInput, required: true }),
     },
     resolve: async (query, _root, args, ctx) => {
       if (!ctx.currentUser) {
@@ -18,20 +19,25 @@ builder.mutationField('deleteTaskWorkLog', (t) =>
         throw new Error('WorkLog ID is required')
       }
 
-      const existing = await ctx.prisma.taskWorkLog.findFirst({
+      const workLog = await ctx.prisma.taskWorkLog.findFirst({
         where: {
           id: workLogId,
           createdById: ctx.currentUser.id,
         },
       })
 
-      if (!existing) {
-        throw new Error('TaskWorkLog not found')
+      if (!workLog) {
+        throw new Error('WorkLog not found')
       }
 
-      return ctx.prisma.taskWorkLog.delete({
+      return ctx.prisma.taskWorkLog.update({
         ...query,
-        where: { id: workLogId },
+        where: {
+          id: workLogId,
+        },
+        data: {
+          content: args.data.content ?? undefined,
+        },
       })
     },
   }),

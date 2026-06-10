@@ -1,20 +1,20 @@
-import {
-  SortOrder,
-  TaskFragment,
-  useTaskWorkLogsQuery,
-} from 'src/gql/generated'
+import { TaskFragment } from 'src/gql/generated'
 import { FormattedDate } from 'src/ui-kit/format/FormattedDate'
 import {
   TaskCardStyled,
   TaskCardTitle,
-  TaskCardStatus,
   TaskCardMeta,
   TaskCardDescription,
+  TaskCardToolbar,
 } from './styles'
-import { TaskStatusBadge } from '../TaskStatusBadge'
 import Link from 'next/link'
-import { Markdown } from '../Markdown'
-import { WorkLogCard } from '../WorkLogCard'
+import { useAppContext } from '../AppContext'
+import { useBoolean } from 'src/hooks/useBoolean'
+import { Button } from 'src/ui-kit/Button'
+import { TaskEditForm } from '../pages/Tasks/Task/Form'
+import { TaskCardFullView } from './Full'
+import React from 'react'
+import { TaskCardStatus } from './TaskStatus'
 
 type TaskCardProps = {
   task: TaskFragment
@@ -25,31 +25,55 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   task,
   variant = 'list',
 }) => {
-  const workLogsResponse = useTaskWorkLogsQuery({
-    variables: {
-      where: {
-        taskId: task.id,
-      },
-      orderBy: {
-        createdAt: SortOrder.ASC,
-      },
-    },
-    skip: !task.id || variant !== 'full',
-  })
+  const { user: currentUser } = useAppContext()
+  const [inEditMode, startEditing, stopEditing] = useBoolean()
+
+  const canEdit =
+    currentUser && task.createdById === currentUser.id && variant === 'full'
+      ? true
+      : false
+
+  // const {} = useMemo(() => {
+  //   if (!canEdit) {
+  //     return
+  //   }
+
+  //   const onClickStatusButton: React.MouseEventHandler<HTMLButtonElement> = (event) => {
+  //     event.preventDefault()
+  //     event.stopPropagation()
+
+  //   }
+
+  //   return {
+
+  //   }
+  // }, [])
+
+  if (inEditMode) {
+    return (
+      <TaskEditForm
+        task={task}
+        cancelHandler={stopEditing}
+        parentId={undefined}
+      />
+    )
+  }
 
   return (
     <TaskCardStyled>
-      <TaskCardTitle>
-        {variant === 'list' ? (
-          <Link href={`/tasks/${task.id}`}>{task.title}</Link>
-        ) : (
-          task.title
-        )}
-      </TaskCardTitle>
+      <TaskCardToolbar>
+        <TaskCardTitle>
+          {variant === 'list' ? (
+            <Link href={`/tasks/${task.id}`}>{task.title}</Link>
+          ) : (
+            task.title
+          )}
+        </TaskCardTitle>
 
-      <TaskCardStatus>
-        {task.status && <TaskStatusBadge status={task.status} />}
-      </TaskCardStatus>
+        {canEdit && <Button onClick={startEditing}>Edit</Button>}
+      </TaskCardToolbar>
+
+      <TaskCardStatus canEdit={canEdit} status={task.status} taskId={task.id} />
 
       <TaskCardMeta>
         {task.createdAt && (
@@ -64,13 +88,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
       )}
 
       {variant === 'full' && (
-        <>
-          {task.content && <Markdown>{task.content}</Markdown>}
-
-          {workLogsResponse.data?.response?.map((n) => (
-            <WorkLogCard key={n.id} workLog={n} variant="list" />
-          ))}
-        </>
+        <TaskCardFullView task={task} currentUser={currentUser} />
       )}
     </TaskCardStyled>
   )

@@ -13,7 +13,6 @@ type MindLogsViewProps = {
 
 export const MindLogsView: React.FC<MindLogsViewProps> = ({
   mindLogs,
-  loading,
   currentPage,
   totalPages,
 }) => {
@@ -21,21 +20,13 @@ export const MindLogsView: React.FC<MindLogsViewProps> = ({
     <MindLogsViewStyled>
       <h1>Mind Logs</h1>
 
-      {loading && mindLogs.length === 0 ? (
-        <p>Loading...</p>
-      ) : mindLogs.length > 0 ? (
-        <>
-          <MindLogsViewListStyled>
-            {mindLogs.map((n) => (
-              <MindLogCard key={n.id} mindLog={n} />
-            ))}
-          </MindLogsViewListStyled>
+      <MindLogsViewListStyled>
+        {mindLogs.map((n) => (
+          <MindLogCard key={n.id} mindLog={n} />
+        ))}
+      </MindLogsViewListStyled>
 
-          <Pagination currentPage={currentPage} totalPages={totalPages} />
-        </>
-      ) : (
-        <p>No mind logs found</p>
-      )}
+      <Pagination currentPage={currentPage} totalPages={totalPages} />
     </MindLogsViewStyled>
   )
 }

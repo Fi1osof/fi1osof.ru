@@ -41,6 +41,12 @@ mutation createTaskWorkLog($data: TaskWorkLogCreateInput!) {
   }
 }
 
+mutation updateTaskWorkLog($where: TaskWorkLogWhereUniqueInput!, $data: TaskWorkLogUpdateInput!) {
+  response: updateTaskWorkLog(where: $where, data: $data) {
+    ...TaskWorkLog_
+  }
+}
+
 mutation deleteTaskWorkLog($where: TaskWorkLogWhereUniqueInput!) {
   response: deleteTaskWorkLog(where: $where) {
     ...TaskWorkLog_
