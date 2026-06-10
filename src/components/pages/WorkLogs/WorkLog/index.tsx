@@ -21,7 +21,7 @@ export const WorkLogPage: Page<WorkLogPageProps> = ({ workLogId }) => {
     <>
       <SeoHeaders title="Work Log" />
       {workLog && (
-        <WorkLogPageStyled>
+        <WorkLogPageStyled size="wide">
           <WorkLogCard workLog={workLog} variant="full" />
         </WorkLogPageStyled>
       )}

@@ -2,6 +2,7 @@ import { initializeApollo } from 'src/gql/apolloClient'
 import NextApp, { AppInitialProps } from 'next/app'
 
 import { MainApp, NextPageContextCustom, PageProps, withWs } from './interfaces'
+import { getSiteOrigin } from 'src/helpers/seo/getSiteOrigin'
 
 export const getInitialProps: MainApp['getInitialProps'] = async (
   appContext,
@@ -52,6 +53,7 @@ export const getInitialProps: MainApp['getInitialProps'] = async (
       ...pageProps,
       statusCode,
       initialApolloState: apolloClient.cache.extract(),
+      origin: getSiteOrigin(ctx.req),
     },
   }
 

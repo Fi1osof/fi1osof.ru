@@ -1,0 +1,22 @@
+query mainPageData {
+  tasks(
+    orderBy: { createdAt: desc }
+    where: { createdById: { equals: "cmkppub1z0002mu0z427kxsay" } }
+    take: 5
+  ) {
+    ...TaskNoNesting
+    WorkLogs {
+      id
+    }
+  }
+
+  taskWorkLogs(orderBy: { createdAt: desc }, take: 5) {
+    id
+    createdAt
+    Task {
+      id
+      title
+      description
+    }
+  }
+}

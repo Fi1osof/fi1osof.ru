@@ -18,8 +18,8 @@ export const TasksView: React.FC<TasksViewProps> = ({
   totalPages,
 }) => {
   return (
-    <TasksViewStyled>
-      <h1>Tasks</h1>
+    <TasksViewStyled size="wide">
+      <h1>Задачи</h1>
 
       <TaskStatusFilter />
 

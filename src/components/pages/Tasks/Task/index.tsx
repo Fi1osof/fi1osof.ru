@@ -22,7 +22,7 @@ export const TaskPage: Page<TaskPageProps> = ({ taskId }) => {
     <>
       <SeoHeaders
         title={task?.title || 'Task'}
-        noindex={searchable}
+        noindex={!searchable}
         nofollow={!searchable}
       />
       {task && <TaskPageView task={task} />}

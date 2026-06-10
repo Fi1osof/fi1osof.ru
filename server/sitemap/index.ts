@@ -8,7 +8,7 @@ export enum SitemapSection {
   index = '/sitemap.xml',
   main = '/sitemap/main.xml',
   posts = '/sitemap/posts.xml',
-  users = '/sitemap/users.xml',
+  // users = '/sitemap/users.xml',
 }
 
 type UrlItem = {
@@ -55,11 +55,13 @@ export const generateSitemapIndex = async ({
     <sitemap>
         <loc>${siteOrigin}${SitemapSection.posts}</loc>
     </sitemap>
-    <sitemap>
-        <loc>${siteOrigin}${SitemapSection.users}</loc>
-    </sitemap>
-</sitemapindex>`
+    </sitemapindex>
+`
 }
+
+// <sitemap>
+//     <loc>${siteOrigin}${SitemapSection.users}</loc>
+// </sitemap>
 
 export const generateSitemapMain = async (
   props: SitemapGeneratorProps,
@@ -157,9 +159,9 @@ export const generateSitemap = async (req: Request, res: Response) => {
     case SitemapSection.posts:
       res.send(await generateSitemapPosts({ siteOrigin }))
       break
-    case SitemapSection.users:
-      res.send(await generateSitemapUsers({ siteOrigin }))
-      break
+    // case SitemapSection.users:
+    //   res.send(await generateSitemapUsers({ siteOrigin }))
+    //   break
     default:
       res.status(404).send('Not found')
   }

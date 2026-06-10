@@ -1,7 +1,10 @@
+import { Container } from 'src/Fi1osofRu/lovable/src/ui-kit/Layout/Container'
 import styled from 'styled-components'
 
-export const TasksViewStyled = styled.div`
-  padding: ${({ theme }) => theme.spacing.lg};
+export const TasksViewStyled = styled(Container)`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 `
 
 export const TasksViewGridStyled = styled.div`

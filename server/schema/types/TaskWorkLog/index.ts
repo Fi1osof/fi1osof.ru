@@ -3,7 +3,9 @@ import { builder } from '../../builder'
 // TaskWorkLog object type
 builder.prismaObject('TaskWorkLog', {
   fields: (t) => ({
-    id: t.exposeID('id'),
+    id: t.exposeID('id', {
+      nullable: false,
+    }),
     createdAt: t.expose('createdAt', { type: 'DateTime' }),
     content: t.exposeString('content'),
     taskId: t.exposeID('taskId'),

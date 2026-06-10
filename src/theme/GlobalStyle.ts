@@ -30,7 +30,7 @@ export const GlobalStyle = createGlobalStyle`
     height: 100%;
   }
 
-  a {
+  /* a {
     text-decoration: none;
     color: ${theme.colors.foreground};
     
@@ -41,7 +41,7 @@ export const GlobalStyle = createGlobalStyle`
     &:active {
       text-decoration: none;
     }
-  }
+  } */
 
   input {
     &:disabled {

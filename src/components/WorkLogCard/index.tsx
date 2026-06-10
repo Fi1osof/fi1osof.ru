@@ -18,7 +18,7 @@ export const WorkLogCard: React.FC<WorkLogCardProps> = ({
     <WorkLogCardStyled>
       <WorkLogCardMeta>
         {variant === 'list' && workLog.id ? (
-          <Link href={`/work-logs/${workLog.id}`}>
+          <Link href={`/worklogs/${workLog.id}`}>
             <FormattedDate value={workLog.createdAt} format="dateTimeMedium" />
           </Link>
         ) : (

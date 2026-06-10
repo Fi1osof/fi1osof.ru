@@ -29,7 +29,8 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   const [inEditMode, startEditing, stopEditing] = useBoolean()
 
   const canEdit =
-    currentUser && task.createdById === currentUser.id && variant === 'full'
+    currentUser?.sudo === true ||
+    (currentUser && task.createdById === currentUser.id && variant === 'full')
       ? true
       : false
 

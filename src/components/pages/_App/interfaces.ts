@@ -35,6 +35,8 @@ export interface PageProps extends React.PropsWithChildren<
    * Server error
    */
   statusCode?: number
+
+  origin?: string | undefined
 }
 
 /**

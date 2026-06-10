@@ -24,7 +24,6 @@ builder.mutationField('updateTask', (t) =>
       const existing = await ctx.prisma.task.findFirst({
         where: {
           id: taskId,
-          assigneeId: currentUser.id,
         },
       })
 

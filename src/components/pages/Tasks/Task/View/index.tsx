@@ -12,7 +12,7 @@ export const TaskPageView: React.FC<TaskPageViewProps> = ({ task }) => {
   const { user: currentUser } = useAppContext()
 
   return (
-    <TaskPageViewStyled>
+    <TaskPageViewStyled size="wide">
       <TaskCard task={task} variant="full" />
 
       <TaskWorlLogs task={task} currentUser={currentUser} />
