@@ -1,7 +1,12 @@
 import type React from 'react'
 import { Header } from '../../Navigation/Header'
 import { Footer } from '../../Navigation/Footer'
-import { LayoutRootStyled, LayoutBodyStyled } from './styles'
+import {
+  LayoutRootStyled,
+  LayoutBodyStyled,
+  LayoutRootBrendNameStyled,
+  LayoutRootBrendNameFullStyled,
+} from './styles'
 import type { LayoutProps } from './types'
 
 export const Layout: React.FC<LayoutProps> = ({
@@ -9,7 +14,16 @@ export const Layout: React.FC<LayoutProps> = ({
   nav,
   currentPath,
   // onNavigate,
-  brandName = 'Николай Ланец · Fi1osof',
+  // brandName = '',
+  brandName = (
+    <LayoutRootBrendNameStyled>
+      <span>Fi1osof</span>
+      <LayoutRootBrendNameFullStyled>
+        {' '}
+        · Николай Ланец
+      </LayoutRootBrendNameFullStyled>
+    </LayoutRootBrendNameStyled>
+  ),
   brandTagline = 'инженер-исследователь · публичный журнал',
   className,
 }) => {

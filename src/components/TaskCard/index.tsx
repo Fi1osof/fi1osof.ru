@@ -15,6 +15,7 @@ import { TaskEditForm } from '../pages/Tasks/Task/Form'
 import { TaskCardFullView } from './Full'
 import React from 'react'
 import { TaskCardStatus } from './TaskStatus'
+import { TaskStartTimer } from './Buttons/StartTimer'
 
 type TaskCardProps = {
   task: TaskFragment
@@ -71,7 +72,12 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           )}
         </TaskCardTitle>
 
-        {canEdit && <Button onClick={startEditing}>Edit</Button>}
+        {canEdit && (
+          <>
+            <TaskStartTimer taskId={task.id} />
+            <Button onClick={startEditing}>Редактировать</Button>
+          </>
+        )}
       </TaskCardToolbar>
 
       <TaskCardStatus canEdit={canEdit} status={task.status} taskId={task.id} />

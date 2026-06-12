@@ -60,5 +60,9 @@ export const GlobalStyle = createGlobalStyle`
     }
   }
 
+  noindex {
+    display: contents
+  }
+
   ${MarkdownEditorGlobalStyled}
 `

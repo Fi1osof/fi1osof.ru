@@ -14,7 +14,7 @@ import './resolvers/updateUser'
 import './resolvers/createReferrerToken'
 
 // User object type
-builder.prismaObject('User', {
+export const User = builder.prismaObject('User', {
   fields: (t) => ({
     id: t.exposeID('id', {
       nullable: false,

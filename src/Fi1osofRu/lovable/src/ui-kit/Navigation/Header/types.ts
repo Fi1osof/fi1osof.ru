@@ -6,7 +6,7 @@ export interface HeaderNavItem {
 }
 
 export interface HeaderProps {
-  name: string
+  name: React.ReactNode
   tagline: string
   nav: HeaderNavItem[]
   // onNavigate?: (item: HeaderNavItem) => void

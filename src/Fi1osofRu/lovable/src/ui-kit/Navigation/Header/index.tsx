@@ -13,9 +13,11 @@ import {
   BurgerLineStyled,
   MobilePanelStyled,
   MobileLinkStyled,
+  HeaderTimerSlotStyled,
 } from './styles'
 import type { HeaderProps } from './types'
 import { useBoolean } from 'src/hooks/useBoolean'
+import { HeaderTimer } from './Timer'
 
 export const Header: React.FC<HeaderProps> = ({
   name,
@@ -47,6 +49,10 @@ export const Header: React.FC<HeaderProps> = ({
             <HeaderNameStyled>{name}</HeaderNameStyled>
             <HeaderTaglineStyled>{tagline}</HeaderTaglineStyled>
           </HeaderBrandStyled>
+
+          <HeaderTimerSlotStyled>
+            <HeaderTimer />
+          </HeaderTimerSlotStyled>
 
           <HeaderNavStyled>
             {nav.map((item) => (

@@ -18,7 +18,7 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
       <Fragment key={item.id}>
         {i > 0 && <BreadcrumbsSepStyled>/</BreadcrumbsSepStyled>}
         <BreadcrumbsItemStyled
-          // href={item.href}
+          href={item.href}
           as={item.href ? Link : 'span'}
           $clickable={Boolean(item.href)}
           // onClick={(e) => {

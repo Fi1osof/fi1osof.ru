@@ -21,7 +21,7 @@ export const TaskStatusEnum = builder.enumType('TaskStatusEnum', {
 })
 
 // Task object type
-builder.prismaObject('Task', {
+export const Task = builder.prismaObject('Task', {
   fields: (t) => ({
     id: t.exposeID('id', {
       nullable: false,

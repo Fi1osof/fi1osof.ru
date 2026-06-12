@@ -68,6 +68,8 @@ model User {
   referrerId String? @db.VarChar(36)
   Files      File[]
 
+  Timers Timer[]
+
   @@unique([email])
   @@unique([username])
 }
@@ -239,6 +241,8 @@ model Task {
   Children Task[]  @relation(name: "TaskChildren")
 
   WorkLogs TaskWorkLog[]
+
+  Timers Timer[]
 }
 
 model TaskWorkLog {
@@ -933,4 +937,22 @@ model PostRevision {
 
   @@index([postId])
   @@index([createdAt])
+}
+
+model Timer {
+  id        String   @id @default(cuid()) @db.VarChar(36)
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp(3)
+
+  startedAt DateTime  @default(now()) @db.Timestamp(3)
+  stoppedAt DateTime?
+
+  taskId String @db.VarChar(36)
+  Task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  createdById String @db.VarChar(36)
+  CreatedBy   User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([createdById])
 }

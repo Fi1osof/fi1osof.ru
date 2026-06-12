@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import styled from 'styled-components'
 
 export const HeaderStyled = styled.header`
@@ -18,12 +17,15 @@ export const HeaderInnerStyled = styled.div`
   padding: ${({ theme }) => theme.space(4)} 0;
 `
 
-export const HeaderBrandStyled = styled(Link)`
+export const HeaderBrandStyled = styled.a`
   display: flex;
   flex-direction: column;
   text-decoration: none;
   color: inherit;
   cursor: pointer;
+  flex: 0 0 auto;
+  min-width: 0;
+  max-width: 60%;
 `
 
 export const HeaderNameStyled = styled.div`
@@ -31,24 +33,44 @@ export const HeaderNameStyled = styled.div`
   font-size: ${({ theme }) => theme.size.lg};
   font-weight: 600;
   letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  @media (max-width: ${({ theme }) => theme.breakpoint.mobile}) {
+    font-size: ${({ theme }) => theme.size.md};
+  }
 `
 
 export const HeaderTaglineStyled = styled.div`
   font-family: ${({ theme }) => theme.font.mono};
   font-size: ${({ theme }) => theme.size.xs};
   color: ${({ theme }) => theme.color.inkSubtle};
-`
-
-export const HeaderNavStyled = styled.nav`
-  display: flex;
-  gap: ${({ theme }) => theme.space(5)};
-  flex-wrap: wrap;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   @media (max-width: ${({ theme }) => theme.breakpoint.mobile}) {
     display: none;
   }
 `
 
-export const HeaderLinkStyled = styled(Link)<{ $active?: boolean }>`
+export const HeaderTimerSlotStyled = styled.div`
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+  padding: 0 ${({ theme }) => theme.space(3)};
+`
+
+export const HeaderNavStyled = styled.nav`
+  display: flex;
+  gap: ${({ theme }) => theme.space(5)};
+  flex-wrap: nowrap;
+  @media (max-width: ${({ theme }) => theme.breakpoint.mobile}) {
+    display: none;
+  }
+`
+
+export const HeaderLinkStyled = styled.a<{ $active?: boolean }>`
   font-family: ${({ theme }) => theme.font.mono};
   font-size: ${({ theme }) => theme.size.sm};
   color: ${({ $active, theme }) =>
@@ -73,6 +95,7 @@ export const BurgerButtonStyled = styled.button<{ $open?: boolean }>`
   background: transparent;
   border: 0;
   cursor: pointer;
+  flex: none;
   @media (max-width: ${({ theme }) => theme.breakpoint.mobile}) {
     display: flex;
   }
@@ -96,7 +119,7 @@ export const MobilePanelStyled = styled.div`
   }
 `
 
-export const MobileLinkStyled = styled(Link)<{ $active?: boolean }>`
+export const MobileLinkStyled = styled.a<{ $active?: boolean }>`
   display: block;
   padding: ${({ theme }) => theme.space(3)} 0;
   font-family: ${({ theme }) => theme.font.mono};

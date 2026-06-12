@@ -33,3 +33,36 @@ export const NestedStringNullableFilter: ReturnType<typeof builder.inputType> =
   })
 
 export type StringNullableFilter = typeof StringNullableFilter.$inferInput
+
+const dateTimeFilterFields = (
+  t: Parameters<Parameters<typeof builder.inputType>[1]['fields']>[0],
+) => ({
+  equals: t.field({ type: 'DateTime' }),
+  in: t.field({ type: ['DateTime'] }),
+  notIn: t.field({ type: ['DateTime'] }),
+  lt: t.field({ type: 'DateTime' }),
+  lte: t.field({ type: 'DateTime' }),
+  gt: t.field({ type: 'DateTime' }),
+  gte: t.field({ type: 'DateTime' }),
+})
+
+export const DateTimeNullableFilter = builder.inputType(
+  'DateTimeNullableFilter',
+  {
+    fields: (t) => ({
+      ...dateTimeFilterFields(t),
+      not: t.field({ type: NestedDateTimeNullableFilter }),
+    }),
+  },
+)
+
+export const NestedDateTimeNullableFilter: ReturnType<
+  typeof builder.inputType
+> = builder.inputType('NestedDateTimeNullableFilter', {
+  fields: (t) => ({
+    ...dateTimeFilterFields(t),
+    not: t.field({ type: NestedDateTimeNullableFilter }),
+  }),
+})
+
+export type DateTimeNullableFilter = typeof DateTimeNullableFilter.$inferInput

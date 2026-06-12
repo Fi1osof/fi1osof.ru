@@ -1,4 +1,17 @@
-import styled from 'styled-components'
+import { minWidth } from 'src/theme/helpers'
+import styled, { css } from 'styled-components'
+
+export const LayoutRootBrendNameFullStyled = styled.span``
+
+export const LayoutRootBrendNameStyled = styled.div`
+  ${LayoutRootBrendNameFullStyled} {
+    display: none;
+
+    ${minWidth.sm(css`
+      display: unset;
+    `)}
+  }
+`
 
 export const LayoutRootStyled = styled.div`
   min-height: 100vh;
