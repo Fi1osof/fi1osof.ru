@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import styled from 'styled-components'
 
 export const HeaderStyled = styled.header`
@@ -17,7 +18,7 @@ export const HeaderInnerStyled = styled.div`
   padding: ${({ theme }) => theme.space(4)} 0;
 `
 
-export const HeaderBrandStyled = styled.a`
+export const HeaderBrandStyled = styled(Link)`
   display: flex;
   flex-direction: column;
   text-decoration: none;
@@ -70,7 +71,7 @@ export const HeaderNavStyled = styled.nav`
   }
 `
 
-export const HeaderLinkStyled = styled.a<{ $active?: boolean }>`
+export const HeaderLinkStyled = styled(Link)<{ $active?: boolean }>`
   font-family: ${({ theme }) => theme.font.mono};
   font-size: ${({ theme }) => theme.size.sm};
   color: ${({ $active, theme }) =>
@@ -119,7 +120,7 @@ export const MobilePanelStyled = styled.div`
   }
 `
 
-export const MobileLinkStyled = styled.a<{ $active?: boolean }>`
+export const MobileLinkStyled = styled(Link)<{ $active?: boolean }>`
   display: block;
   padding: ${({ theme }) => theme.space(3)} 0;
   font-family: ${({ theme }) => theme.font.mono};

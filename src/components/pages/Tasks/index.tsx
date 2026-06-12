@@ -26,7 +26,7 @@ export const TasksPage: Page<TasksPageProps> = ({ selectedStatus, page }) => {
 
   return (
     <>
-      <SeoHeaders title="Tasks" />
+      <SeoHeaders title="Задачи" />
       <TasksView
         tasks={tasks}
         loading={response.loading}

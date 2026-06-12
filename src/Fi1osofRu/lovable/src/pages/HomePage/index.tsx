@@ -234,6 +234,7 @@ export const LovableHomePage: React.FC<HomePageProps> = ({
       {blocks.map((n, index) => {
         return (
           <Section
+            key={n.key}
             eyebrow={(index + 1).toString().padStart(2, '0')}
             title={n.title}
             aside={n.aside}

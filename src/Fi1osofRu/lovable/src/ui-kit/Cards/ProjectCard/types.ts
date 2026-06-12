@@ -1,11 +1,11 @@
 import type { ActivityKind } from '../../Status/ActivityIndicator/types'
 export interface ProjectCardProps {
   title: string
-  description?: string
-  status?: ActivityKind
+  description?: string | null
+  status?: ActivityKind | null
   startedAt: string
   focus?: string[]
-  image?: string
+  image?: string | null
   href: string
   // onOpen?: (href: string) => void
 }

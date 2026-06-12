@@ -11,6 +11,11 @@ const nav: LayoutNavItem[] = [
     label: 'Сейчас',
   },
   {
+    href: '/projects',
+    id: 'projects',
+    label: 'Проекты',
+  },
+  {
     href: '/tasks',
     id: 'tasks',
     label: 'Задачи',

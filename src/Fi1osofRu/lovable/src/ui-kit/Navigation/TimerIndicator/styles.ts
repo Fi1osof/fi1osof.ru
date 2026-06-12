@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import styled, { keyframes, css } from 'styled-components'
 
 const pulse = keyframes`
@@ -53,7 +54,7 @@ export const TimeStyled = styled.span<{ $active?: boolean }>`
   font-weight: 600;
 `
 
-export const TitleLinkStyled = styled.a<{ $active?: boolean }>`
+export const TitleLinkStyled = styled(Link)<{ $active?: boolean }>`
   min-width: 0;
   flex: 1 1 auto;
   font-family: ${({ theme }) => theme.font.sans};

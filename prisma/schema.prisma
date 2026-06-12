@@ -70,6 +70,8 @@ model User {
 
   Timers Timer[]
 
+  Project Project[]
+
   @@unique([email])
   @@unique([username])
 }
@@ -243,6 +245,9 @@ model Task {
   WorkLogs TaskWorkLog[]
 
   Timers Timer[]
+
+  projectId String?  @db.VarChar(36)
+  Project   Project? @relation(fields: [projectId], references: [id])
 }
 
 model TaskWorkLog {
@@ -954,5 +959,44 @@ model Timer {
   CreatedBy   User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
 
   @@index([taskId])
+  @@index([createdById])
+}
+
+enum ProjectStatus {
+  // Если будет создан со стороны
+  New
+  Idea
+  Accepted
+  Rejected
+  Active
+  Completed
+  Reopened
+}
+
+// TODO Подумать над типами проектов
+// enum ProjectType {
+//   Education
+// }
+
+model Project {
+  id          String   @id @default(cuid()) @db.VarChar(36)
+  createdAt   DateTime @default(now()) @db.Timestamp(3)
+  updatedAt   DateTime @default(now()) @updatedAt @db.Timestamp(3)
+  name        String   @db.Text
+  description String?  @db.Text
+  intro       String?  @db.Text
+  content     String?  @db.Text
+  image       String?  @db.VarChar(1024)
+
+  // Признак того, что проект заказной, а не личный
+  commercial Boolean
+
+  status ProjectStatus? @default(value: New)
+
+  createdById String @db.VarChar(36)
+  CreatedBy   User   @relation(fields: [createdById], references: [id])
+
+  Tasks Task[]
+
   @@index([createdById])
 }

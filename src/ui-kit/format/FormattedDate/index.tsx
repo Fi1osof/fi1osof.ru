@@ -58,7 +58,7 @@ function getFormatDefaults(
   }
 }
 
-function formatDateIntl({
+export function formatDateIntl({
   value,
   locale,
   format,
@@ -82,7 +82,7 @@ function formatDateIntl({
 
 export const FormattedDate: React.FC<FormattedDateProps> = ({
   value,
-  locale = 'en-US',
+  locale = 'ru-RU',
   format = 'datePadded',
   fallback = null,
   ...other

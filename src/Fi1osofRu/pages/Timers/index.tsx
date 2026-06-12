@@ -10,7 +10,7 @@ export const TimersPage: Page = () => {
 
   return (
     <>
-      <SeoHeaders title="Таймеры" />
+      <SeoHeaders title="Журнал" />
 
       <TimersPageView active={null} entries={timers} />
     </>

@@ -1,0 +1,52 @@
+query projects(
+  $orderBy: ProjectOrderByInput
+  $skip: Int
+  $take: Int
+  $where: ProjectWhereInput
+) {
+  projects(orderBy: $orderBy, skip: $skip, take: $take, where: $where) {
+    ...Project_
+  }
+}
+
+query project($where: ProjectWhereUniqueInput!) {
+  project(where: $where) {
+    ...Project_
+  }
+}
+
+mutation createProject($data: ProjectCreateInput!) {
+  response: createProject(data: $data) {
+    ...Project_
+  }
+}
+
+mutation updateProject(
+  $data: ProjectUpdateDataInput!
+  $where: ProjectWhereUniqueInput!
+) {
+  response: updateProject(data: $data, where: $where) {
+    ...Project_
+  }
+}
+
+fragment ProjectNoNesting on Project {
+  id
+  createdAt
+  updatedAt
+  name
+  description
+  intro
+  image
+  content
+  status
+  commercial
+  createdById
+}
+
+fragment Project_ on Project {
+  ...ProjectNoNesting
+  CreatedBy {
+    ...UserNoNesting
+  }
+}

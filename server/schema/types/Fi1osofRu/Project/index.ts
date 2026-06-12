@@ -1,0 +1,7 @@
+import './enums'
+import './inputs'
+import './resolvers/create'
+import './resolvers/update'
+import './resolvers/count'
+import './resolvers/list'
+import './resolvers/object'

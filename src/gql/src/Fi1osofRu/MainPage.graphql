@@ -1,4 +1,8 @@
 query mainPageData {
+  projects(take: 4) {
+    ...Project_
+  }
+
   tasks(
     orderBy: { createdAt: desc }
     where: { createdById: { equals: "cmkppub1z0002mu0z427kxsay" } }

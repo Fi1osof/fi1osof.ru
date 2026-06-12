@@ -13,6 +13,8 @@ import {
   TaskStatusEnum,
   useMainPageDataQuery,
 } from 'src/gql/generated'
+import { getResizedImagePath } from 'src/helpers/getResizedImagePath'
+import { formatDateIntl } from 'src/ui-kit/format/FormattedDate'
 
 const title =
   'Николай Ланец · Fi1osof. Инженер-исследователь · публичный журнал'
@@ -22,49 +24,27 @@ export const Fi1osofRuMainPage: Page = ({ origin }) => {
   const response = useMainPageDataQuery()
 
   const { projects, tasks, workLogs } = useMemo(() => {
-    const projects: Project[] = [
-      {
-        id: 'fi1osof.ru',
-        title: 'fi1osof.ru',
-        description: '',
-        intro: 'Мой личный проект. Сейчас активно работаю над его обновлением',
-        slug: '/',
-        startedAt: '11.06.2026',
-        status: 'active',
-      },
-      {
-        id: 'happybaby2000.ru',
-        title: 'happybaby2000.ru',
-        description:
-          'Интернет-магазин детских комплексов и комплектующих к ним',
-        intro:
-          'Коммерческий проект. Сайту более 17 лет. Изначально был разработан на MODX Revolution, на нем и продолжает работать на сервер. Но фронт теперь полностью переделан с нуля на моем собственном движке',
-        slug: 'https://happybaby2000.ru',
-        startedAt: '08.06.2026',
-        status: 'active',
-      },
-      {
-        id: 'analyra.ru',
-        title: 'analyra.ru',
-        description: '',
-        intro:
-          'Мой личный проект. Цель - полностью автоматизировать проверку сайта не только на SEO и технические ошибки, но и ручное тестирование силами ИИ-агента, то есть агент будет заходить на сайт, пытаться понять зачем он, пройти пользовательские сценарии и дать всему этому свою оценку. Пока что ИИ-часть еще не доделана, но поверхностный анализ сайта можете выполнить - просто укажите там УРЛ своего сайта. Пока что доступно бесплатно.',
-        slug: 'https://analyra.ru',
-        startedAt: '22.05.2026',
-        status: 'active',
-      },
-      {
-        id: 'ne-chatgpt.ru',
-        title: 'ne-chatgpt.ru',
-        description: '',
-        intro: `Это не ЧатГПТ, это ДРУГОЕ :-) <br />
-Мой личный проект. Оформление пока не сделал, но если у вас нет под ругой другого ИИ-чата, вполне можете пообщаться там. При чем это не просто чат, а ИИ-агент со своей памятью. Функции новые полезные я ему скоро добавлю.
-        `,
-        slug: 'https://ne-chatgpt.ru',
-        startedAt: '22.05.2026',
-        status: 'active',
-      },
-    ]
+    const projects: Project[] =
+      response.data?.projects?.map<Project>((n) => {
+        const { id, image, name, createdAt } = n
+
+        return {
+          id,
+          status: 'active',
+          title: name,
+          slug: `/projects/${id}`,
+          startedAt: formatDateIntl({
+            value: createdAt,
+            format: 'dateShort',
+          }),
+          image: image
+            ? getResizedImagePath({
+                path: image,
+                size: 'middle',
+              })
+            : undefined,
+        }
+      }) ?? []
 
     const tasks: Task[] =
       response.data?.tasks?.map<Task>((n) => {

@@ -8,8 +8,8 @@ import type { ProjectsListPageProps } from './types'
 
 export const ProjectsListPage: React.FC<ProjectsListPageProps> = ({
   projects,
-  hrefForProject,
-  onOpen,
+  // hrefForProject,
+  // onOpen,
 }) => {
   const active = projects.filter((p) => p.status !== 'paused')
   const archive = projects.filter((p) => p.status === 'paused')
@@ -42,9 +42,9 @@ export const ProjectsListPage: React.FC<ProjectsListPageProps> = ({
             startedAt: p.startedAt,
             focus: p.focus,
             image: p.image,
-            href: hrefForProject(p.slug),
+            href: p.slug,
           }))}
-          onOpen={onOpen}
+          // onOpen={onOpen}
         />
       </Section>
 
@@ -59,9 +59,9 @@ export const ProjectsListPage: React.FC<ProjectsListPageProps> = ({
               startedAt: p.startedAt,
               focus: p.focus,
               image: p.image,
-              href: hrefForProject(p.slug),
+              href: p.slug,
             }))}
-            onOpen={onOpen}
+            // onOpen={onOpen}
           />
         </Section>
       )}

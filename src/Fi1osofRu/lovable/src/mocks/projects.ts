@@ -4,10 +4,10 @@ export interface Project {
   id: string
   slug: string
   title: string
-  description?: string
-  intro?: string
-  image?: string
-  content?: string
+  description?: string | null
+  intro?: string | null
+  image?: string | null
+  content?: string | null
   status: ActivityKind
   startedAt: string
   focus?: string[]
