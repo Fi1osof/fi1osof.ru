@@ -29,6 +29,11 @@ export const TitleStyled = styled.h1`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
+
+  > :first-child {
+    flex: 1;
+  }
 
   @media (max-width: ${({ theme }) => theme.breakpoint.mobile}) {
     font-size: ${({ theme }) => theme.size.h2};

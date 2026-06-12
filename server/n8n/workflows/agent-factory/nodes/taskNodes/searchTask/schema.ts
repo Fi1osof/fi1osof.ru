@@ -6,13 +6,13 @@ const taskStatusValues = Object.values(TaskStatusEnum)
 
 type SchemaWhereInput = Omit<
   NonNullable<MyTasksQueryVariables['where']>,
-  'assigneeId' | 'createdById' | 'id' | 'parentId'
+  'assigneeId' | 'createdById' | 'id' | 'parentId' | 'projectId'
 >
 
 const where: yup.ObjectSchema<SchemaWhereInput> = yup.object().shape({
   status: yup
-    .string()
-    .oneOf(taskStatusValues)
+    .array()
+    .of(yup.string().oneOf(taskStatusValues).required())
     .label(`Task status (${taskStatusValues.join(', ')})`),
   incompletedOnly: yup
     .boolean()

@@ -15,6 +15,7 @@ import {
 import {
   // Post,
   ProjectFragment,
+  TaskFragment,
   // TaskFragment,
   // TaskStatusEnum,
 } from 'src/gql/generated'
@@ -29,10 +30,16 @@ import { Button } from 'src/ui-kit/Button'
 import { ProjectEditForm } from './Form'
 import { ActivityIndicator } from 'src/Fi1osofRu/lovable/src/ui-kit/Status/ActivityIndicator'
 import { formatDateIntl } from 'src/ui-kit/format/FormattedDate'
+import Link from 'next/link'
+import { ComponentVariant } from 'src/ui-kit/interfaces'
+import { TaskList } from 'src/Fi1osofRu/lovable/src/ui-kit/Lists/TaskList'
+import { useMemo } from 'react'
+import { TaskListItem } from 'src/Fi1osofRu/lovable/src/ui-kit/Lists/TaskList/types'
+import { ActivityKindMap } from 'src/Fi1osofRu/lovable/src/mocks/tasks'
 
 interface ProjectPageViewProps {
   project: ProjectFragment
-  // tasks: Task[]
+  tasks: TaskFragment[]
   // topics: Topic[]
   // allProjects: Project[]
   // hrefForProject: (slug: string) => string
@@ -44,7 +51,7 @@ interface ProjectPageViewProps {
 
 export const ProjectPageView: React.FC<ProjectPageViewProps> = ({
   project,
-  // tasks,
+  tasks,
   // topics,
   // allProjects,
   // hrefForProject,
@@ -60,6 +67,20 @@ export const ProjectPageView: React.FC<ProjectPageViewProps> = ({
   const [inEditMode, inEditModeOn, inEditModeOff] = useBoolean()
 
   const canEdit = currentUser?.sudo || currentUser?.id === project.createdById
+
+  const { activeTasks } = useMemo(() => {
+    const activeTasks: TaskListItem[] = tasks.map<TaskListItem>((n) => {
+      return {
+        id: n.id,
+        href: `/tasks/${n.id}`,
+        problem: null,
+        status: ActivityKindMap[n.status],
+        title: n.title,
+      }
+    })
+
+    return { activeTasks }
+  }, [tasks])
 
   // const tasks: TaskFragment[] = []
 
@@ -101,7 +122,23 @@ export const ProjectPageView: React.FC<ProjectPageViewProps> = ({
           <TitleStyled>
             <span>{title}</span>
 
-            {canEdit && <Button onClick={inEditModeOn}>Редактировать</Button>}
+            {canEdit && (
+              <>
+                <Link
+                  href={`/tasks/create?projectId=${project.id}`}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Button variant={ComponentVariant.DEFAULT}>
+                    Создать задачу
+                  </Button>
+                </Link>
+
+                <Button onClick={inEditModeOn}>Редактировать</Button>
+              </>
+            )}
           </TitleStyled>
           <DescStyled>{intro}</DescStyled>
 
@@ -171,23 +208,27 @@ export const ProjectPageView: React.FC<ProjectPageViewProps> = ({
         </Section>
       )} */}
 
-        {/* <Section eyebrow="работа" title={`Активные задачи · ${active.length}`}>
-        {active.length > 0 ? (
-          <TaskList
-            items={active.map((t) => ({
-              id: t.id,
-              title: t.title,
-              problem: t.problem,
-              status: t.status,
-              worklogCount: t.worklogs?.length ?? 0,
-              href: hrefForTask(t.slug),
-            }))}
-            // onOpen={onOpen}
-          />
-        ) : (
-          <DescStyled>Нет активных задач.</DescStyled>
-        )}
-      </Section> */}
+        <Section
+          eyebrow="работа"
+          title={`Активные задачи · ${activeTasks.length}`}
+        >
+          {activeTasks.length > 0 ? (
+            <TaskList
+              // items={activeTasks.map((t) => ({
+              //   id: t.id,
+              //   title: t.title,
+              //   problem: t.problem,
+              //   status: t.status,
+              //   worklogCount: t.worklogs?.length ?? 0,
+              //   href: `/tasks/${t.id}`,
+              // }))}
+              items={activeTasks}
+              // onOpen={onOpen}
+            />
+          ) : (
+            <DescStyled>Нет активных задач.</DescStyled>
+          )}
+        </Section>
 
         {/* {finished.length > 0 && (
         <Section

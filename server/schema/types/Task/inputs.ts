@@ -29,8 +29,11 @@ export const TaskWhereInput = builder.inputType('TaskWhereInput', {
     assigneeId: t.field({
       type: StringNullableFilter,
     }),
-    status: t.field({ type: TaskStatusEnum }),
+    status: t.field({ type: [TaskStatusEnum] }),
     incompletedOnly: t.boolean({ defaultValue: true }),
+    projectId: t.field({
+      type: StringNullableFilter,
+    }),
   }),
 })
 
@@ -43,6 +46,7 @@ export const TaskCreateInput = builder.inputType('TaskCreateInput', {
     endDatePlaning: t.field({ type: 'DateTime' }),
     parentId: t.string(),
     assigneeId: t.string(),
+    projectId: t.string(),
   }),
 })
 
@@ -60,5 +64,6 @@ export const TaskUpdateInput = builder.inputType('TaskUpdateInput', {
     startDate: t.field({ type: 'DateTime' }),
     endDate: t.field({ type: 'DateTime' }),
     assigneeId: t.string(),
+    projectId: t.string(),
   }),
 })

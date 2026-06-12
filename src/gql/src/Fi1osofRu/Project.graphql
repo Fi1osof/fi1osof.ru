@@ -30,6 +30,15 @@ mutation updateProject(
   }
 }
 
+query projectPageData($projectId: String!) {
+  project(where: { id: $projectId }) {
+    ...Project_
+  }
+  tasks(where: { projectId: { equals: $projectId }, status: [New, Progress] }) {
+    ...TaskNoNesting
+  }
+}
+
 fragment ProjectNoNesting on Project {
   id
   createdAt

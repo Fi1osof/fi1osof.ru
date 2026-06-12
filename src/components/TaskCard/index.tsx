@@ -57,6 +57,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
         task={task}
         cancelHandler={stopEditing}
         parentId={undefined}
+        projectId={task.projectId}
       />
     )
   }
@@ -83,10 +84,12 @@ export const TaskCard: React.FC<TaskCardProps> = ({
       <TaskCardStatus canEdit={canEdit} status={task.status} taskId={task.id} />
 
       <TaskCardMeta>
-        {task.createdAt && (
-          <span className="date">
-            <FormattedDate value={task.createdAt} format="dateShort" />
-          </span>
+        <span className="date">
+          <FormattedDate value={task.createdAt} format="dateShort" />
+        </span>
+
+        {task.Project && (
+          <Link href={`/projects/${task.Project.id}`}>{task.Project.name}</Link>
         )}
       </TaskCardMeta>
 

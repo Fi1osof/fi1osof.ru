@@ -1,3 +1,4 @@
+import { TaskStatusEnum } from 'src/gql/generated'
 import type { ActivityKind } from '../ui-kit/Status/ActivityIndicator/types'
 
 export interface Worklog {
@@ -22,6 +23,13 @@ export interface Task {
   worklogs: Worklog[] | null | undefined
   result?: string | null
   github?: { commits: number; prs: number; repos: string[] } | null
+}
+
+export const ActivityKindMap: Record<TaskStatusEnum, ActivityKind> = {
+  Done: 'done',
+  New: 'active',
+  Progress: 'active',
+  Rejected: 'done',
 }
 
 export const tasks: Task[] = [

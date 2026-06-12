@@ -14,6 +14,7 @@ import './resolvers/task'
 import './resolvers/createTask'
 import './resolvers/updateTask'
 import './resolvers/deleteTask'
+import { Project } from '../Fi1osofRu/Project/types'
 
 // TaskStatus enum
 export const TaskStatusEnum = builder.enumType('TaskStatusEnum', {
@@ -50,5 +51,15 @@ export const Task = builder.prismaObject('Task', {
     Parent: t.relation('Parent', { nullable: true }),
     Children: t.relation('Children'),
     WorkLogs: t.relation('WorkLogs'),
+    projectId: t.exposeID('projectId', { nullable: true }),
+    Project: t.field({
+      type: Project,
+      nullable: true,
+      resolve: (parent) => {
+        return 'Project' in parent
+          ? (parent.Project as typeof Project.$inferType)
+          : null
+      },
+    }),
   }),
 })

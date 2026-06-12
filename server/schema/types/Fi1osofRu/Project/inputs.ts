@@ -26,7 +26,7 @@ export const ProjectWhereUniqueInput = builder.inputType(
   'ProjectWhereUniqueInput',
   {
     fields: (t) => ({
-      id: t.id(),
+      id: t.string(),
     }),
   },
 )

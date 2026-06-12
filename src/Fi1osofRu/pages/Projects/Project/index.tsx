@@ -1,10 +1,10 @@
 import { Page, PageProps } from 'src/components/pages/_App/interfaces'
 import { SeoHeaders } from 'src/components/seo/SeoHeaders'
 import {
-  ProjectDocument,
-  ProjectQuery,
-  ProjectQueryVariables,
-  useProjectQuery,
+  ProjectPageDataDocument,
+  ProjectPageDataQuery,
+  ProjectPageDataQueryVariables,
+  useProjectPageDataQuery,
 } from 'src/gql/generated'
 import { ProjectPageView } from './View'
 
@@ -13,16 +13,14 @@ type ProjectPage = PageProps & {
 }
 
 export const ProjectPage: Page<ProjectPage> = ({ id }) => {
-  const response = useProjectQuery({
+  const response = useProjectPageDataQuery({
     variables: {
-      where: {
-        id,
-      },
+      projectId: id || '',
     },
     skip: !id,
   })
 
-  const project = response.data?.project
+  const { project, tasks } = response.data || {}
 
   if (!project) {
     return null
@@ -32,7 +30,7 @@ export const ProjectPage: Page<ProjectPage> = ({ id }) => {
     <>
       <SeoHeaders title={project.name} />
 
-      <ProjectPageView project={project} />
+      <ProjectPageView project={project} tasks={tasks ?? []} />
     </>
   )
 }
@@ -43,12 +41,13 @@ ProjectPage.getInitialProps = async ({ query, apolloClient }) => {
 
   const response = id
     ? // eslint-disable-next-line @typescript-eslint/no-deprecated
-      await apolloClient.query<ProjectQuery, ProjectQueryVariables>({
-        query: ProjectDocument,
+      await apolloClient.query<
+        ProjectPageDataQuery,
+        ProjectPageDataQueryVariables
+      >({
+        query: ProjectPageDataDocument,
         variables: {
-          where: {
-            id: id,
-          },
+          projectId: id,
         },
       })
     : undefined

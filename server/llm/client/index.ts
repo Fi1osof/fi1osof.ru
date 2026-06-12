@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import {
   LLMClientChatCompletionRequest,
   LLMClientCompletionRequest,
@@ -149,8 +148,6 @@ export class LLMClient {
     }
 
     const result: T = await response.json()
-
-    console.log('result', JSON.stringify(result, null, 2))
 
     return result
   }

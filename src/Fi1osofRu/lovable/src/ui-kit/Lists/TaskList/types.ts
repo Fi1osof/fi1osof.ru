@@ -1,5 +1,8 @@
 import type { TaskCardProps } from '../../Cards/TaskCard/types'
+
+export type TaskListItem = TaskCardProps & { id: string }
+
 export interface TaskListProps {
-  items: (TaskCardProps & { id: string })[]
+  items: TaskListItem[]
   // onOpen?: (href: string) => void
 }

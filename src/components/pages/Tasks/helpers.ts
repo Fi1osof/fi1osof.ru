@@ -12,7 +12,7 @@ export function getTasksWithCountQueryVariables(
 ): TasksWithCountQueryVariables {
   return {
     where: {
-      status: status ?? undefined,
+      status: status ? [status] : undefined,
       incompletedOnly: status === null,
     },
     skip: (page - 1) * pageSize,

@@ -4,7 +4,12 @@ query myTasks($where: TaskWhereInput, $skip: Int, $take: Int) {
   }
 }
 
-query tasks($where: TaskWhereInput, $orderBy: TaskOrderByInput, $skip: Int, $take: Int) {
+query tasks(
+  $where: TaskWhereInput
+  $orderBy: TaskOrderByInput
+  $skip: Int
+  $take: Int
+) {
   response: tasks(where: $where, orderBy: $orderBy, skip: $skip, take: $take) {
     ...Task_
   }
@@ -18,7 +23,12 @@ query tasksCount($where: TaskWhereInput) {
   response: tasksCount(where: $where)
 }
 
-query tasksWithCount($where: TaskWhereInput, $orderBy: TaskOrderByInput, $skip: Int, $take: Int) {
+query tasksWithCount(
+  $where: TaskWhereInput
+  $orderBy: TaskOrderByInput
+  $skip: Int
+  $take: Int
+) {
   tasks(where: $where, orderBy: $orderBy, skip: $skip, take: $take) {
     ...Task_
   }
@@ -51,6 +61,10 @@ mutation deleteTask($where: TaskWhereUniqueInput!) {
 
 fragment Task_ on Task {
   ...TaskNoNesting
+
+  Project {
+    ...ProjectNoNesting
+  }
 }
 
 fragment TaskNoNesting on Task {
@@ -68,5 +82,5 @@ fragment TaskNoNesting on Task {
   createdById
   assigneeId
   parentId
+  projectId
 }
-
