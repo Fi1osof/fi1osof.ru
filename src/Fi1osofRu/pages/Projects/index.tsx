@@ -18,7 +18,7 @@ export const ProjectsPage: Page = () => {
 }
 
 ProjectsPage.getInitialProps = async ({ apolloClient }) => {
-  apolloClient.query({
+  await apolloClient.query({
     query: ProjectsDocument,
   })
 

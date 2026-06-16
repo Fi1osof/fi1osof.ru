@@ -1,6 +1,6 @@
 import { Page } from 'src/components/pages/_App/interfaces'
 import { SeoHeaders } from 'src/components/seo/SeoHeaders'
-import { useTimersQuery } from 'src/gql/generated'
+import { TimersDocument, useTimersQuery } from 'src/gql/generated'
 import { TimersPageView } from './View'
 
 export const TimersPage: Page = () => {
@@ -15,4 +15,12 @@ export const TimersPage: Page = () => {
       <TimersPageView active={null} entries={timers} />
     </>
   )
+}
+
+TimersPage.getInitialProps = async ({ apolloClient }) => {
+  await apolloClient.query({
+    query: TimersDocument,
+  })
+
+  return {}
 }
