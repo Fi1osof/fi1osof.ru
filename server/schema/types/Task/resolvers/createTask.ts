@@ -15,7 +15,7 @@ builder.mutationField('createTask', (t) =>
       }
 
       const {
-        data: { assigneeId, ...other },
+        data: { assigneeId, projectId, ...other },
       } = args
 
       return prisma.task.create({
@@ -24,6 +24,7 @@ builder.mutationField('createTask', (t) =>
           ...other,
           createdById: currentUser.id,
           assigneeId: assigneeId !== undefined ? assigneeId : currentUser.id,
+          projectId: projectId || undefined,
         },
       })
     },

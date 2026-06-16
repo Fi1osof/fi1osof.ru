@@ -38,7 +38,7 @@ builder.mutationField('updateTask', (t) =>
       }
 
       const {
-        data: { ...other },
+        data: { projectId, ...other },
       } = args
 
       return prisma.task.update({
@@ -50,6 +50,7 @@ builder.mutationField('updateTask', (t) =>
           ...other,
           title: args.data.title ?? undefined,
           status: args.data.status ?? undefined,
+          projectId: projectId === '' ? null : projectId,
         },
       })
     },
