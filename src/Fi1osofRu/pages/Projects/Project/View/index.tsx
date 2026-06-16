@@ -140,7 +140,9 @@ export const ProjectPageView: React.FC<ProjectPageViewProps> = ({
               </>
             )}
           </TitleStyled>
-          <DescStyled>{intro}</DescStyled>
+          <DescStyled>
+            <Markdown>{intro}</Markdown>
+          </DescStyled>
 
           <MetaRowStyled>
             <ActivityIndicator kind={'active'} />

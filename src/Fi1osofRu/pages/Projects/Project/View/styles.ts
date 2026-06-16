@@ -40,7 +40,7 @@ export const TitleStyled = styled.h1`
   }
 `
 
-export const DescStyled = styled.p`
+export const DescStyled = styled.div`
   color: ${({ theme }) => theme.color.inkMuted};
   max-width: 720px;
   font-size: ${({ theme }) => theme.size.lg};
