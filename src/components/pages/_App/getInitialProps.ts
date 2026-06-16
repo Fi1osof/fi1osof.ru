@@ -47,6 +47,29 @@ export const getInitialProps: MainApp['getInitialProps'] = async (
     newAppContext.ctx.res.statusCode = statusCode
   }
 
+  /**
+   * Если страница была не найдена, проверяем ее на фрикоде,
+   * так как много контента переехало в свое время туда.
+   */
+  if (
+    (statusCode === 404 || ctx.pathname === '/404') &&
+    ctx.req?.url &&
+    ctx.res
+  ) {
+    const res = ctx.res
+
+    const url = `https://freecode.academy${ctx.req.url}`
+
+    const response = await fetch(url).catch(console.error)
+
+    if (response?.ok) {
+      res.writeHead(301, {
+        Location: url,
+      })
+      res.end()
+    }
+  }
+
   const newProps: AppInitialProps = {
     ...otherProps,
     pageProps: {
