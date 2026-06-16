@@ -36,6 +36,7 @@ services:
   mailhog:
     ports:
       - 8025:8025
+      - 1025:1025
 
   world3d:
     volumes:
