@@ -29,6 +29,7 @@ builder.mutationField('createTimer', (t) =>
         where: {
           taskId,
           createdById: currentUser.id,
+          stoppedAt: null,
         },
       })
 
