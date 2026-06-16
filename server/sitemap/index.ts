@@ -9,6 +9,8 @@ export enum SitemapSection {
   main = '/sitemap/main.xml',
   posts = '/sitemap/posts.xml',
   // users = '/sitemap/users.xml',
+  projects = '/sitemap/projects.xml',
+  tasks = '/sitemap/tasks.xml',
 }
 
 type UrlItem = {
@@ -54,6 +56,12 @@ export const generateSitemapIndex = async ({
     </sitemap>
     <sitemap>
         <loc>${siteOrigin}${SitemapSection.posts}</loc>
+    </sitemap>
+    <sitemap>
+        <loc>${siteOrigin}${SitemapSection.projects}</loc>
+    </sitemap>
+    <sitemap>
+        <loc>${siteOrigin}${SitemapSection.tasks}</loc>
     </sitemap>
     </sitemapindex>
 `
@@ -144,6 +152,48 @@ export const generateSitemapUsers = async (
   return generateSitemapXML(xmlData, props)
 }
 
+export const generateSitemapProjects = async (
+  props: SitemapGeneratorProps,
+): Promise<string> => {
+  const objects = await prismaClient.project.findMany({
+    orderBy: {
+      createdAt: 'desc',
+    },
+  })
+
+  const xmlData: UrlItem[] = objects.map((n) => {
+    const { id, updatedAt } = n
+
+    return {
+      url: `/projects/${id}`,
+      updatedAt: updatedAt.toISOString(),
+    }
+  })
+
+  return generateSitemapXML(xmlData, props)
+}
+
+export const generateSitemapTasks = async (
+  props: SitemapGeneratorProps,
+): Promise<string> => {
+  const objects = await prismaClient.task.findMany({
+    orderBy: {
+      createdAt: 'desc',
+    },
+  })
+
+  const xmlData: UrlItem[] = objects.map((n) => {
+    const { id, updatedAt } = n
+
+    return {
+      url: `/tasks/${id}`,
+      updatedAt: updatedAt.toISOString(),
+    }
+  })
+
+  return generateSitemapXML(xmlData, props)
+}
+
 export const generateSitemap = async (req: Request, res: Response) => {
   res.header('Content-Type', 'application/xml')
 
@@ -162,6 +212,12 @@ export const generateSitemap = async (req: Request, res: Response) => {
     // case SitemapSection.users:
     //   res.send(await generateSitemapUsers({ siteOrigin }))
     //   break
+    case SitemapSection.projects:
+      res.send(await generateSitemapProjects({ siteOrigin }))
+      break
+    case SitemapSection.tasks:
+      res.send(await generateSitemapTasks({ siteOrigin }))
+      break
     default:
       res.status(404).send('Not found')
   }
