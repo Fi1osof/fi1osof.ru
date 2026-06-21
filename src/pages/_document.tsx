@@ -6,7 +6,7 @@ import { ServerStyleSheet } from 'styled-components'
 export default class MyDocument extends Document {
   render() {
     return (
-      <Html>
+      <Html lang="ru-RU">
         <Head>
           {/* Google Font: Nunito */}
           <link
