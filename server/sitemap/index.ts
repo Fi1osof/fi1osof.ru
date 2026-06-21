@@ -8,7 +8,7 @@ export enum SitemapSection {
   index = '/sitemap.xml',
   main = '/sitemap/main.xml',
   posts = '/sitemap/posts.xml',
-  // users = '/sitemap/users.xml',
+  users = '/sitemap/users.xml',
   projects = '/sitemap/projects.xml',
   tasks = '/sitemap/tasks.xml',
   worklogs = '/sitemap/worklogs.xml',
@@ -56,6 +56,9 @@ export const generateSitemapIndex = async ({
         <loc>${siteOrigin}/sitemap/main.xml</loc>
     </sitemap>
     <sitemap>
+        <loc>${siteOrigin}${SitemapSection.users}</loc>
+    </sitemap>
+    <sitemap>
         <loc>${siteOrigin}${SitemapSection.posts}</loc>
     </sitemap>
     <sitemap>
@@ -70,10 +73,6 @@ export const generateSitemapIndex = async ({
     </sitemapindex>
 `
 }
-
-// <sitemap>
-//     <loc>${siteOrigin}${SitemapSection.users}</loc>
-// </sitemap>
 
 export const generateSitemapMain = async (
   props: SitemapGeneratorProps,
@@ -246,9 +245,9 @@ export const generateSitemap = async (req: Request, res: Response) => {
     case SitemapSection.posts:
       res.send(await generateSitemapPosts({ siteOrigin }))
       break
-    // case SitemapSection.users:
-    //   res.send(await generateSitemapUsers({ siteOrigin }))
-    //   break
+    case SitemapSection.users:
+      res.send(await generateSitemapUsers({ siteOrigin }))
+      break
     case SitemapSection.projects:
       res.send(await generateSitemapProjects({ siteOrigin }))
       break
