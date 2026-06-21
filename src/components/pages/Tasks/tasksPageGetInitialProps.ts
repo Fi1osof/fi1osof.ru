@@ -19,10 +19,14 @@ export const tasksPageGetInitialProps: Page<TasksPageProps>['getInitialProps'] =
         ? parseInt(pageParam, 10)
         : 1
 
+    const projectId =
+      (typeof query.projectId === 'string' && query.projectId) || undefined
+
     const variables = getTasksWithCountQueryVariables(
       selectedStatus,
       page,
       PAGE_SIZE,
+      projectId,
     )
 
     await apolloClient.query({
@@ -33,5 +37,6 @@ export const tasksPageGetInitialProps: Page<TasksPageProps>['getInitialProps'] =
     return {
       selectedStatus,
       page,
+      projectId,
     }
   }

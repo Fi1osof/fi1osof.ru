@@ -22,7 +22,7 @@ export const WorkLogsPage: Page<WorkLogsPageProps> = ({ page }) => {
 
   return (
     <>
-      <SeoHeaders title="Work Logs" />
+      <SeoHeaders title="Ворклоги" />
       <WorkLogsView
         workLogs={workLogs}
         loading={response.loading}

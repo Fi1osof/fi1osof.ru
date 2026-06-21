@@ -23,8 +23,10 @@ import {
   CommitTitleStyled,
   CommitMetaStyled,
   CommitBarStyled,
+  BlockStyled,
 } from './styles'
 import type { HomePageProps } from './types'
+import Link from 'next/link'
 
 const focusAreas = [
   'Agent Systems',
@@ -94,7 +96,12 @@ export const LovableHomePage: React.FC<HomePageProps> = ({
       aside: <AvailabilityIndicator status={availability.status} />,
       content: (
         <AvailabilityWrapStyled>
-          <div>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
             <StatLabelStyled style={{ marginBottom: 12 }}>
               фиксированные обязательства
             </StatLabelStyled>
@@ -136,19 +143,23 @@ export const LovableHomePage: React.FC<HomePageProps> = ({
       key: 'projects',
       title: 'Активные проекты',
       content: (
-        <ProjectList
-          items={projects.map((p) => ({
-            id: p.id,
-            title: p.title,
-            description: p.intro,
-            status: p.status,
-            startedAt: p.startedAt,
-            focus: p.focus,
-            image: p.image,
-            href: p.slug,
-          }))}
-          // onOpen={onOpen}
-        />
+        <BlockStyled>
+          <ProjectList
+            items={projects.map((p) => ({
+              id: p.id,
+              title: p.title,
+              description: p.intro,
+              status: p.status,
+              startedAt: p.startedAt,
+              focus: p.focus,
+              image: p.image,
+              href: p.slug,
+            }))}
+            // onOpen={onOpen}
+          />
+
+          <Link href={'/projects'}>смотреть все</Link>
+        </BlockStyled>
       ),
     },
 
@@ -156,35 +167,42 @@ export const LovableHomePage: React.FC<HomePageProps> = ({
       key: 'tasks',
       title: 'Активные задачи',
       content: (
-        <TaskList
-          items={tasks.map((t) => ({
-            id: t.id,
-            title: t.title,
-            problem: t.problem,
-            status: t.status,
-            projectName: projects.find((p) => p.id === t.projectId)?.title,
-            worklogCount: t.worklogs?.length ?? 0,
-            href: t.slug,
-          }))}
-          // onOpen={onOpen}
-        />
+        <BlockStyled>
+          <TaskList
+            items={tasks.map((t) => ({
+              id: t.id,
+              title: t.title,
+              problem: t.problem,
+              status: t.status,
+              projectName: projects.find((p) => p.id === t.projectId)?.title,
+              worklogCount: t.worklogs?.length ?? 0,
+              href: t.slug,
+            }))}
+            // onOpen={onOpen}
+          />
+          <Link href={'/tasks'}>смотреть все</Link>
+        </BlockStyled>
       ),
     },
     {
       key: '',
       title: 'Последние ворклоги',
       content: (
-        <WorklogList
-          items={worklogs.map((w) => ({
-            id: w.id,
-            taskTitle: w.taskTitle,
-            body: w.body,
-            eventAt: w.eventAt,
-            publishedAt: w.publishedAt,
-            href: w.taskHref,
-          }))}
-          // onOpen={onOpen}
-        />
+        <BlockStyled>
+          <WorklogList
+            items={worklogs.map((w) => ({
+              id: w.id,
+              taskTitle: w.taskTitle,
+              body: w.body,
+              eventAt: w.eventAt,
+              publishedAt: w.publishedAt,
+              href: w.taskHref,
+            }))}
+            // onOpen={onOpen}
+          />
+
+          <Link href={'/worklogs'}>смотреть все</Link>
+        </BlockStyled>
       ),
     },
     // {

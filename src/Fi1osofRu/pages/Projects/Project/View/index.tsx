@@ -230,6 +230,12 @@ export const ProjectPageView: React.FC<ProjectPageViewProps> = ({
           ) : (
             <DescStyled>Нет активных задач.</DescStyled>
           )}
+
+          <p>
+            <Link href={`/tasks?projectId=${project.id}`}>
+              Смотреть все задачи проекта
+            </Link>
+          </p>
         </Section>
 
         {/* {finished.length > 0 && (

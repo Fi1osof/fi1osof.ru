@@ -20,7 +20,7 @@ export const Fi1osofRuGlobalStyles = createGlobalStyle`
     margin: 0;
   }
   p { margin: 0; }
-  a { color: inherit; text-decoration: none; }
+  a { text-decoration: none; }
   button { font-family: inherit; }
   ::selection { background: ${({ theme }) => theme.color.accentSoft}; }
 `

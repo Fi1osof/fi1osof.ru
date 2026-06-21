@@ -32,6 +32,10 @@ query taskWorkLogsWithCount(
 query taskWorkLog($where: TaskWorkLogWhereUniqueInput!) {
   response: taskWorkLog(where: $where) {
     ...TaskWorkLog_
+
+    Task {
+      ...TaskNoNesting
+    }
   }
 }
 
@@ -41,7 +45,10 @@ mutation createTaskWorkLog($data: TaskWorkLogCreateInput!) {
   }
 }
 
-mutation updateTaskWorkLog($where: TaskWorkLogWhereUniqueInput!, $data: TaskWorkLogUpdateInput!) {
+mutation updateTaskWorkLog(
+  $where: TaskWorkLogWhereUniqueInput!
+  $data: TaskWorkLogUpdateInput!
+) {
   response: updateTaskWorkLog(where: $where, data: $data) {
     ...TaskWorkLog_
   }

@@ -32,4 +32,8 @@ export const SectionEyebrowStyled = styled.div`
   margin-bottom: ${({ theme }) => theme.space(2)};
 `
 
-export const SectionInnerStyled = styled.div``
+export const SectionInnerStyled = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`

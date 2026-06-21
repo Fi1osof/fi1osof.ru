@@ -25,7 +25,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
 
       <TasksViewGridStyled>
         {tasks.map((task) => (
-          <TaskCard key={task.id} task={task} />
+          <TaskCard key={task.id} task={task} variant="list" />
         ))}
       </TasksViewGridStyled>
 

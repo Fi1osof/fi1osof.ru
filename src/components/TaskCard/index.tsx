@@ -19,12 +19,14 @@ import { TaskStartTimer } from './Buttons/StartTimer'
 
 type TaskCardProps = {
   task: TaskFragment
-  variant?: 'list' | 'full'
+  variant: 'list' | 'full'
+  titlePrefix?: string
 }
 
 export const TaskCard: React.FC<TaskCardProps> = ({
   task,
   variant = 'list',
+  titlePrefix,
 }) => {
   const { user: currentUser } = useAppContext()
   const [inEditMode, startEditing, stopEditing] = useBoolean()
@@ -66,6 +68,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
     <TaskCardStyled>
       <TaskCardToolbar>
         <TaskCardTitle>
+          {titlePrefix}{' '}
           {variant === 'list' ? (
             <Link href={`/tasks/${task.id}`}>{task.title}</Link>
           ) : (

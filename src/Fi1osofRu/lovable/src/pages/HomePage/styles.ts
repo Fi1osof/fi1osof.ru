@@ -89,6 +89,7 @@ export const CommitTimelineStyled = styled.ul`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.space(3)};
+  flex: 1;
 `
 
 export const CommitItemStyled = styled.li`
@@ -99,6 +100,7 @@ export const CommitItemStyled = styled.li`
   background: ${({ theme }) => theme.color.surface};
   border: 1px solid ${({ theme }) => theme.color.hairline};
   border-radius: ${({ theme }) => theme.radius.md};
+  flex: 1;
 `
 
 export const CommitTitleStyled = styled.div`
@@ -126,4 +128,10 @@ export const CommitBarStyled = styled.div`
     background: ${({ theme }) => theme.color.accent};
     width: 60%;
   }
+`
+
+export const BlockStyled = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 `

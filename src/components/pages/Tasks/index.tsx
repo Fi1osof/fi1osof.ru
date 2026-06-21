@@ -8,11 +8,16 @@ import { tasksPageGetInitialProps } from './tasksPageGetInitialProps'
 
 const PAGE_SIZE = 20
 
-export const TasksPage: Page<TasksPageProps> = ({ selectedStatus, page }) => {
+export const TasksPage: Page<TasksPageProps> = ({
+  selectedStatus,
+  page,
+  projectId,
+}) => {
   const variables = getTasksWithCountQueryVariables(
     selectedStatus,
     page,
     PAGE_SIZE,
+    projectId,
   )
 
   const response = useTasksWithCountQuery({

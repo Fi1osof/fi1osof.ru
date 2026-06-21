@@ -38,6 +38,10 @@ query tasksWithCount(
 query task($where: TaskWhereUniqueInput!) {
   response: task(where: $where) {
     ...Task_
+
+    WorkLogs {
+      ...TaskWorkLogNoNesting
+    }
   }
 }
 

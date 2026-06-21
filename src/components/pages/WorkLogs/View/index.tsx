@@ -18,7 +18,7 @@ export const WorkLogsView: React.FC<WorkLogsViewProps> = ({
 }) => {
   return (
     <WorkLogsViewStyled size="wide">
-      <h1>Work Logs</h1>
+      <h1>Ворклоги</h1>
 
       <WorkLogsViewListStyled>
         {workLogs.map((workLog) => (

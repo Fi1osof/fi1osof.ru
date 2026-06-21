@@ -11,6 +11,7 @@ export enum SitemapSection {
   // users = '/sitemap/users.xml',
   projects = '/sitemap/projects.xml',
   tasks = '/sitemap/tasks.xml',
+  worklogs = '/sitemap/worklogs.xml',
 }
 
 type UrlItem = {
@@ -63,6 +64,9 @@ export const generateSitemapIndex = async ({
     <sitemap>
         <loc>${siteOrigin}${SitemapSection.tasks}</loc>
     </sitemap>
+    <sitemap>
+        <loc>${siteOrigin}${SitemapSection.worklogs}</loc>
+    </sitemap>
     </sitemapindex>
 `
 }
@@ -83,6 +87,18 @@ export const generateSitemapMain = async (
   const xmlData: UrlItem[] = [
     {
       url: `/`,
+      updatedAt: monday.toISOString().split('T')[0],
+    },
+    {
+      url: `/projects`,
+      updatedAt: monday.toISOString().split('T')[0],
+    },
+    {
+      url: `/tasks`,
+      updatedAt: monday.toISOString().split('T')[0],
+    },
+    {
+      url: `/worklogs`,
       updatedAt: monday.toISOString().split('T')[0],
     },
   ]
@@ -194,6 +210,27 @@ export const generateSitemapTasks = async (
   return generateSitemapXML(xmlData, props)
 }
 
+export const generateSitemapWorkLogs = async (
+  props: SitemapGeneratorProps,
+): Promise<string> => {
+  const objects = await prismaClient.taskWorkLog.findMany({
+    orderBy: {
+      createdAt: 'desc',
+    },
+  })
+
+  const xmlData: UrlItem[] = objects.map((n) => {
+    const { id, createdAt } = n
+
+    return {
+      url: `/worklogs/${id}`,
+      updatedAt: createdAt.toISOString(),
+    }
+  })
+
+  return generateSitemapXML(xmlData, props)
+}
+
 export const generateSitemap = async (req: Request, res: Response) => {
   res.header('Content-Type', 'application/xml')
 
@@ -217,6 +254,9 @@ export const generateSitemap = async (req: Request, res: Response) => {
       break
     case SitemapSection.tasks:
       res.send(await generateSitemapTasks({ siteOrigin }))
+      break
+    case SitemapSection.worklogs:
+      res.send(await generateSitemapWorkLogs({ siteOrigin }))
       break
     default:
       res.status(404).send('Not found')

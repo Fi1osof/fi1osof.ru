@@ -1,6 +1,9 @@
 import styled, { css } from 'styled-components'
 
 export const ContainerStyled = styled.div<{ $size: 'default' | 'wide' }>`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   width: 100%;
   margin: 0 auto;
   padding: 0 ${({ theme }) => theme.space(6)};

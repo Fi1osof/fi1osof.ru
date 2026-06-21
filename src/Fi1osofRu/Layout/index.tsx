@@ -26,8 +26,8 @@ const nav: LayoutNavItem[] = [
   //   label: 'Заметки',
   // },
   {
-    href: '/timers',
-    id: 'timers',
+    href: '/worklogs',
+    id: 'worklogs',
     label: 'Журнал',
   },
 ]
