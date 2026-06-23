@@ -5,16 +5,33 @@ import {
   LlmProvider,
   useLlmImageGenerationMutation,
 } from 'src/gql/generated'
-import { ImageGeneratorControlsStyled, ImageGeneratorStyled } from './styles'
+import {
+  ImageGeneratorControlsStyled,
+  ImageGeneratorResultsStyled,
+  ImageGeneratorStyled,
+} from './styles'
 import { Textarea } from 'src/ui-kit/controls/Textarea'
 import { useCallback, useState } from 'react'
 import { useSnackbar } from 'src/ui-kit/Snackbar'
 import { Button } from 'src/ui-kit/Button'
 import { ImageGenerationAspectRatio } from './AspectRatio'
 import { ImageSize } from './ImageSize'
+import { ModelSelect } from './ModelSelect'
+
+type ImageResult = {
+  key: string
+  model: LlmModel
+  imageUrl: string | null
+  loading: boolean
+  error: string | null
+}
 
 export const ImageGenerator: React.FC = () => {
   const [prompt, promptSetter] = useState('')
+  const [models, modelsSetter] = useState<LlmModel[]>([
+    LlmModel.GEMINI3_1_FLASH_IMAGE,
+  ])
+  const [multipleModels, multipleModelsSetter] = useState(false)
 
   const [aspectRatio, aspectRatioSetter] =
     useState<LlmImageGenerationAspectRatioInput>(
@@ -28,7 +45,7 @@ export const ImageGenerator: React.FC = () => {
 
   const { addMessage } = useSnackbar() || {}
 
-  const [mutation, { loading }] = useLlmImageGenerationMutation()
+  const [mutation] = useLlmImageGenerationMutation()
 
   const onChange = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -37,39 +54,64 @@ export const ImageGenerator: React.FC = () => {
     [],
   )
 
-  const [src, srcSetter] = useState('')
+  const [results, resultsSetter] = useState<ImageResult[]>([])
+
+  const loading = results.some((r) => r.loading)
 
   const onClickSend = useCallback(() => {
-    promptSetter((prompt) => {
+    const currentPrompt = prompt
+
+    const initialResults: ImageResult[] = models.map((m) => ({
+      key: crypto.randomUUID(),
+      model: m,
+      imageUrl: null,
+      loading: true,
+      error: null,
+    }))
+
+    resultsSetter(initialResults)
+
+    models.forEach((m, index) => {
       mutation({
         variables: {
           input: {
             provider: LlmProvider.OPENROUTER,
-            model: LlmModel.GEMINI3_1_FLASH_IMAGE,
-            prompt,
+            model: m,
+            prompt: currentPrompt,
             aspectRatio,
             imageSize,
           },
         },
       })
         .then((r) => {
-          const imageUrl = r.data?.llmImageGeneration.choices
-            .at(0)
-            ?.message.images?.at(0)?.imageUrl
+          const imageUrl =
+            r.data?.llmImageGeneration.choices.at(0)?.message.images?.at(0)
+              ?.imageUrl ?? null
 
-          if (imageUrl) {
-            srcSetter(imageUrl)
-          }
-        })
-        .catch((error) => {
-          addMessage?.(
-            (error as Error | undefined)?.message || 'Request execution error',
+          resultsSetter((prev) =>
+            prev.map((item, i) =>
+              i === index ? { ...item, imageUrl, loading: false } : item,
+            ),
           )
         })
+        .catch((error) => {
+          const errorMessage =
+            (error as Error | undefined)?.message || 'Request execution error'
 
-      return prompt
+          addMessage?.(errorMessage, {
+            variant: 'error',
+          })
+
+          resultsSetter((prev) =>
+            prev.map((item, i) =>
+              i === index
+                ? { ...item, error: errorMessage, loading: false }
+                : item,
+            ),
+          )
+        })
     })
-  }, [mutation, aspectRatio, imageSize, addMessage])
+  }, [mutation, aspectRatio, imageSize, addMessage, models, prompt])
 
   return (
     <ImageGeneratorStyled>
@@ -80,6 +122,13 @@ export const ImageGenerator: React.FC = () => {
 
         <div>
           <ImageSize imageSize={imageSize} imageSizeSetter={imageSizeSetter} />
+
+          <ModelSelect
+            models={models}
+            modelsSetter={modelsSetter}
+            multiple={multipleModels}
+            multipleSetter={multipleModelsSetter}
+          />
 
           <ImageGenerationAspectRatio
             aspectRatio={aspectRatio}
@@ -94,7 +143,18 @@ export const ImageGenerator: React.FC = () => {
         </Button>
       </div>
 
-      {src && <img src={src} />}
+      {results.length > 0 && (
+        <ImageGeneratorResultsStyled>
+          {results.map((result) => (
+            <div key={result.key}>
+              <div>{result.model}</div>
+              {result.loading && <div>Loading...</div>}
+              {result.error && <div>Error: {result.error}</div>}
+              {result.imageUrl && <img src={result.imageUrl} />}
+            </div>
+          ))}
+        </ImageGeneratorResultsStyled>
+      )}
     </ImageGeneratorStyled>
   )
 }

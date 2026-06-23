@@ -19,18 +19,44 @@ export enum LlmModel {
   // Qwen3_5_122B_A10B = 'qwen/qwen3.5-122b-a10b',
   // Qwen3_5_397B_A17B = 'qwen/qwen3.5-397b-a17b',
 
-  // Gemini 3.x models
-  Gemini3_1_Flash_Lite_Preview = 'google/gemini-3.1-flash-lite-preview',
-  Gemini3_Flash_Preview = 'google/gemini-3-flash-preview',
-
   // Gemini 2.5 models
+  // Google: Nano Banana
   Gemini2_5_Flash = 'google/gemini-2.5-flash',
   Gemini2_5_Flash_Lite = 'google/gemini-2.5-flash-lite',
-
-  // Image generation models
-  Gemini3_1_Flash_Image = 'google/gemini-3.1-flash-image-preview',
+  // $2.50per 1M
   Gemini2_5_Flash_Image = 'google/gemini-2.5-flash-image',
+
+  // Gemini 3.x models
+  // Google: Nano Banana 2
+  Gemini3_1_Flash_Lite_Preview = 'google/gemini-3.1-flash-lite-preview',
+  Gemini3_Flash_Preview = 'google/gemini-3-flash-preview',
+  // $3per 1M
+  Gemini3_1_Flash_Image = 'google/gemini-3.1-flash-image-preview',
+
+  // $12per 1M
+  GOOGLE_GEMINI_3_PRO_IMAGE_PREVIEW = 'google/gemini-3-pro-image-preview',
+
+  // $0.04/image
+  BYTEDANCE_SEED_SEEDREAM_4_5 = 'bytedance-seed/seedream-4.5',
+
+  // $8 / $15per 1M
+  OPENAI_GPT_5_4_IMAGE_2 = 'openai/gpt-5.4-image-2',
+
+  // Black Forest Labs
+  // $0.014/megapixel
+  BLACK_FOREST_LABS_FLUX_2_KLEIN_4B = 'black-forest-labs/flux.2-klein-4b',
+  // $0.03/megapixel
+  BLACK_FOREST_LABS_FLUX_2_PRO = 'black-forest-labs/flux.2-pro',
+  // $0.07/megapixel
+  BLACK_FOREST_LABS_FLUX_2_MAX = 'black-forest-labs/flux.2-max',
 }
+
+export const LLM_TOP_MODELS: LlmModel[] = [
+  LlmModel.GOOGLE_GEMINI_3_PRO_IMAGE_PREVIEW,
+  LlmModel.OPENAI_GPT_5_4_IMAGE_2,
+  LlmModel.BLACK_FOREST_LABS_FLUX_2_PRO,
+  LlmModel.BLACK_FOREST_LABS_FLUX_2_MAX,
+]
 
 export interface LLMClientOptions {
   provider: LlmProvider

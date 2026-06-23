@@ -153,7 +153,8 @@ export const llmImageGenerationResolver = async (
         content: prompt,
       },
     ],
-    modalities: ['image', 'text'],
+    // modalities: ['image', 'text'],
+    // modalities: ['image'],
     image_config: {
       aspect_ratio: aspectRatio ?? undefined,
       image_size: imageSize ?? undefined,
