@@ -7,7 +7,7 @@ export interface PrismaContext {
   prisma: PrismaClient
   req:
     | ExpressContextFunctionArgument['req']
-    | { headers: { authorization: string | undefined } }
+    | Pick<ExpressContextFunctionArgument['req'], 'headers'>
     | undefined
 
   // Authorized user
