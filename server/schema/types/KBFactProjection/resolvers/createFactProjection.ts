@@ -13,7 +13,7 @@ builder.mutationField('createFactProjection', (t) =>
       }
 
       // Verify that the fact belongs to the user
-      const fact = await ctx.prisma.kBFact.findFirst({
+      const fact = await ctx.prisma.kBFact.findUnique({
         where: {
           id: args.data.factId,
           createdById: ctx.currentUser.id,
@@ -25,7 +25,7 @@ builder.mutationField('createFactProjection', (t) =>
       }
 
       // Verify that the knowledge space belongs to the user
-      const space = await ctx.prisma.kBKnowledgeSpace.findFirst({
+      const space = await ctx.prisma.kBKnowledgeSpace.findUnique({
         where: {
           id: args.data.knowledgeSpaceId,
           createdById: ctx.currentUser.id,

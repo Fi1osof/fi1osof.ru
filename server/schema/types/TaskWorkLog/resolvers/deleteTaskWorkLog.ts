@@ -18,7 +18,7 @@ builder.mutationField('deleteTaskWorkLog', (t) =>
         throw new Error('WorkLog ID is required')
       }
 
-      const existing = await ctx.prisma.taskWorkLog.findFirst({
+      const existing = await ctx.prisma.taskWorkLog.findUnique({
         where: {
           id: workLogId,
           createdById: ctx.currentUser.id,

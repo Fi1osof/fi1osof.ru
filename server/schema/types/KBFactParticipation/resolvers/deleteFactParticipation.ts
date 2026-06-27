@@ -13,7 +13,7 @@ builder.mutationField('deleteFactParticipation', (t) =>
 
       // Check if participation exists and belongs to user (via fact)
       const existingParticipation =
-        await ctx.prisma.kBFactParticipation.findFirst({
+        await ctx.prisma.kBFactParticipation.findUnique({
           where: {
             id: args.id,
             Fact: {

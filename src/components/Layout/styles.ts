@@ -4,7 +4,7 @@ import { theme } from 'src/theme'
 
 export const LayoutStyled = styled.div`
   display: flex;
-  min-height: 100vh;
+  min-height: 100dvh;
   background: #ffffff;
   overflow: hidden;
 `
@@ -18,7 +18,7 @@ export const LayoutMain = styled.div<LayoutMainProps>`
   min-width: 0;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 100dvh;
   margin-left: ${({ $sidebarOpen }) => ($sidebarOpen ? '260px' : '48px')};
   transition: margin-left 0.2s ease-in-out;
 

@@ -17,6 +17,7 @@ import { AuthProviders } from '../AuthProviders'
 import { useSearchParams } from 'next/navigation'
 import { GET_PARAM_REFERRERTOKEN_NAME, SignUpFormData } from './interfaces'
 import { signUpSchema } from './schema'
+import { AuthFormFooterStyled } from '../styles'
 
 export interface SignUpFormProps {
   onSuccessHandler?: (data: SignupMutation['response']) => void
@@ -152,14 +153,16 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
         <Controller name="password" render={fieldRenderer} />
         <Controller name="referrerToken" render={fieldRenderer} />
 
-        <AuthProviders
-          onSuccessHandler={onSuccessHandler}
-          referrerToken={form.getValues().referrerToken ?? null}
-        />
+        <AuthFormFooterStyled>
+          <AuthProviders
+            onSuccessHandler={onSuccessHandler}
+            referrerToken={form.getValues().referrerToken ?? null}
+          />
 
-        <Button type="submit" disabled={loading}>
-          {loading ? 'Signing up...' : 'Sign up'}
-        </Button>
+          <Button type="submit" disabled={loading}>
+            {loading ? 'Signing up...' : 'Sign up'}
+          </Button>
+        </AuthFormFooterStyled>
       </FormProvider>
     </SignUpFormStyled>
   )

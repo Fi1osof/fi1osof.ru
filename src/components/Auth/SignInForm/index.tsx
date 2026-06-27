@@ -15,6 +15,7 @@ import { useAppContext } from 'src/components/AppContext'
 import { useSnackbar } from 'src/ui-kit/Snackbar'
 import { Button } from 'src/ui-kit/Button'
 import { AuthProviders } from '../AuthProviders'
+import { AuthFormFooterStyled } from '../styles'
 
 export type { SignInFormData }
 
@@ -129,14 +130,16 @@ export const SignInForm: React.FC<SignInFormProps> = ({
         <Controller name="username" render={fieldRenderer} />
         <Controller name="password" render={fieldRenderer} />
 
-        <AuthProviders
-          onSuccessHandler={onSuccessHandler}
-          referrerToken={null}
-        />
+        <AuthFormFooterStyled>
+          <AuthProviders
+            onSuccessHandler={onSuccessHandler}
+            referrerToken={null}
+          />
 
-        <Button type="submit" disabled={loading}>
-          {loading ? 'Signing in...' : 'Sign In'}
-        </Button>
+          <Button type="submit" disabled={loading}>
+            {loading ? 'Signing in...' : 'Sign In'}
+          </Button>
+        </AuthFormFooterStyled>
       </FormProvider>
     </SignInFormStyled>
   )

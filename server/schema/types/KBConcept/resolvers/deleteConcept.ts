@@ -12,7 +12,7 @@ builder.mutationField('deleteConcept', (t) =>
       }
 
       // Check if concept exists and belongs to user
-      const existingConcept = await ctx.prisma.kBConcept.findFirst({
+      const existingConcept = await ctx.prisma.kBConcept.findUnique({
         where: {
           id: args.id,
           createdById: ctx.currentUser.id,

@@ -10,6 +10,22 @@ export const ImageGeneratorControlsStyled = styled.div`
   ${minWidth.md(css`
     grid-template-columns: 2fr 1fr;
   `)}
+
+  > * {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+`
+
+export const ImageGeneratorResultsStyled = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  img {
+    max-width: 100%;
+  }
 `
 
 export const ImageGeneratorStyled = styled.div`

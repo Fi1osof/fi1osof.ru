@@ -23,6 +23,7 @@ export const TasksPage: Page<TasksPageProps> = ({
   const response = useTasksWithCountQuery({
     variables,
     pollInterval: 60000,
+    fetchPolicy: 'cache-and-network',
   })
 
   const tasks = response.data?.tasks || []

@@ -27,6 +27,7 @@ import { memo, useCallback, useMemo, useState } from 'react'
 import { MarkdownEditorStyled } from './styles'
 import { MarkdownEditorToolbar } from './Toolbar'
 import { useSingleUploadMutation } from 'src/gql/generated'
+import { useStopPropagationScroll } from 'src/hooks/useStopPropagationScroll'
 
 type MarkdownEditorEditorProps = {
   value: string | null | undefined
@@ -40,6 +41,8 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorEditorProps> = ({
 }) => {
   const [editor, editorSetter] = useState<MDXEditorMethods | null>(null)
   const [uploadFile] = useSingleUploadMutation()
+
+  const { containerRef } = useStopPropagationScroll()
 
   const imageUploadHandler = useCallback(
     async (file: File): Promise<string> => {
@@ -120,7 +123,7 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorEditorProps> = ({
   }, [editor, imageUploadHandler, jsxComponentDescriptors])
 
   return (
-    <MarkdownEditorStyled {...other}>
+    <MarkdownEditorStyled ref={containerRef} {...other}>
       <MDXEditor
         ref={editorSetter}
         contentEditableClassName="content"

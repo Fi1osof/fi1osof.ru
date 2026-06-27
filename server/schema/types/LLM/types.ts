@@ -55,9 +55,9 @@ const LLMUsageCompletionTokensDetailsType = builder.simpleObject(
 
 const LLMUsageType = builder.simpleObject('LLMUsage', {
   fields: (t) => ({
-    promptTokens: t.int({ nullable: false }),
-    completionTokens: t.int({ nullable: false }),
-    totalTokens: t.int({ nullable: false }),
+    promptTokens: t.float({ nullable: false }),
+    completionTokens: t.float({ nullable: false }),
+    totalTokens: t.float({ nullable: false }),
     cost: t.float({ nullable: true }),
     isByok: t.boolean({ nullable: true }),
     promptTokensDetails: t.field({

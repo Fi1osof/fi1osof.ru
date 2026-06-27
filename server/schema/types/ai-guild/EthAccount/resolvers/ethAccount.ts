@@ -24,7 +24,7 @@ builder.queryField('ethAccount', (t) =>
         return null
       }
 
-      return ctx.prisma.ethAccount.findFirst({
+      return ctx.prisma.ethAccount.findUnique({
         ...query,
         where: {
           id: id ?? undefined,

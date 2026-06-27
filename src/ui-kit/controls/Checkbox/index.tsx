@@ -8,9 +8,14 @@ export interface CheckboxProps extends Omit<
   label: string
 }
 
-export const Checkbox: React.FC<CheckboxProps> = ({ label, ...props }) => {
+export const Checkbox: React.FC<CheckboxProps> = ({
+  label,
+  style,
+  className,
+  ...props
+}) => {
   return (
-    <CheckboxWrapper>
+    <CheckboxWrapper style={style} className={className}>
       <CheckboxInput type="checkbox" {...props} />
       <CheckboxLabel>{label}</CheckboxLabel>
     </CheckboxWrapper>

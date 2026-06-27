@@ -11,7 +11,7 @@ builder.mutationField('deleteKnowledgeSpace', (t) =>
         throw new Error('Unauthorized')
       }
 
-      const existingSpace = await ctx.prisma.kBKnowledgeSpace.findFirst({
+      const existingSpace = await ctx.prisma.kBKnowledgeSpace.findUnique({
         where: {
           id: args.id,
           createdById: ctx.currentUser.id,

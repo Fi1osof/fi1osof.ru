@@ -13,7 +13,7 @@ builder.mutationField('updateReaction', (t) =>
         throw new Error('Unauthorized')
       }
 
-      const existingReaction = await ctx.prisma.eXReaction.findFirst({
+      const existingReaction = await ctx.prisma.eXReaction.findUnique({
         where: {
           id: args.id,
           createdById: ctx.currentUser.id,

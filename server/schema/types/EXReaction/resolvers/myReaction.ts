@@ -12,7 +12,7 @@ builder.queryField('myReaction', (t) =>
         throw new Error('Unauthorized')
       }
 
-      return ctx.prisma.eXReaction.findFirst({
+      return ctx.prisma.eXReaction.findUnique({
         ...query,
         where: {
           id: args.id,

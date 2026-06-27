@@ -20,7 +20,7 @@ export const ModalContent = styled.div`
   box-shadow: ${({ theme }) => theme.shadows.md};
   max-width: 600px;
   width: 100%;
-  max-height: 80vh;
+  max-height: 80dvh;
   overflow: hidden;
   display: flex;
   flex-direction: column;

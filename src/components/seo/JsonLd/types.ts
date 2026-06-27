@@ -61,6 +61,7 @@ export interface WebPageSchema {
   name: string
   url?: string
   description?: string
+  image?: string
   isPartOf?: { '@type': 'WebSite'; name: string; url: string }
 }
 

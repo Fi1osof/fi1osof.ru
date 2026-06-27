@@ -53,6 +53,7 @@ export async function sendMessageStream(
         chatInput: message,
         sessionId,
         token: localStorage.getItem('token'),
+        user_current_page: global.location?.href,
       }),
       signal: abortSignal,
     })

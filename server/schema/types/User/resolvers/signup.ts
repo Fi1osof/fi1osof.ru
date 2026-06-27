@@ -24,7 +24,7 @@ builder.mutationField('signup', (t) =>
 
       if (
         email &&
-        (await ctx.prisma.user.findFirst({
+        (await ctx.prisma.user.findUnique({
           where: { email },
         }))
       ) {
@@ -33,7 +33,7 @@ builder.mutationField('signup', (t) =>
 
       if (
         username &&
-        (await ctx.prisma.user.findFirst({
+        (await ctx.prisma.user.findUnique({
           where: { username },
         }))
       ) {

@@ -11,7 +11,7 @@ import {
 
 interface ModalProps {
   isOpen: boolean
-  onClose: () => void
+  onClose: (() => void) | undefined
   title: string
   children: React.ReactNode
 }
@@ -30,7 +30,8 @@ export const Modal: React.FC<ModalProps> = ({
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && onClose) {
+        e.preventDefault()
         onClose()
       }
     },
@@ -39,7 +40,8 @@ export const Modal: React.FC<ModalProps> = ({
 
   const handleOverlayClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      if (e.target === e.currentTarget) {
+      if (e.target === e.currentTarget && onClose) {
+        e.preventDefault()
         onClose()
       }
     },

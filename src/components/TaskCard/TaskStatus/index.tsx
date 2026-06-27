@@ -83,7 +83,7 @@ export const TaskCardStatus: React.FC<TaskCardStatusProps> = ({
   return (
     <TaskCardStatusStyled>
       <Popover
-        item={<Select options={options} onChange={onChange} />}
+        item={<Select options={options} onChange={onChange} value={status} />}
         opened={inEditModeStatus}
         onCloseHandler={inEditModeStatusOff}
       >
