@@ -36,17 +36,21 @@ const createComponents = ({
   a: ({ node: _node, href: hrefProps, ...props }) => {
     const href: string | undefined = hrefProps
 
+    if (!href) {
+      return <span {...props} />
+    }
+
+    const external = /^https?:/.test(href)
+
+    const Component = external ? 'a' : Link
+
     return (
       <>
-        {href ? (
-          <Link
-            href={href}
-            {...props}
-            target={href && /^https?:/.test(href) ? '_blank' : undefined}
-          />
-        ) : (
-          <span {...props} />
-        )}
+        <Component
+          href={href}
+          {...props}
+          target={external ? '_blank' : undefined}
+        />
       </>
     )
   },
