@@ -11,7 +11,7 @@ builder.queryField('myConcept', (t) =>
         throw new Error('Unauthorized')
       }
 
-      const concept = await ctx.prisma.kBConcept.findFirst({
+      const concept = await ctx.prisma.kBConcept.findUnique({
         ...query,
         where: {
           id: args.id,

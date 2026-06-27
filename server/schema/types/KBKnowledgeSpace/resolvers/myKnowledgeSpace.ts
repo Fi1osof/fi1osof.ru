@@ -11,7 +11,7 @@ builder.queryField('myKnowledgeSpace', (t) =>
         throw new Error('Unauthorized')
       }
 
-      const space = await ctx.prisma.kBKnowledgeSpace.findFirst({
+      const space = await ctx.prisma.kBKnowledgeSpace.findUnique({
         ...query,
         where: {
           id: args.id,

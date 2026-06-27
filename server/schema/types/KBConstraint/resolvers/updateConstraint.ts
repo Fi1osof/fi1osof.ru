@@ -13,7 +13,7 @@ builder.mutationField('updateConstraint', (t) =>
         throw new Error('Unauthorized')
       }
 
-      const existingConstraint = await ctx.prisma.kBConstraint.findFirst({
+      const existingConstraint = await ctx.prisma.kBConstraint.findUnique({
         where: {
           id: args.id,
           createdById: ctx.currentUser.id,

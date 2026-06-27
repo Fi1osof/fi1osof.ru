@@ -12,7 +12,7 @@ builder.mutationField('createTaskWorkLog', (t) =>
         throw new Error('Not authenticated')
       }
 
-      const task = await ctx.prisma.task.findFirst({
+      const task = await ctx.prisma.task.findUnique({
         where: {
           id: args.data.taskId,
           assigneeId: ctx.currentUser.id,

@@ -11,7 +11,7 @@ builder.queryField('myLabel', (t) =>
         throw new Error('Unauthorized')
       }
 
-      const label = await ctx.prisma.kBLabel.findFirst({
+      const label = await ctx.prisma.kBLabel.findUnique({
         ...query,
         where: {
           id: args.id,

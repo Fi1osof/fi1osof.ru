@@ -11,7 +11,7 @@ builder.queryField('myFactProjection', (t) =>
         throw new Error('Unauthorized')
       }
 
-      const projection = await ctx.prisma.kBFactProjection.findFirst({
+      const projection = await ctx.prisma.kBFactProjection.findUnique({
         ...query,
         where: {
           id: args.id,

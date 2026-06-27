@@ -13,7 +13,7 @@ builder.mutationField('createLabel', (t) =>
       }
 
       // Verify that the concept belongs to the user
-      const concept = await ctx.prisma.kBConcept.findFirst({
+      const concept = await ctx.prisma.kBConcept.findUnique({
         where: {
           id: args.data.conceptId,
           createdById: ctx.currentUser.id,

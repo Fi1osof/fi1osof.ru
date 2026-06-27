@@ -11,7 +11,7 @@ builder.queryField('myDecision', (t) =>
         throw new Error('Unauthorized')
       }
 
-      const decision = await ctx.prisma.kBDecision.findFirst({
+      const decision = await ctx.prisma.kBDecision.findUnique({
         ...query,
         where: {
           id: args.id,

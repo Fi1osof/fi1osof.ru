@@ -11,7 +11,7 @@ builder.mutationField('deleteFactProjection', (t) =>
         throw new Error('Unauthorized')
       }
 
-      const existingProjection = await ctx.prisma.kBFactProjection.findFirst({
+      const existingProjection = await ctx.prisma.kBFactProjection.findUnique({
         where: {
           id: args.id,
           createdById: ctx.currentUser.id,

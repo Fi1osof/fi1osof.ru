@@ -13,7 +13,7 @@ builder.mutationField('createReaction', (t) =>
       }
 
       // Verify reflex exists and belongs to user
-      const reflex = await ctx.prisma.eXReflex.findFirst({
+      const reflex = await ctx.prisma.eXReflex.findUnique({
         where: {
           id: args.data.reflexId,
           createdById: ctx.currentUser.id,

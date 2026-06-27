@@ -11,7 +11,7 @@ builder.queryField('myConstraint', (t) =>
         throw new Error('Unauthorized')
       }
 
-      const constraint = await ctx.prisma.kBConstraint.findFirst({
+      const constraint = await ctx.prisma.kBConstraint.findUnique({
         ...query,
         where: {
           id: args.id,

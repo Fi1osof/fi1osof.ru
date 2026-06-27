@@ -22,7 +22,7 @@ builder.mutationField('updateConcept', (t) =>
       } = args
 
       // Check if concept exists and belongs to user
-      const existing = await ctx.prisma.kBConcept.findFirst({
+      const existing = await ctx.prisma.kBConcept.findUnique({
         where: {
           id: id ?? undefined,
         },

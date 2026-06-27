@@ -11,12 +11,14 @@ builder.mutationField('deleteIdentityOperation', (t) =>
         throw new Error('Unauthorized')
       }
 
-      const existingOperation = await ctx.prisma.kBIdentityOperation.findFirst({
-        where: {
-          id: args.id,
-          createdById: ctx.currentUser.id,
+      const existingOperation = await ctx.prisma.kBIdentityOperation.findUnique(
+        {
+          where: {
+            id: args.id,
+            createdById: ctx.currentUser.id,
+          },
         },
-      })
+      )
 
       if (!existingOperation) {
         throw new Error('Identity operation not found or access denied')

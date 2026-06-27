@@ -11,7 +11,7 @@ builder.queryField('myIdentityOperation', (t) =>
         throw new Error('Unauthorized')
       }
 
-      const operation = await ctx.prisma.kBIdentityOperation.findFirst({
+      const operation = await ctx.prisma.kBIdentityOperation.findUnique({
         ...query,
         where: {
           id: args.id,

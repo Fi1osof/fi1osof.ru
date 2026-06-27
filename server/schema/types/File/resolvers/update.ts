@@ -17,7 +17,7 @@ builder.mutationField('updateFile', (t) =>
 
       const { id, path } = args.where
 
-      const existingFile = await prisma.file.findFirst({
+      const existingFile = await prisma.file.findUnique({
         where: {
           id: id ?? undefined,
           path: path ?? undefined,

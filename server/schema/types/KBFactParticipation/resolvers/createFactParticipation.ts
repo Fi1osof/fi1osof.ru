@@ -13,7 +13,7 @@ builder.mutationField('createFactParticipation', (t) =>
       }
 
       // Verify that the fact belongs to the user
-      const fact = await ctx.prisma.kBFact.findFirst({
+      const fact = await ctx.prisma.kBFact.findUnique({
         where: {
           id: args.data.factId,
           createdById: ctx.currentUser.id,
@@ -25,7 +25,7 @@ builder.mutationField('createFactParticipation', (t) =>
       }
 
       // Verify that the concept belongs to the user
-      const concept = await ctx.prisma.kBConcept.findFirst({
+      const concept = await ctx.prisma.kBConcept.findUnique({
         where: {
           id: args.data.conceptId,
           createdById: ctx.currentUser.id,

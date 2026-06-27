@@ -12,7 +12,7 @@ builder.mutationField('deleteLabel', (t) =>
       }
 
       // Check if label exists and belongs to user
-      const existingLabel = await ctx.prisma.kBLabel.findFirst({
+      const existingLabel = await ctx.prisma.kBLabel.findUnique({
         where: {
           id: args.id,
           createdById: ctx.currentUser.id,

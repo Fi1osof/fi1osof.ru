@@ -14,7 +14,7 @@ builder.mutationField('updateFact', (t) =>
       }
 
       // Check if fact exists and belongs to user
-      const existingFact = await ctx.prisma.kBFact.findFirst({
+      const existingFact = await ctx.prisma.kBFact.findUnique({
         where: {
           id: args.id,
           createdById: ctx.currentUser.id,

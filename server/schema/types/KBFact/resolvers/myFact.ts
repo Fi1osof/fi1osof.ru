@@ -11,7 +11,7 @@ builder.queryField('myFact', (t) =>
         throw new Error('Unauthorized')
       }
 
-      const fact = await ctx.prisma.kBFact.findFirst({
+      const fact = await ctx.prisma.kBFact.findUnique({
         ...query,
         where: {
           id: args.id,

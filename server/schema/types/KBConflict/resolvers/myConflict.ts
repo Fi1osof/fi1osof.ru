@@ -11,7 +11,7 @@ builder.queryField('myConflict', (t) =>
         throw new Error('Unauthorized')
       }
 
-      const conflict = await ctx.prisma.kBConflict.findFirst({
+      const conflict = await ctx.prisma.kBConflict.findUnique({
         ...query,
         where: {
           id: args.id,

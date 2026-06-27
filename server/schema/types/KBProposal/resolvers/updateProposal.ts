@@ -13,7 +13,7 @@ builder.mutationField('updateProposal', (t) =>
         throw new Error('Unauthorized')
       }
 
-      const existingProposal = await ctx.prisma.kBProposal.findFirst({
+      const existingProposal = await ctx.prisma.kBProposal.findUnique({
         where: {
           id: args.id,
           createdById: ctx.currentUser.id,
