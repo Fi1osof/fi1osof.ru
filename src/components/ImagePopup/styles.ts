@@ -43,7 +43,7 @@ export const ImagePopupClose = styled.button`
 
 export const ImagePopupContent = styled.img`
   max-width: 90vw;
-  max-height: 90vh;
+  max-height: 90dvh;
   object-fit: contain;
   display: block;
 `
