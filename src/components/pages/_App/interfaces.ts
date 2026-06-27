@@ -61,9 +61,7 @@ export type Page<P extends PageProps = PageProps, IP = P> = NextComponentType<
   P
 >
 
-export interface AppInitialProps extends NextAppInitialProps {
-  pageProps: PageProps
-}
+export type AppInitialProps = NextAppInitialProps & Omit<AppProps, 'Component'>
 
 export type MainApp<P = AppProps> = React.FC<P> & {
   getInitialProps(context: AppContext): Promise<AppInitialProps>
