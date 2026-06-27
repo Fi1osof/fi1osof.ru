@@ -8,7 +8,7 @@ type AuthMode = 'signIn' | 'signUp'
 
 export interface AuthModalProps {
   isOpen: boolean
-  onClose: () => void
+  onClose: (() => void) | undefined
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
@@ -23,7 +23,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   }, [])
 
   const handleSuccess = useCallback(() => {
-    onClose()
+    onClose?.()
     setMode('signIn')
   }, [onClose])
 
