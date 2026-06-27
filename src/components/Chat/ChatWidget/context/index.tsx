@@ -5,10 +5,12 @@ import React, {
   useCallback,
   useMemo,
   useRef,
+  useEffect,
 } from 'react'
 import { ChatMessage, CHAT_SESSION_STORAGE_KEY } from '../interfaces'
 import { useSnackbar } from 'src/ui-kit/Snackbar/context'
 import { sendMessageStream } from '../../lib/streamClient'
+import { useRouter } from 'next/router'
 
 type ChatContextValue = {
   messages: ChatMessage[]
@@ -154,6 +156,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
       setIsLoading(true)
       abortControllerRef.current = new AbortController()
       startTypingTimer()
+      setIsExpanded(true)
 
       try {
         await sendMessageStream(
@@ -239,6 +242,14 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
       clearTypingTimer,
     ],
   )
+
+  const router = useRouter()
+
+  useEffect(() => {
+    if (router) {
+      setIsOpen(false)
+    }
+  }, [router])
 
   const value = useMemo<ChatContextValue>(
     () => ({
