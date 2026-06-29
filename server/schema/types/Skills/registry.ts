@@ -3,7 +3,12 @@ import { dirname, join, relative, sep } from 'path'
 import { RegisteredSkill, SkillManifest } from './interfaces'
 
 const SKILLS_DIR = join(__dirname, '../')
-const SKILL_FILE_NAMES = ['skillManifest.ts']
+
+/**
+ * В прод-режиме в бандл собираются js-файлы, а не ts,
+ * поэтому прописываем вариант и с .js
+ */
+const SKILL_FILE_NAMES = ['skillManifest.ts', 'skillManifest.js']
 
 function findSkillFiles(dir: string): string[] {
   if (!existsSync(dir)) {
