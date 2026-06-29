@@ -100,6 +100,10 @@ export const generateSitemapMain = async (
       url: `/worklogs`,
       updatedAt: monday.toISOString().split('T')[0],
     },
+    {
+      url: `/about`,
+      updatedAt: monday.toISOString().split('T')[0],
+    },
   ]
 
   return generateSitemapXML(xmlData, props)

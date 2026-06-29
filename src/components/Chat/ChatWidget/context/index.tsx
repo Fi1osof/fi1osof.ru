@@ -51,9 +51,9 @@ type ChatProviderProps = {
 
 export const ChatProvider: React.FC<ChatProviderProps> = ({
   children,
-  welcomeTitle = 'Hi! How can I help?',
-  welcomeText = 'Ask me anything',
-  placeholder = 'Type your message...',
+  welcomeTitle = 'Привет! Чем могу помочь?',
+  welcomeText = 'Спросите меня что угодно',
+  placeholder = 'Введите ваше сообщение...',
 }) => {
   const snackbar = useSnackbar()
   const [isOpen, setIsOpen] = useState(false)
@@ -201,7 +201,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
                       msg.id === streamingMessageIdRef.current
                         ? {
                             ...msg,
-                            text: 'Sorry, something went wrong. Please try again.',
+                            text: 'Извините, что-то пошло не так. Попробуйте снова.',
                           }
                         : msg,
                     ),
@@ -211,7 +211,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
                     ...prev,
                     {
                       id: Date.now().toString(),
-                      text: 'Sorry, something went wrong. Please try again.',
+                      text: 'Извините, что-то пошло не так. Попробуйте снова.',
                       isUser: false,
                     },
                   ])
@@ -227,7 +227,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
         )
       } catch (error) {
         const errorMessage =
-          error instanceof Error ? error.message : 'Unknown error'
+          error instanceof Error ? error.message : 'Неизвестная ошибка'
         snackbar?.addMessage(errorMessage, { variant: 'error' })
         setIsLoading(false)
         clearTypingTimer()

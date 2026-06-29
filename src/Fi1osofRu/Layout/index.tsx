@@ -30,6 +30,11 @@ const nav: LayoutNavItem[] = [
     id: 'worklogs',
     label: 'Журнал',
   },
+  {
+    href: '/about',
+    id: 'about',
+    label: 'Обо мне',
+  },
 ]
 
 export const Fi1osofRuLayout: React.FC<React.PropsWithChildren> = ({

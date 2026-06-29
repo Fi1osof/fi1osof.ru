@@ -37,7 +37,7 @@ export const HeaderNameStyled = styled.div`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  @media (max-width: ${({ theme }) => theme.breakpoint.mobile}) {
+  @media (max-width: ${({ theme }) => theme.breakpoint.tablet}) {
     font-size: ${({ theme }) => theme.size.md};
   }
 `
@@ -49,7 +49,7 @@ export const HeaderTaglineStyled = styled.div`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  @media (max-width: ${({ theme }) => theme.breakpoint.mobile}) {
+  @media (max-width: ${({ theme }) => theme.breakpoint.tablet}) {
     display: none;
   }
 `
@@ -66,7 +66,7 @@ export const HeaderNavStyled = styled.nav`
   display: flex;
   gap: ${({ theme }) => theme.space(5)};
   flex-wrap: nowrap;
-  @media (max-width: ${({ theme }) => theme.breakpoint.mobile}) {
+  @media (max-width: ${({ theme }) => theme.breakpoint.tablet}) {
     display: none;
   }
 `
@@ -97,7 +97,7 @@ export const BurgerButtonStyled = styled.button<{ $open?: boolean }>`
   border: 0;
   cursor: pointer;
   flex: none;
-  @media (max-width: ${({ theme }) => theme.breakpoint.mobile}) {
+  @media (max-width: ${({ theme }) => theme.breakpoint.tablet}) {
     display: flex;
   }
 `
@@ -115,7 +115,7 @@ export const MobilePanelStyled = styled.div`
   flex-direction: column;
   padding: ${({ theme }) => theme.space(2)} 0 ${({ theme }) => theme.space(4)};
   border-top: 1px solid ${({ theme }) => theme.color.hairline};
-  @media (max-width: ${({ theme }) => theme.breakpoint.mobile}) {
+  @media (max-width: ${({ theme }) => theme.breakpoint.tablet}) {
     display: flex;
   }
 `

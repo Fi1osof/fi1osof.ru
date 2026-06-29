@@ -59,11 +59,11 @@ export async function sendMessageStream(
     })
 
     if (!response.ok) {
-      throw new Error(`HTTP error: ${response.status}`)
+      throw new Error(`HTTP ошибка: ${response.status}`)
     }
 
     if (!response.body) {
-      throw new Error('No response body')
+      throw new Error('Нет тела ответа')
     }
 
     const reader = response.body.getReader()
@@ -82,7 +82,7 @@ export async function sendMessageStream(
             } else if (chunk.type === 'error') {
               const msg =
                 chunk.metadata?.message ||
-                `Error in ${chunk.metadata?.nodeName || 'agent'}`
+                `Ошибка в ${chunk.metadata?.nodeName || 'агенте'}`
               onError(new Error(msg))
               return
             }
@@ -106,7 +106,7 @@ export async function sendMessageStream(
           } else if (chunk.type === 'error') {
             const msg =
               chunk.metadata?.message ||
-              `Error in ${chunk.metadata?.nodeName || 'agent'}`
+              `Ошибка в ${chunk.metadata?.nodeName || 'агенте'}`
             onError(new Error(msg))
             return
           }

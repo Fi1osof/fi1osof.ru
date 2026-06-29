@@ -8,6 +8,10 @@ export interface PersonSchema {
   name?: string
   url?: string
   image?: string
+  jobTitle?: string
+  sameAs?: string[]
+  knowsAbout?: string[]
+  description?: string
 }
 
 export interface OrganizationSchema {
