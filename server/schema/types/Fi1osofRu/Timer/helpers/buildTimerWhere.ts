@@ -11,10 +11,8 @@ type TimerWhereInputType = typeof TimerWhereInput.$inferInput
 
 export function buildTimerWhere(
   where: TimerWhereInputType | null | undefined,
-  ctx: PrismaContext | undefined,
+  _ctx: PrismaContext | undefined,
 ): Prisma.TimerWhereInput {
-  const { currentUser } = ctx || {}
-
   const { id, taskId, createdById, startedAt, stoppedAt, ...other } =
     where || {}
 
@@ -25,10 +23,6 @@ export function buildTimerWhere(
     createdById: buildStringFilterWhere(createdById),
     startedAt: buildDateTimeFilterWhere(startedAt),
     stoppedAt: buildDateTimeNullableFilterWhere(stoppedAt),
-  }
-
-  if (currentUser && !currentUser.sudo) {
-    result.createdById = currentUser.id
   }
 
   return result
