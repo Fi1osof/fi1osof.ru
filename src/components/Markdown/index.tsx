@@ -9,15 +9,45 @@ import ReactMarkdown, {
 import rehypeRaw from 'rehype-raw'
 import rehypePrism from 'rehype-prism-plus'
 import remarkGfm from 'remark-gfm'
+import { visit } from 'unist-util-visit'
+import type { Root, Element } from 'hast'
 
 import { Image } from 'src/components/Image'
 import { Mermaid } from 'src/components/Mermaid'
 import { MarkdownStyled } from './styles'
+import { MarkdownFile } from './components/File'
+import { MarkdownFilesList } from './components/MarkdownFilesList'
 
 /**
  * Since version 9, remark has been nullifying tel and mailto links.
  * https://github.com/remarkjs/react-markdown/issues/829
  */
+function rehypeUnwrapFilesUploader() {
+  return (tree: Root) => {
+    visit(tree, 'element', (node: Element) => {
+      if (node.tagName === 'files-uploader') {
+        const extractFileElements = (
+          children: typeof node.children,
+        ): typeof node.children => {
+          const result: typeof node.children = []
+
+          for (const child of children) {
+            if (child.type === 'element' && child.tagName === 'file') {
+              result.push(child)
+            } else if (child.type === 'element' && child.children) {
+              result.push(...extractFileElements(child.children))
+            }
+          }
+
+          return result
+        }
+
+        node.children = extractFileElements(node.children)
+      }
+    })
+  }
+}
+
 const urlTransform: UrlTransform = (url, _name, _node) => {
   const fixed = defaultUrlTransform(url)
 
@@ -32,7 +62,18 @@ const createComponents = ({
   getContent,
 }: {
   getContent: () => string | null | undefined
-}): Components => ({
+}): Components & {
+  'files-uploader': React.FC<React.PropsWithChildren>
+  file: React.FC<
+    React.PropsWithChildren<{
+      node?: {
+        properties?: {
+          dataId?: string
+        }
+      }
+    }>
+  >
+} => ({
   a: ({ node: _node, href: hrefProps, ...props }) => {
     const href: string | undefined = hrefProps
 
@@ -95,6 +136,18 @@ const createComponents = ({
 
     return <pre {...props}>{children}</pre>
   },
+  'files-uploader': ({ children }) => {
+    return <MarkdownFilesList>{children}</MarkdownFilesList>
+  },
+  file: ({ node, children }) => {
+    const id = node?.properties?.dataId
+
+    if (!id) {
+      return null
+    }
+
+    return <MarkdownFile id={id} fileName={children} />
+  },
 })
 
 // const allowElement: AllowElement = (element, index, parent) => {
@@ -122,7 +175,11 @@ export const Markdown: React.FC<MarkdownProps> = ({ children, ...other }) => {
         remarkPlugins={[remarkGfm]}
         components={components}
         // allowElement={allowElement}
-        rehypePlugins={[rehypeRaw, [rehypePrism, { ignoreMissing: true }]]}
+        rehypePlugins={[
+          rehypeRaw,
+          rehypeUnwrapFilesUploader,
+          [rehypePrism, { ignoreMissing: true }],
+        ]}
       >
         {children}
       </ReactMarkdown>

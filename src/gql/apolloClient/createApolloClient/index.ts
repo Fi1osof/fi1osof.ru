@@ -19,6 +19,56 @@ import type { IncomingHttpHeaders } from 'http'
 
 export * from './interfaces'
 
+type FetchWithProgress = (
+  input: RequestInfo | URL,
+  init?: RequestInit & { onUploadProgress?: (percent: number) => void },
+) => Promise<Response>
+
+const fetchWithUploadProgress: FetchWithProgress = (input, init) => {
+  const onProgress = init?.onUploadProgress
+
+  if (typeof window === 'undefined' || !onProgress || !init?.body) {
+    return fetch(input, init)
+  }
+
+  return new Promise<Response>((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open(init.method || 'POST', input.toString())
+
+    if (init.headers) {
+      const headers = init.headers as Record<string, string>
+      Object.entries(headers).forEach(([key, value]) => {
+        xhr.setRequestHeader(key, value)
+      })
+    }
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percent = Math.round((event.loaded / event.total) * 100)
+        onProgress(percent)
+      }
+    }
+
+    xhr.onload = () => {
+      resolve(
+        new Response(xhr.responseText, {
+          status: xhr.status,
+          statusText: xhr.statusText,
+        }),
+      )
+    }
+
+    xhr.onerror = () => reject(new Error('Network error'))
+    xhr.onabort = () => reject(new DOMException('Aborted', 'AbortError'))
+
+    if (init.signal) {
+      init.signal.addEventListener('abort', () => xhr.abort())
+    }
+
+    xhr.send(init.body as XMLHttpRequestBodyInit)
+  })
+}
+
 let wsLink: GraphQLWsLink | undefined
 
 function getEndpoint() {
@@ -130,6 +180,7 @@ function createApolloClient({ withWs, appContext }: createApolloClientProps) {
 
   const uploadLink = new UploadHttpLink({
     uri: endpoint,
+    fetch: fetchWithUploadProgress as typeof fetch,
   })
 
   const secureUploadLink = new SetContextLink((prevContext, operation) => {
