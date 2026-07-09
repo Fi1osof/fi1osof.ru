@@ -1,6 +1,6 @@
 import { Page } from '../../_App/interfaces'
 import { UserPageProps } from './interfaces'
-import { UserDocument } from 'src/gql/generated'
+import { UserDocument, UserQuery, UserQueryVariables } from 'src/gql/generated'
 import { getUserQueryVariables } from './helpers'
 
 export const userPageGetInitialProps: Page<UserPageProps>['getInitialProps'] =
@@ -11,10 +11,13 @@ export const userPageGetInitialProps: Page<UserPageProps>['getInitialProps'] =
     const variables = getUserQueryVariables(userId)
 
     const user = userId
-      ? await apolloClient.query({
-          query: UserDocument,
-          variables,
-        })
+      ? await apolloClient
+          // eslint-disable-next-line @typescript-eslint/no-deprecated
+          .query<UserQuery, UserQueryVariables>({
+            query: UserDocument,
+            variables,
+          })
+          .then((r) => r.data?.object)
       : undefined
 
     return {

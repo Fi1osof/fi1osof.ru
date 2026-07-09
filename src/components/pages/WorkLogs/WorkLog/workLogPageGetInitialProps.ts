@@ -1,6 +1,10 @@
 import { Page } from '../../_App/interfaces'
 import { WorkLogPageProps } from './interfaces'
-import { TaskWorkLogDocument } from 'src/gql/generated'
+import {
+  TaskWorkLogDocument,
+  TaskWorkLogQuery,
+  TaskWorkLogQueryVariables,
+} from 'src/gql/generated'
 import { getWorkLogQueryVariables } from '../helpers'
 
 export const workLogPageGetInitialProps: Page<WorkLogPageProps>['getInitialProps'] =
@@ -11,14 +15,17 @@ export const workLogPageGetInitialProps: Page<WorkLogPageProps>['getInitialProps
     const variables = getWorkLogQueryVariables(workLogId)
 
     const workLog = workLogId
-      ? await apolloClient.query({
-          query: TaskWorkLogDocument,
-          variables,
-        })
+      ? await apolloClient
+          // eslint-disable-next-line @typescript-eslint/no-deprecated
+          .query<TaskWorkLogQuery, TaskWorkLogQueryVariables>({
+            query: TaskWorkLogDocument,
+            variables,
+          })
+          .then((r) => r.data?.response)
       : undefined
 
     return {
       workLogId,
-      statusCode: !workLog?.data?.response ? 404 : undefined,
+      statusCode: !workLog ? 404 : undefined,
     }
   }

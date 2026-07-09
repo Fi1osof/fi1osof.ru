@@ -1,6 +1,6 @@
 import { Page } from '../../_App/interfaces'
 import { PostPageProps } from './interfaces'
-import { PostDocument } from 'src/gql/generated'
+import { PostDocument, PostQuery, PostQueryVariables } from 'src/gql/generated'
 
 export const postPageGetInitialProps: Page<PostPageProps>['getInitialProps'] =
   async ({ query, apolloClient }) => {
@@ -8,18 +8,21 @@ export const postPageGetInitialProps: Page<PostPageProps>['getInitialProps'] =
       typeof query.id === 'string' && query.id ? query.id : undefined
 
     const post = postId
-      ? await apolloClient.query({
-          query: PostDocument,
-          variables: {
-            where: {
-              id: postId,
+      ? await apolloClient
+          // eslint-disable-next-line @typescript-eslint/no-deprecated
+          .query<PostQuery, PostQueryVariables>({
+            query: PostDocument,
+            variables: {
+              where: {
+                id: postId,
+              },
             },
-          },
-        })
+          })
+          .then((r) => r.data?.object)
       : undefined
 
     return {
       postId,
-      statusCode: !post?.data?.object ? 404 : undefined,
+      statusCode: !post ? 404 : undefined,
     }
   }

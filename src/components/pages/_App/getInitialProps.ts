@@ -50,7 +50,15 @@ export const getInitialProps: MainApp['getInitialProps'] = async (
   const { pageProps, ...otherProps } =
     await NextApp.getInitialProps(newAppContext)
 
-  const { statusCode } = pageProps as PageProps
+  let statusCode = (pageProps as PageProps | undefined)?.statusCode
+
+  if (statusCode === undefined) {
+    switch (ctx.pathname) {
+      case '/404':
+        statusCode = 404
+        break
+    }
+  }
 
   /**
    * If running on the server side
