@@ -83,6 +83,7 @@ const ruleTree = {
     signPost: isActive,
     world3dObjectCreate: isActive,
     sendMail: isSudo,
+    createRedirectRule: isSudo,
   },
 } satisfies PermissionsRuleTree
 

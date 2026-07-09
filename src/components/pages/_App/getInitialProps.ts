@@ -9,6 +9,12 @@ import {
   withWs,
 } from './interfaces'
 import { getSiteOrigin } from 'src/helpers/getSiteOrigin'
+import {
+  CreateSystemLogDocument,
+  CreateSystemLogMutation,
+  CreateSystemLogMutationVariables,
+} from 'src/gql/generated/createSystemLog'
+import { SystemLogLevel, SystemLogSource } from 'src/gql/generated'
 
 export const getInitialProps: MainApp['getInitialProps'] = async (
   appContext,
@@ -61,6 +67,47 @@ export const getInitialProps: MainApp['getInitialProps'] = async (
       initialApolloState: apolloClient.cache.extract(),
       origin: getSiteOrigin(ctx.req),
     },
+  }
+
+  if (
+    statusCode !== undefined &&
+    statusCode !== 200 &&
+    ctx.req?.url &&
+    ctx.res
+  ) {
+    const req = ctx.req
+    const res = ctx.res
+    const url = req.url || ''
+    const path = url.split('?')[0]
+
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
+    const response = await apolloClient.mutate<
+      CreateSystemLogMutation,
+      CreateSystemLogMutationVariables
+    >({
+      mutation: CreateSystemLogDocument,
+      variables: {
+        data: {
+          level: SystemLogLevel.ERROR,
+          source: SystemLogSource.CLIENT,
+          message: `HTTP ${statusCode}: ${path}`,
+          url,
+          path,
+          statusCode,
+          method: req.method,
+          userAgent: req.headers['user-agent'],
+          referer: req.headers.referer,
+        },
+      },
+    })
+
+    const result = response.data?.createSystemLog
+    if (result?.redirectTo && result.redirectStatusCode) {
+      res.writeHead(result.redirectStatusCode, {
+        Location: result.redirectTo,
+      })
+      res.end()
+    }
   }
 
   return newProps

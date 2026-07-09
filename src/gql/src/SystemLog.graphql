@@ -1,0 +1,7 @@
+mutation createSystemLog($data: CreateSystemLogInput!) {
+  createSystemLog(data: $data) {
+    id
+    redirectStatusCode
+    redirectTo
+  }
+}

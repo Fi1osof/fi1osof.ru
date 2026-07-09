@@ -68,6 +68,8 @@ model User {
   referrerId String? @db.VarChar(36)
   Files      File[]
 
+  IncidentsResolved Incident[] @relation(name: "IncidentResolvedBy")
+
   @@unique([email])
   @@unique([username])
 }
@@ -933,4 +935,112 @@ model PostRevision {
 
   @@index([postId])
   @@index([createdAt])
+}
+
+// ============================================
+// Statistics & Redirects
+// ============================================
+
+enum RedirectPatternType {
+  regex
+  prefix
+  exact
+}
+
+enum IncidentStatus {
+  open
+  resolved
+  ignored
+}
+
+enum SystemLogLevel {
+  error
+  warning
+  info
+  debug
+}
+
+enum SystemLogSource {
+  client
+  server
+  api
+}
+
+model SystemLog {
+  id        String   @id @default(cuid()) @db.VarChar(36)
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+
+  level   SystemLogLevel  @default(info)
+  source  SystemLogSource @default(server)
+  message String          @db.Text
+  stack   String?         @db.Text
+
+  url        String? @db.Text
+  path       String? @db.VarChar(2048)
+  statusCode Int?
+  method     String? @db.VarChar(10)
+  userAgent  String? @db.Text
+  robotType  String? @db.VarChar(50)
+  ip         String? @db.VarChar(45)
+  referer    String? @db.Text
+  headers    Json?
+  data       Json?
+
+  redirectRuleId String?       @db.VarChar(36)
+  RedirectRule   RedirectRule? @relation(fields: [redirectRuleId], references: [id], onDelete: SetNull)
+
+  incidentId String?   @db.VarChar(36)
+  Incident   Incident? @relation(fields: [incidentId], references: [id], onDelete: SetNull)
+
+  @@index([level])
+  @@index([source])
+  @@index([statusCode])
+  @@index([path])
+  @@index([createdAt])
+  @@index([robotType])
+  @@index([incidentId])
+  @@index([redirectRuleId])
+}
+
+model RedirectRule {
+  id        String   @id @default(cuid()) @db.VarChar(36)
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp(3)
+
+  name        String              @db.VarChar(255)
+  pattern     String              @db.Text
+  patternType RedirectPatternType @default(regex)
+  replacement String              @db.Text
+  statusCode  Int                 @default(301)
+  priority    Int                 @default(0)
+  enabled     Boolean             @default(true)
+  comment     String?             @db.Text
+
+  SystemLogs SystemLog[]
+
+  @@unique([pattern, patternType])
+  @@index([enabled])
+  @@index([priority])
+}
+
+model Incident {
+  id        String   @id @default(cuid()) @db.VarChar(36)
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp(3)
+
+  title       String               @db.VarChar(500)
+  pattern     String?              @db.Text
+  patternType RedirectPatternType?
+  status      IncidentStatus       @default(open)
+  resolution  String?              @db.Text
+  resolvedAt  DateTime?            @db.Timestamp(3)
+
+  resolvedById String? @db.VarChar(36)
+  ResolvedBy   User?   @relation(fields: [resolvedById], references: [id], onDelete: SetNull, name: "IncidentResolvedBy")
+
+  SystemLogs SystemLog[]
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([resolvedById])
 }
