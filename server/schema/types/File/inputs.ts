@@ -16,6 +16,7 @@ export const FileWhereUniqueInput = builder.inputType('FileWhereUniqueInput', {
   fields: (t) => ({
     id: t.id({}),
     path: t.string({}),
+    hash: t.string({}),
   }),
 })
 

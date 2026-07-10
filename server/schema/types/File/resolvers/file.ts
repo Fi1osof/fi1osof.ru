@@ -11,13 +11,14 @@ builder.queryField('file', (t) =>
     resolve: async (query, _root, args, ctx) => {
       const { prisma } = ctx
 
-      const { id, path, ...other } = args.where
+      const { id, path, hash, ...other } = args.where
 
       return prisma.file.findUnique({
         ...query,
         where: {
           id: id ?? undefined,
           path: path ?? undefined,
+          hash: hash ?? undefined,
           ...other,
         },
       })

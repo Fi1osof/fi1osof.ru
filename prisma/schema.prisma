@@ -121,7 +121,7 @@ model File {
   filename    String?  @db.Text
   mimetype    String   @db.Text
   encoding    String   @db.Text
-  hash        String?  @db.Text
+  hash        String?  @unique @db.VarChar(64)
   size        Decimal?
   rank        Int?
 
