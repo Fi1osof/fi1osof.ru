@@ -8,7 +8,7 @@ import { UsersPageProps } from './interfaces'
 import { useAppContext } from 'src/components/AppContext'
 import { useMemo } from 'react'
 
-export const UsersPage: Page<UsersPageProps> = ({ page }) => {
+export const UsersPage: Page<UsersPageProps> = ({ page, siteOrigin }) => {
   const { user: currentUser } = useAppContext()
 
   const response = useUsersConnectionQuery({
@@ -22,7 +22,11 @@ export const UsersPage: Page<UsersPageProps> = ({ page }) => {
 
   return (
     <>
-      <SeoHeaders title="Users" />
+      <SeoHeaders
+        title="Users"
+        siteOrigin={siteOrigin}
+        canonical={`/users${page > 1 ? `?page=${page}` : ''}`}
+      />
       <UsersView
         users={users}
         page={page}

@@ -5,7 +5,13 @@ import { KnowledgeBaseView } from './View'
 export const KnowledgeBasePage: React.FC = () => {
   return (
     <>
-      <SeoHeaders title="Knowledge Base" nofollow noindex />
+      <SeoHeaders
+        title="Knowledge Base"
+        nofollow
+        noindex
+        canonical={undefined}
+        siteOrigin={undefined}
+      />
       <KnowledgeBaseView />
     </>
   )

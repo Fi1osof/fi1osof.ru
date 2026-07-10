@@ -17,6 +17,9 @@ builder.queryField('concept', (t) =>
         where: {
           id: id ?? undefined,
         },
+        include: {
+          SiteRoute: true,
+        },
       })
 
       if (!concept) {

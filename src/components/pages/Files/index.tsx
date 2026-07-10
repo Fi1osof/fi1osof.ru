@@ -23,7 +23,13 @@ export const FilesPage: Page<FilesPageProps> = ({ page = 1 }) => {
 
   return (
     <>
-      <SeoHeaders title="Files" nofollow noindex />
+      <SeoHeaders
+        title="Files"
+        nofollow
+        noindex
+        canonical={undefined}
+        siteOrigin={undefined}
+      />
 
       <FilesView
         files={response.data?.files ?? []}

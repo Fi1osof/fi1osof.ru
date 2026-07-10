@@ -1,7 +1,7 @@
 query postsConnection($where: PostWhereInput, $skip: Int, $take: Int = 10) {
   postsCount(where: $where)
   posts(where: $where, skip: $skip, take: $take) {
-    ...Post_
+    ...PostNoNesting
   }
 }
 
@@ -26,7 +26,7 @@ mutation updatePost(
   }
 }
 
-fragment Post_ on Post {
+fragment PostNoNesting on Post {
   id
   createdAt
   updatedAt
@@ -36,8 +36,12 @@ fragment Post_ on Post {
   title
   description
   intro
-  content
   createdById
+}
+
+fragment Post_ on Post {
+  ...PostNoNesting
+  content
   CreatedBy {
     ...UserNoNesting
   }

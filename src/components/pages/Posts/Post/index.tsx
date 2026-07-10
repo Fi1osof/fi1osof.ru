@@ -7,8 +7,9 @@ import { PostStatus, usePostQuery, UserStatusEnum } from 'src/gql/generated'
 import { SeoHeaders } from 'src/components/seo/SeoHeaders'
 import { JsonLd } from 'src/components/seo/JsonLd'
 import { createBlogPosting } from 'src/components/seo/JsonLd/helpers'
+import { createPostLink } from 'src/components/Link/Post'
 
-export const PostPage: Page<PostPageProps> = ({ postId }) => {
+export const PostPage: Page<PostPageProps> = ({ postId, siteOrigin }) => {
   const response = usePostQuery({
     skip: !postId,
     variables: {
@@ -54,6 +55,8 @@ export const PostPage: Page<PostPageProps> = ({ postId }) => {
         description={post.description}
         noindex={!searchable}
         nofollow={!searchable}
+        siteOrigin={siteOrigin}
+        canonical={createPostLink(post)}
       />
       {blogPostingSchema && <JsonLd data={blogPostingSchema} />}
       <PostPageView post={post} />

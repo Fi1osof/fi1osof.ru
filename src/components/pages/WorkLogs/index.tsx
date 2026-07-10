@@ -8,7 +8,7 @@ import { WorkLogsPageProps } from './interfaces'
 
 const PAGE_SIZE = 20
 
-export const WorkLogsPage: Page<WorkLogsPageProps> = ({ page }) => {
+export const WorkLogsPage: Page<WorkLogsPageProps> = ({ page, siteOrigin }) => {
   const variables = getWorkLogsWithCountQueryVariables(page, PAGE_SIZE)
 
   const response = useTaskWorkLogsWithCountQuery({
@@ -22,7 +22,13 @@ export const WorkLogsPage: Page<WorkLogsPageProps> = ({ page }) => {
 
   return (
     <>
-      <SeoHeaders title="Work Logs" />
+      <SeoHeaders
+        title="Work Logs"
+        noindex
+        nofollow
+        canonical={'/worklogs'}
+        siteOrigin={siteOrigin}
+      />
       <WorkLogsView
         workLogs={workLogs}
         loading={response.loading}

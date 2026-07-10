@@ -18,5 +18,6 @@ export function getUsersQueryVariables({
   return {
     where: { status: currentUser ? undefined : UserStatusEnum.ACTIVE },
     skip: (page - 1) * first,
+    first,
   }
 }

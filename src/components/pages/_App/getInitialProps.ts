@@ -73,7 +73,7 @@ export const getInitialProps: MainApp['getInitialProps'] = async (
       ...pageProps,
       statusCode,
       initialApolloState: apolloClient.cache.extract(),
-      origin: getSiteOrigin(ctx.req),
+      siteOrigin: getSiteOrigin(ctx.req),
     },
   }
 
@@ -88,33 +88,40 @@ export const getInitialProps: MainApp['getInitialProps'] = async (
     const url = req.url || ''
     const path = url.split('?')[0]
 
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    const response = await apolloClient.mutate<
-      CreateSystemLogMutation,
-      CreateSystemLogMutationVariables
-    >({
-      mutation: CreateSystemLogDocument,
-      variables: {
-        data: {
-          level: SystemLogLevel.ERROR,
-          source: SystemLogSource.CLIENT,
-          message: `HTTP ${statusCode}: ${path}`,
-          url,
-          path,
-          statusCode,
-          method: req.method,
-          userAgent: req.headers['user-agent'],
-          referer: req.headers.referer,
-        },
-      },
-    })
+    const skip = [
+      '/_next/static/chunks/pages/types.js.map',
+      '/.well-known/appspecific/com.chrome.devtools.json',
+    ].includes(url)
 
-    const result = response.data?.createSystemLog
-    if (result?.redirectTo && result.redirectStatusCode) {
-      res.writeHead(result.redirectStatusCode, {
-        Location: result.redirectTo,
+    if (!skip) {
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
+      const response = await apolloClient.mutate<
+        CreateSystemLogMutation,
+        CreateSystemLogMutationVariables
+      >({
+        mutation: CreateSystemLogDocument,
+        variables: {
+          data: {
+            level: SystemLogLevel.ERROR,
+            source: SystemLogSource.CLIENT,
+            message: `HTTP ${statusCode}: ${path}`,
+            url,
+            path,
+            statusCode,
+            method: req.method,
+            userAgent: req.headers['user-agent'],
+            referer: req.headers.referer,
+          },
+        },
       })
-      res.end()
+
+      const result = response.data?.createSystemLog
+      if (result?.redirectTo && result.redirectStatusCode) {
+        res.writeHead(result.redirectStatusCode, {
+          Location: result.redirectTo,
+        })
+        res.end()
+      }
     }
   }
 

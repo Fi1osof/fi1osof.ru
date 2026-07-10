@@ -5,7 +5,13 @@ import { TaskEditForm } from '../Form'
 export const TaskCreatePage: Page = () => {
   return (
     <>
-      <SeoHeaders title="Create task" noindex nofollow />
+      <SeoHeaders
+        title="Create task"
+        noindex
+        nofollow
+        canonical={undefined}
+        siteOrigin={undefined}
+      />
 
       <TaskEditForm
         task={undefined}

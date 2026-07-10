@@ -8,7 +8,11 @@ import { tasksPageGetInitialProps } from './tasksPageGetInitialProps'
 
 const PAGE_SIZE = 20
 
-export const TasksPage: Page<TasksPageProps> = ({ selectedStatus, page }) => {
+export const TasksPage: Page<TasksPageProps> = ({
+  selectedStatus,
+  page,
+  siteOrigin,
+}) => {
   const variables = getTasksWithCountQueryVariables(
     selectedStatus,
     page,
@@ -27,7 +31,13 @@ export const TasksPage: Page<TasksPageProps> = ({ selectedStatus, page }) => {
 
   return (
     <>
-      <SeoHeaders title="Tasks" />
+      <SeoHeaders
+        title="Tasks"
+        siteOrigin={siteOrigin}
+        canonical={`/tasks${page > 1 ? `?page=${page}` : ''}`}
+        nofollow
+        noindex
+      />
       <TasksView
         tasks={tasks}
         loading={response.loading}

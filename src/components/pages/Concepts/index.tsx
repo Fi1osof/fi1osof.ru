@@ -23,7 +23,13 @@ export const ConceptsPage: Page<ConceptsPageProps> = ({ page = 1 }) => {
 
   return (
     <>
-      <SeoHeaders title="Concepts" nofollow noindex />
+      <SeoHeaders
+        title="Concepts"
+        nofollow
+        noindex
+        canonical={undefined}
+        siteOrigin={undefined}
+      />
 
       <ConceptsView
         concepts={response.data?.concepts ?? []}

@@ -7,7 +7,13 @@ export default function () {
 
   return (
     <>
-      <SeoHeaders title="Image uploader" noindex nofollow />
+      <SeoHeaders
+        title="Image uploader"
+        noindex
+        nofollow
+        canonical={undefined}
+        siteOrigin={undefined}
+      />
       {user?.sudo && <ImageGenerator />}
     </>
   )

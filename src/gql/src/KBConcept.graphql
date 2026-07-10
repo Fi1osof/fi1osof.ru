@@ -108,5 +108,6 @@ fragment KBConceptNoNesting on KBConcept {
   code
   parentId
   rootId
+  uri
   content @include(if: $detailedInfo)
 }

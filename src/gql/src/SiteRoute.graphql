@@ -1,0 +1,28 @@
+query siteRoute($where: SiteRouteWhereUniqueInput!) {
+  siteRoute(where: $where) {
+    ...SiteRoute_
+  }
+}
+
+query siteRoutes {
+  siteRoutes {
+    ...SiteRouteNoNesting
+  }
+}
+
+fragment SiteRouteNoNesting on SiteRoute {
+  id
+  createdAt
+  slug
+  path
+  createdById
+  kBConceptId
+}
+
+fragment SiteRoute_ on SiteRoute {
+  ...SiteRouteNoNesting
+  KBConcept {
+    id
+    name
+  }
+}

@@ -50,6 +50,9 @@ export const conceptsResolver = (
       name: args.orderBy?.name ?? undefined,
       type: args.orderBy?.type ?? undefined,
     },
+    include: {
+      SiteRoute: true,
+    },
   })
 }
 

@@ -311,6 +311,7 @@ model KBConcept {
   Descendants KBConcept[] @relation("ConceptRoot")
 
   KBConceptFiles KBConceptFile[]
+  SiteRoute      SiteRoute?
 
   @@unique([rootId, code])
   @@unique([parentId, code])
@@ -1043,4 +1044,29 @@ model Incident {
   @@index([status])
   @@index([createdAt])
   @@index([resolvedById])
+}
+
+// -- End of Statistics & Redirects --
+
+model SiteRoute {
+  id        String   @id @default(cuid()) @db.VarChar(36)
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp(3)
+
+  path String @unique
+  slug String
+  rank Int    @default(0)
+
+  parentId String?
+  Parent   SiteRoute? @relation("SiteRouteTree", fields: [parentId], references: [id])
+
+  Children SiteRoute[] @relation("SiteRouteTree")
+
+  kBConceptId String?    @unique
+  KBConcept   KBConcept? @relation(fields: [kBConceptId], references: [id])
+
+  createdById String @db.VarChar(36)
+
+  @@unique([parentId, slug])
+  @@index([createdById])
 }

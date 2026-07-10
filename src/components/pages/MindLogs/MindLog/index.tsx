@@ -19,7 +19,13 @@ export const MindLogPage: Page<MindLogPageProps> = ({ mindLogId }) => {
 
   return (
     <>
-      <SeoHeaders title={`Mind Log: ${mindLog?.type}`} noindex nofollow />
+      <SeoHeaders
+        title={`Mind Log: ${mindLog?.type}`}
+        noindex
+        nofollow
+        canonical={undefined}
+        siteOrigin={undefined}
+      />
       {mindLog && (
         <MindLogPageStyled>
           <MindLogCard mindLog={mindLog} />

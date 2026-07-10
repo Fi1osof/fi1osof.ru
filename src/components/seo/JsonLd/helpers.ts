@@ -78,10 +78,10 @@ export const createOrganization = (
 
 export const createBreadcrumbList = ({
   items,
-  origin,
+  siteOrigin,
 }: {
   items: { name: string; url?: string }[]
-  origin: string
+  siteOrigin: string
 }): WithContext<'BreadcrumbList'> & BreadcrumbListSchema => ({
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
@@ -92,8 +92,8 @@ export const createBreadcrumbList = ({
     item: !item.url
       ? undefined
       : item.url === '/'
-        ? origin
-        : `${origin}${item.url}`,
+        ? siteOrigin
+        : `${siteOrigin}${item.url}`,
   })),
 })
 

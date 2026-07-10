@@ -25,7 +25,13 @@ export const FilePage: Page = () => {
 
   return (
     <>
-      <SeoHeaders title={file?.name ?? 'File'} nofollow noindex />
+      <SeoHeaders
+        title={file?.name ?? 'File'}
+        nofollow
+        noindex
+        canonical={undefined}
+        siteOrigin={undefined}
+      />
 
       {file && <FileView file={file} currentUser={currentUser} />}
     </>

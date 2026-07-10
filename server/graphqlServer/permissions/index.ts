@@ -84,6 +84,7 @@ const ruleTree = {
     world3dObjectCreate: isActive,
     sendMail: isSudo,
     createRedirectRule: isSudo,
+    createSiteRoute: isSudo,
   },
 } satisfies PermissionsRuleTree
 

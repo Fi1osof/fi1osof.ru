@@ -5,7 +5,13 @@ import { PostEditForm } from '../Form'
 export const PostCreatePage: Page = () => {
   return (
     <>
-      <SeoHeaders title="Create post" noindex nofollow />
+      <SeoHeaders
+        title="Create post"
+        noindex
+        nofollow
+        canonical={undefined}
+        siteOrigin={undefined}
+      />
 
       <PostEditForm
         post={undefined}

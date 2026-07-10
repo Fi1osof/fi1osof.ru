@@ -14,6 +14,7 @@ import './resolvers/updateConcept'
 import './resolvers/deleteConcept'
 import { KBConceptOrderByInput, KBConceptWhereInput } from './inputs'
 import { conceptsResolver } from './resolvers/concepts'
+import { SiteRoute } from '@prisma/client'
 
 // Export all types
 export * from './inputs'
@@ -52,5 +53,15 @@ builder.prismaObject('KBConcept', {
     }),
     Descendants: t.relation('Descendants'),
     Files: t.relation('KBConceptFiles'),
+    SiteRoute: t.relation('SiteRoute'),
+    uri: t.string({
+      nullable: false,
+      resolve(source) {
+        const SiteRoute =
+          'SiteRoute' in source ? (source.SiteRoute as SiteRoute) : undefined
+
+        return SiteRoute?.path || `/concepts/${source.id}`
+      },
+    }),
   }),
 })
