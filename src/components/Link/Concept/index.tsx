@@ -10,11 +10,13 @@ export function createConceptLink(object: KbConceptNoNestingFragment): string {
 
 type ConceptLinkProps = React.PropsWithChildren & {
   object: KbConceptNoNestingFragment | null | undefined
+  className?: string
 }
 
 export const ConceptLink: React.FC<ConceptLinkProps> = ({
   object,
   children,
+  className,
 }) => {
   if (!object) {
     return null
@@ -22,5 +24,9 @@ export const ConceptLink: React.FC<ConceptLinkProps> = ({
 
   const href = createConceptLink(object)
 
-  return <Link href={href}>{children || object.name || object.id}</Link>
+  return (
+    <Link href={href} className={className}>
+      {children || object.name || object.id}
+    </Link>
+  )
 }

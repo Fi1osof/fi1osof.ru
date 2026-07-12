@@ -10,14 +10,23 @@ export function createTaskLink(object: TaskNoNestingFragment): string {
 
 type TaskLinkProps = React.PropsWithChildren & {
   object: TaskNoNestingFragment | null | undefined
+  className?: string
 }
 
-export const TaskLink: React.FC<TaskLinkProps> = ({ object, children }) => {
+export const TaskLink: React.FC<TaskLinkProps> = ({
+  object,
+  children,
+  className,
+}) => {
   if (!object) {
     return null
   }
 
   const href = createTaskLink(object)
 
-  return <Link href={href}>{children || object.id}</Link>
+  return (
+    <Link href={href} className={className}>
+      {children || object.id}
+    </Link>
+  )
 }

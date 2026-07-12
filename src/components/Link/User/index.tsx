@@ -9,6 +9,13 @@ import {
 } from './styles'
 import { Avatar } from 'src/components/Avatar'
 
+const UserIcon: React.FC = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </svg>
+)
+
 export function createUserLink(user: UserNoNestingFragment): string {
   const { id } = user
 
@@ -20,20 +27,15 @@ type UserLinkProps = {
   withAvatar?: boolean
   showName?: boolean
   size?: 'small' | 'normal' | 'big'
+  className?: string
 }
-
-const UserIcon: React.FC = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-    <circle cx="12" cy="7" r="4" />
-  </svg>
-)
 
 export const UserLink: React.FC<UserLinkProps> = ({
   user,
   withAvatar = true,
   showName = true,
   size = 'normal',
+  className,
 }) => {
   if (!user) {
     return null
@@ -65,7 +67,7 @@ export const UserLink: React.FC<UserLinkProps> = ({
   }
 
   return (
-    <UserLinkContainer>
+    <UserLinkContainer className={className}>
       {avatarElement}
       {showName && (
         <NameContainer>

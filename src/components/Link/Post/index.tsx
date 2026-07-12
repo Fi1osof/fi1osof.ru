@@ -10,14 +10,23 @@ export function createPostLink(object: PostNoNestingFragment): string {
 
 type PostLinkProps = React.PropsWithChildren & {
   object: PostNoNestingFragment | null | undefined
+  className?: string
 }
 
-export const PostLink: React.FC<PostLinkProps> = ({ object, children }) => {
+export const PostLink: React.FC<PostLinkProps> = ({
+  object,
+  children,
+  className,
+}) => {
   if (!object) {
     return null
   }
 
   const href = createPostLink(object)
 
-  return <Link href={href}>{children || object.id}</Link>
+  return (
+    <Link href={href} className={className}>
+      {children || object.id}
+    </Link>
+  )
 }
