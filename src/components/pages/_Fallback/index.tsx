@@ -20,17 +20,21 @@ export const SiteRouterPage: Page<SiteRouterPageProps> = ({ conceptId }) => {
 }
 
 SiteRouterPage.getInitialProps = async ({ asPath, apolloClient }) => {
-  const siteRoute = await apolloClient
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    .query<SiteRouteQuery, SiteRouteQueryVariables>({
-      query: SiteRouteDocument,
-      variables: {
-        where: {
-          path: asPath,
-        },
-      },
-    })
-    .then((r) => r.data?.siteRoute)
+  const path = asPath?.split('?')[0]
+
+  const siteRoute = path
+    ? await apolloClient
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        .query<SiteRouteQuery, SiteRouteQueryVariables>({
+          query: SiteRouteDocument,
+          variables: {
+            where: {
+              path,
+            },
+          },
+        })
+        .then((r) => r.data?.siteRoute)
+    : undefined
 
   if (siteRoute?.kBConceptId) {
     return preloadConcept({
