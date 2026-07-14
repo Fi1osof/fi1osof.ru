@@ -42,7 +42,7 @@ const ruleTree = {
   Query: {
     ethAccount: isSudo,
     ethAccounts: isSudo,
-    concepts: isSudo,
+    // concepts: isSudo,
     facts: isSudo,
     factParticipations: isSudo,
     factProjections: isSudo,

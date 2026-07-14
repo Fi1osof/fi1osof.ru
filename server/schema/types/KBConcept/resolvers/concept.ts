@@ -22,10 +22,6 @@ builder.queryField('concept', (t) =>
         },
       })
 
-      if (!concept) {
-        throw new Error('Concept not found or access denied')
-      }
-
       return concept
     },
   }),

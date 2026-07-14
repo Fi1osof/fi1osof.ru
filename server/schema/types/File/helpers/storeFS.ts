@@ -1,10 +1,12 @@
 import path from 'path'
 import fs from 'fs'
+import crypto from 'crypto'
 
 const { createWriteStream, unlink, mkdirSync } = fs
 
 interface StoreResult {
   path: string
+  hash: string
 }
 
 export const storeFS = async ({
@@ -37,10 +39,12 @@ export const storeFS = async ({
   return new Promise((resolve, reject) => {
     const storedFileUrl = normalized
     const writeStream = createWriteStream(storedFileUrl)
+    const hash = crypto.createHash('sha256')
 
     writeStream.on('finish', () => {
       resolve({
         path: filePath,
+        hash: hash.digest('hex'),
       })
     })
 
@@ -51,6 +55,7 @@ export const storeFS = async ({
     })
 
     stream
+      .on('data', (chunk) => hash.update(chunk))
       .on('error', (error) => {
         writeStream.destroy(error)
       })

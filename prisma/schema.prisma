@@ -268,6 +268,12 @@ model TaskWorkLog {
 // - One KB = one subject of cognition
 // ============================================
 
+enum KBConceptVisibility {
+  public
+  hidden
+  unpublished
+}
+
 // Concept: A semantic anchor representing an entity in the knowledge graph.
 // Can be a person, organization, event, abstract idea, etc.
 // Concepts are intentionally loose — they can be drafts, poorly defined initially.
@@ -282,8 +288,8 @@ model KBConcept {
   name        String   @db.VarChar(500)
   // Brief description of what this concept represents
   description String?  @db.Text
-
-  content String? @db.Text
+  intro       String?  @db.Text
+  content     String?  @db.Text
 
   image String? @db.Text
 
@@ -313,12 +319,25 @@ model KBConcept {
   KBConceptFiles KBConceptFile[]
   SiteRoute      SiteRoute?
 
+  uri String? @unique @db.VarChar(1024)
+
+  // File
+  path     String? @unique @db.VarChar(1024)
+  mimetype String? @db.VarChar(100)
+  hash     String? @unique @db.VarChar(64)
+  size     Float?
+
+  quality    Float               @default(0.7)
+  visibility KBConceptVisibility @default(hidden)
+
   @@unique([rootId, code])
   @@unique([parentId, code])
   @@index([parentId])
   @@index([rootId])
   @@index([type])
   @@index([code])
+  @@index([quality])
+  @@index([visibility])
 }
 
 // Label roles define how a name relates to its concept:

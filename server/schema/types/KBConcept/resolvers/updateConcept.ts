@@ -17,7 +17,7 @@ builder.mutationField('updateConcept', (t) =>
       }
 
       const {
-        data: { data, name, ...other },
+        data: { name, quality, data: dataArg, visibility, ...other },
         where: { id },
       } = args
 
@@ -40,14 +40,18 @@ builder.mutationField('updateConcept', (t) =>
       //   throw new Error('Concept not found or access denied')
       // }
 
+      const data: Prisma.KBConceptUpdateInput = {
+        ...other,
+        name: name ?? undefined,
+        quality: quality ?? undefined,
+        visibility: visibility ?? undefined,
+        data: dataArg as Prisma.KBConceptCreateInput['data'],
+      }
+
       return ctx.prisma.kBConcept.update({
         ...query,
         where: { id: existing.id },
-        data: {
-          ...other,
-          data: data as Prisma.KBConceptUpdateInput['data'],
-          name: name ?? undefined,
-        },
+        data,
       })
     },
   }),

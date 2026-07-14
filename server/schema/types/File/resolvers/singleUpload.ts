@@ -1,6 +1,5 @@
 import { builder } from '../../../builder'
-import fs from 'fs'
-import { storeFS } from '../helpers/storeFS'
+import { saveFile } from '../helpers/saveFile'
 
 const SingleUploadInput = builder.inputType('SingleUploadInput', {
   fields: (t) => ({
@@ -29,41 +28,22 @@ builder.mutationField('singleUpload', (t) =>
         throw new Error('Can not get file')
       }
 
-      const fileData = await (
-        upload as unknown as {
-          file: Promise<{
-            createReadStream: () => fs.ReadStream
-            filename: string
-            mimetype: string
-            encoding: string
-          }>
-        }
-      ).file
-
-      const { createReadStream, filename, mimetype, encoding } = fileData
-      const stream: fs.ReadStream = createReadStream()
-
-      const writeResult = await storeFS({
-        userId: currentUser.id,
-        stream,
-        filename,
-        directory,
-      })
-
-      if (!writeResult?.path) {
-        throw new Error(`Can not upload file ${filename}`)
-      }
-
-      const stats = fs.statSync(writeResult.path)
-      const { size } = stats
+      const { filename, mimetype, encoding, path, size, hash } = await saveFile(
+        {
+          upload,
+          directory,
+          userId: currentUser.id,
+        },
+      )
 
       return prisma.file.create({
         data: {
           filename,
           mimetype,
           encoding,
-          path: writeResult.path.replace(/^\.\//, ''),
+          path,
           size,
+          hash,
           name: name ?? undefined,
           CreatedBy: {
             connect: {

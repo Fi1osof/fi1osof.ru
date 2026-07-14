@@ -14,16 +14,29 @@ builder.mutationField('createConcept', (t) =>
       }
 
       const {
-        data: { data, ...other },
+        data: { name, quality, data: dataArg, visibility, ...other },
       } = args
+
+      if (!name) {
+        throw new Error('name required')
+      }
+
+      const data: Prisma.KBConceptCreateInput = {
+        ...other,
+        name,
+        quality: quality ?? undefined,
+        visibility: visibility ?? undefined,
+        data: dataArg as Prisma.KBConceptCreateInput['data'],
+        CreatedBy: {
+          connect: {
+            id: ctx.currentUser.id,
+          },
+        },
+      }
 
       return ctx.prisma.kBConcept.create({
         ...query,
-        data: {
-          ...other,
-          data: data as Prisma.KBConceptCreateInput['data'],
-          createdById: ctx.currentUser.id,
-        },
+        data,
       })
     },
   }),

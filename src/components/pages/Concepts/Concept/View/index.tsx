@@ -21,7 +21,11 @@ export const ConceptView: React.FC<ConceptViewProps> = ({
   return (
     <ConceptViewStyled>
       {inEditMode ? (
-        <ConceptEditForm concept={concept} cancelHandler={stopEdit} />
+        <ConceptEditForm
+          concept={concept}
+          cancelHandler={stopEdit}
+          currentUser={currentUser}
+        />
       ) : (
         <>
           <ConceptItem concept={concept} variant="full" />
