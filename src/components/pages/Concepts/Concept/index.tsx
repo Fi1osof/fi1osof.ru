@@ -1,38 +1,37 @@
 import { SeoHeaders } from 'src/components/seo/SeoHeaders'
 import { Page } from '../../_App/interfaces'
-import { useConceptQuery } from 'src/gql/generated'
+import { KbConceptVisibility, useConceptQuery } from 'src/gql/generated'
 import { useAppContext } from 'src/components/AppContext'
 import { ConceptView } from './View'
 import { conceptPageGetInitialProps } from './getInitialProps'
 import { ConceptPageProps } from './interfaces'
 
-export const ConceptPage: Page<ConceptPageProps> = ({
-  siteOrigin,
-  conceptId,
-}) => {
+export const ConceptPage: Page<ConceptPageProps> = ({ siteOrigin, uri }) => {
   const { user: currentUser } = useAppContext()
 
   const response = useConceptQuery({
     variables: {
       where: {
-        id: conceptId,
+        uri,
       },
     },
-    skip: !conceptId,
+    skip: !uri,
   })
 
   const concept = response.data?.concept
 
-  const searchable = !concept
+  const searchable =
+    !concept || concept.visibility === KbConceptVisibility.UNPUBLISHED
 
   return (
     <>
       <SeoHeaders
         title={concept?.name ?? 'Concept'}
-        nofollow={!searchable}
-        noindex={!searchable}
+        description={concept?.description}
         canonical={concept?.uri}
         siteOrigin={siteOrigin}
+        nofollow={!searchable}
+        noindex={!searchable}
       />
 
       {concept && <ConceptView concept={concept} currentUser={currentUser} />}

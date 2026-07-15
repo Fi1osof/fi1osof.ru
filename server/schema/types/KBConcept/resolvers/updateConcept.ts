@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client'
 import { builder } from '../../../builder'
 import { KBConceptUpdateInput, KBConceptWhereUniqueInput } from '../inputs'
+import { prepareConceptData } from '../helpers/validateConceptData'
 
 builder.mutationField('updateConcept', (t) =>
   t.prismaField({
@@ -47,6 +48,8 @@ builder.mutationField('updateConcept', (t) =>
         visibility: visibility ?? undefined,
         data: dataArg as Prisma.KBConceptCreateInput['data'],
       }
+
+      prepareConceptData(data)
 
       return ctx.prisma.kBConcept.update({
         ...query,

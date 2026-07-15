@@ -19,6 +19,7 @@ export const KBConceptWhereUniqueInput = builder.inputType(
   {
     fields: (t) => ({
       id: t.id({}),
+      uri: t.id({}),
     }),
   },
 )
@@ -55,6 +56,7 @@ export const KBConceptWhereInput = builder.inputType('KBConceptWhereInput', {
     rootId: t.field({
       type: StringNullableFilter,
     }),
+    visibility: t.field({ type: KBConceptVisibilityEnum }),
   }),
 })
 

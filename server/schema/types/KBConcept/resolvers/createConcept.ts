@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client'
 import { builder } from '../../../builder'
 import { KBConceptCreateInput } from '../inputs'
+import { createCUID } from '../../helpers/createCUID'
 
 builder.mutationField('createConcept', (t) =>
   t.prismaField({
@@ -14,19 +15,23 @@ builder.mutationField('createConcept', (t) =>
       }
 
       const {
-        data: { name, quality, data: dataArg, visibility, ...other },
+        data: { name, quality, data: dataArg, visibility, uri, ...other },
       } = args
 
       if (!name) {
         throw new Error('name required')
       }
 
+      const id = createCUID()
+
       const data: Prisma.KBConceptCreateInput = {
         ...other,
+        id,
         name,
         quality: quality ?? undefined,
         visibility: visibility ?? undefined,
         data: dataArg as Prisma.KBConceptCreateInput['data'],
+        uri: uri || `/concepts/${id}`,
         CreatedBy: {
           connect: {
             id: ctx.currentUser.id,

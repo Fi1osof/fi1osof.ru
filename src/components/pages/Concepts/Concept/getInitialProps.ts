@@ -8,24 +8,24 @@ import { ConceptPageProps } from './interfaces'
 import { ApolloClient } from '@apollo/client'
 
 type preloadConceptProps = {
-  conceptId: string | undefined
+  uri: string | undefined
   apolloClient: ApolloClient
 }
 
 export const preloadConcept = async ({
-  conceptId,
+  uri,
   apolloClient,
 }: preloadConceptProps): Promise<
   ReturnType<NonNullable<Page<ConceptPageProps>['getInitialProps']>>
 > => {
-  const concept = conceptId
+  const concept = uri
     ? await apolloClient
         // eslint-disable-next-line @typescript-eslint/no-deprecated
         .query<ConceptQuery, ConceptQueryVariables>({
           query: ConceptDocument,
           variables: {
             where: {
-              id: conceptId,
+              uri,
             },
           },
         })
@@ -33,17 +33,17 @@ export const preloadConcept = async ({
     : undefined
 
   return {
-    conceptId,
+    uri,
     statusCode: !concept ? 404 : undefined,
   }
 }
 
 export const conceptPageGetInitialProps: Page<ConceptPageProps>['getInitialProps'] =
-  async ({ query, apolloClient }) => {
-    const conceptId = typeof query.id === 'string' ? query.id : undefined
+  async ({ apolloClient, asPath }) => {
+    const uri = asPath?.split('?')[0]
 
     return preloadConcept({
-      conceptId,
+      uri,
       apolloClient,
     })
   }

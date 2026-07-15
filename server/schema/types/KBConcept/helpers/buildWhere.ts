@@ -24,6 +24,7 @@ export function buildKBConceptWhere(
     description,
     parentId,
     rootId,
+    visibility,
     ...other
   } = where || {}
 
@@ -37,6 +38,7 @@ export function buildKBConceptWhere(
     description: buildStringNullableFilterWhere(description),
     parentId: buildStringNullableFilterWhere(parentId),
     rootId: buildStringNullableFilterWhere(rootId),
+    visibility: visibility ?? undefined,
     ...other,
   }
 

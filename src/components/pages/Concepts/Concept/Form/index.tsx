@@ -38,6 +38,7 @@ import {
   ConceptUploader,
   ConceptUploaderProps,
 } from 'src/components/Concept/ConceptUploader'
+import { Textarea } from 'src/ui-kit/controls/Textarea'
 
 const MarkdownEditor = dynamic(
   () => import('src/components/Markdown/Editor').then((r) => r.MarkdownEditor),
@@ -234,7 +235,7 @@ export const ConceptEditForm: React.FC<ConceptEditFormProps> = ({
           break
         case 'description':
           label = 'Description'
-          EditorComponent = MarkdownEditor
+          EditorComponent = Textarea
           break
         case 'intro':
           label = 'Intro'
