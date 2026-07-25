@@ -53,6 +53,17 @@ const LLMUsageCompletionTokensDetailsType = builder.simpleObject(
   },
 )
 
+const LLMUsageServerToolUseDetailsType = builder.simpleObject(
+  'LLMUsageServerToolUseDetails',
+  {
+    fields: (t) => ({
+      webSearchRequests: t.int({ nullable: true }),
+      toolCallsRequested: t.int({ nullable: true }),
+      toolCallsExecuted: t.int({ nullable: true }),
+    }),
+  },
+)
+
 const LLMUsageType = builder.simpleObject('LLMUsage', {
   fields: (t) => ({
     promptTokens: t.float({ nullable: false }),
@@ -67,6 +78,10 @@ const LLMUsageType = builder.simpleObject('LLMUsage', {
     costDetails: t.field({ type: LLMUsageCostDetailsType, nullable: true }),
     completionTokensDetails: t.field({
       type: LLMUsageCompletionTokensDetailsType,
+      nullable: true,
+    }),
+    serverToolUseDetails: t.field({
+      type: LLMUsageServerToolUseDetailsType,
       nullable: true,
     }),
   }),

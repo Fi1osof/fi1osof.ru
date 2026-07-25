@@ -29,7 +29,12 @@ export enum LlmModel {
   // Gemini 3.x models
   // Google: Nano Banana 2
   Gemini3_1_Flash_Lite_Preview = 'google/gemini-3.1-flash-lite-preview',
+  Gemini3_1_Flash_Lite = 'google/gemini-3.1-flash-lite',
   Gemini3_Flash_Preview = 'google/gemini-3-flash-preview',
+
+  GEMINI_3_5_FLASH = 'google/gemini-3.5-flash',
+  GEMINI_3_5_FLASH_LITE = 'google/gemini-3.5-flash-lite',
+
   // $3per 1M
   Gemini3_1_Flash_Image = 'google/gemini-3.1-flash-image-preview',
 
@@ -49,6 +54,15 @@ export enum LlmModel {
   BLACK_FOREST_LABS_FLUX_2_PRO = 'black-forest-labs/flux.2-pro',
   // $0.07/megapixel
   BLACK_FOREST_LABS_FLUX_2_MAX = 'black-forest-labs/flux.2-max',
+
+  PERPLEXITY_SONAR_REASONING_PRO = 'perplexity/sonar-reasoning-pro',
+
+  // Anthropic models
+  // ANTHROPIC_CLAUDE_3_7_SONNET = 'anthropic/claude-3.7-sonnet',
+  // ANTHROPIC_CLAUDE_3_5_SONNET = 'anthropic/claude-3.5-sonnet',
+  // ANTHROPIC_CLAUDE_3_5_HAIKU = 'anthropic/claude-3.5-haiku',
+  // ANTHROPIC_CLAUDE_3_OPUS = 'anthropic/claude-3-opus',
+  ANTHROPIC_CLAUDE_HAIKU_4_5 = 'anthropic/claude-haiku-4.5',
 }
 
 export const LLM_TOP_MODELS: LlmModel[] = [
@@ -112,12 +126,19 @@ export interface LLMClientCompletionRequest {
   stop?: string[]
 }
 
+export interface LLMClientTool {
+  type: string
+  parameters?: unknown
+}
+
 export interface LLMClientChatCompletionRequest {
   messages: LLMClientChatMessage[]
+  tools?: LLMClientTool[]
   max_tokens?: number
   temperature?: number
   top_p?: number
   stop?: string[]
+  providerOptions?: unknown
 }
 
 // Raw API response types (snake_case)
@@ -140,6 +161,12 @@ export interface LLMClientRawUsageCompletionTokensDetails {
   audio_tokens?: number
 }
 
+export interface LLMClientRawUsageServerToolUseDetails {
+  web_search_requests?: number
+  tool_calls_requested?: number
+  tool_calls_executed?: number
+}
+
 export interface LLMClientRawUsage {
   prompt_tokens: number
   completion_tokens: number
@@ -149,6 +176,7 @@ export interface LLMClientRawUsage {
   prompt_tokens_details?: LLMClientRawUsagePromptTokensDetails
   cost_details?: LLMClientRawUsageCostDetails
   completion_tokens_details?: LLMClientRawUsageCompletionTokensDetails
+  server_tool_use_details?: LLMClientRawUsageServerToolUseDetails
 }
 
 export interface LLMClientRawCompletionResponse {
@@ -228,6 +256,12 @@ export interface LLMUsageCompletionTokensDetails {
   audioTokens?: number
 }
 
+export interface LLMUsageServerToolUseDetails {
+  webSearchRequests?: number
+  toolCallsRequested?: number
+  toolCallsExecuted?: number
+}
+
 export interface LLMUsage {
   promptTokens: number
   completionTokens: number
@@ -237,6 +271,7 @@ export interface LLMUsage {
   promptTokensDetails?: LLMUsagePromptTokensDetails
   costDetails?: LLMUsageCostDetails
   completionTokensDetails?: LLMUsageCompletionTokensDetails
+  serverToolUseDetails?: LLMUsageServerToolUseDetails
 }
 
 export interface LLMChoiceMessage {
