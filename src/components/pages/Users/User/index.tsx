@@ -20,7 +20,7 @@ export const UserPage: Page<UserPageProps> = ({ userId, siteOrigin }) => {
 
   const user = response.data?.object
 
-  const searchable = user?.status === UserStatusEnum.ACTIVE
+  const searchable = user?.status === UserStatusEnum.ACTIVE ? true : false
 
   const personSchema = useMemo(() => {
     if (!user) {

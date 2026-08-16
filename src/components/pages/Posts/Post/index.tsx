@@ -3,7 +3,7 @@ import { Page } from '../../_App/interfaces'
 import { PostPageView } from './View'
 import { PostPageProps } from './interfaces'
 import { postPageGetInitialProps } from './postPageGetInitialProps'
-import { PostStatus, usePostQuery, UserStatusEnum } from 'src/gql/generated'
+import { PostStatus, usePostQuery } from 'src/gql/generated'
 import { SeoHeaders } from 'src/components/seo/SeoHeaders'
 import { JsonLd } from 'src/components/seo/JsonLd'
 import { createBlogPosting } from 'src/components/seo/JsonLd/helpers'
@@ -21,9 +21,7 @@ export const PostPage: Page<PostPageProps> = ({ postId, siteOrigin }) => {
 
   const post = response.data?.object
 
-  const searchable =
-    post?.CreatedBy?.status === UserStatusEnum.ACTIVE &&
-    post?.status === PostStatus.PUBLISHED
+  const searchable = post?.status === PostStatus.PUBLISHED ? true : false
 
   const blogPostingSchema = useMemo(() => {
     if (!post) {

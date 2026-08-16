@@ -21,7 +21,9 @@ export const ConceptPage: Page<ConceptPageProps> = ({ siteOrigin, uri }) => {
   const concept = response.data?.concept
 
   const searchable =
-    !concept || concept.visibility === KbConceptVisibility.UNPUBLISHED
+    concept && concept.visibility !== KbConceptVisibility.UNPUBLISHED
+      ? true
+      : false
 
   return (
     <>
