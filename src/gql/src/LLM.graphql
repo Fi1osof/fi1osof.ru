@@ -4,6 +4,12 @@ mutation llmImageGeneration($input: LLMImageGenerationInput!) {
   }
 }
 
+mutation llmChatCompletion($input: LLMChatCompletionInput!) {
+  response: llmChatCompletion(input: $input) {
+    ...LLMResponse_
+  }
+}
+
 fragment LLMResponse_ on LLMResponse {
   choices {
     index

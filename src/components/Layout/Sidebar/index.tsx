@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from 'react'
+import React, { memo, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {
@@ -18,6 +18,7 @@ import {
 } from './styles'
 import { useAppContext } from 'src/components/AppContext'
 import { UserLink } from 'src/components/Link/User'
+import { UserStatusEnum } from 'src/gql/generated'
 
 type SidebarProps = {
   isOpen: boolean
@@ -32,7 +33,14 @@ const LoginIcon: React.FC = () => (
   </svg>
 )
 
-const navItems = [
+type NavItem = {
+  label: string
+  href: string
+  icon: React.ReactNode
+  accessPolicy?: 'active' | 'sudo'
+}
+
+const navItems: Array<NavItem | undefined> = [
   {
     label: 'Concepts',
     href: '/concepts',
@@ -87,9 +95,9 @@ const navItems = [
       </svg>
     ),
   },
-  process.env.NEXT_PUBLIC_WORLD3D_ENABLED === 'true' && {
-    label: 'Metaverse',
-    href: '/world3d',
+  {
+    label: 'Admin',
+    href: '/admin',
     icon: (
       <svg
         viewBox="0 0 24 24"
@@ -99,13 +107,34 @@ const navItems = [
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <path d="M2 10a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-3.5a2 2 0 0 1-1.6-.8L14 15h-4l-.9 1.2a2 2 0 0 1-1.6.8H4a2 2 0 0 1-2-2v-5z" />
-        <path d="M7 8V6a5 5 0 0 1 10 0v2" />
-        <line x1="10" y1="10" x2="10" y2="15" />
-        <line x1="14" y1="10" x2="14" y2="15" />
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <line x1="3" y1="9" x2="21" y2="9" />
+        <line x1="9" y1="9" x2="9" y2="21" />
       </svg>
     ),
+    accessPolicy: 'sudo',
   },
+  process.env.NEXT_PUBLIC_WORLD3D_ENABLED === 'true'
+    ? {
+        label: 'Metaverse',
+        href: '/world3d',
+        icon: (
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M2 10a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-3.5a2 2 0 0 1-1.6-.8L14 15h-4l-.9 1.2a2 2 0 0 1-1.6.8H4a2 2 0 0 1-2-2v-5z" />
+            <path d="M7 8V6a5 5 0 0 1 10 0v2" />
+            <line x1="10" y1="10" x2="10" y2="15" />
+            <line x1="14" y1="10" x2="14" y2="15" />
+          </svg>
+        ),
+      }
+    : undefined,
 ]
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
@@ -119,6 +148,26 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
       onToggle()
     }
   }, [isOpen, onToggle, router])
+
+  const navItemsPrepared = useMemo<Array<NavItem | undefined>>(() => {
+    return navItems.filter((n) => {
+      let allow: boolean
+
+      switch (n?.accessPolicy) {
+        case undefined:
+          allow = true
+          break
+        case 'active':
+          allow = user?.status === UserStatusEnum.ACTIVE
+          break
+        case 'sudo':
+          allow = user?.sudo === true
+          break
+      }
+
+      return allow ? n : undefined
+    })
+  }, [user?.status, user?.sudo])
 
   return (
     <>
@@ -158,7 +207,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
         </SidebarHeader>
 
         <SidebarNav $isOpen={isOpen}>
-          {navItems.map(
+          {navItemsPrepared.map(
             (item) =>
               item && (
                 <SidebarNavItem key={item.href} $isOpen={isOpen}>
