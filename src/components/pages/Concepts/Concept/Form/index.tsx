@@ -34,10 +34,7 @@ import {
 } from 'src/gql/generated'
 import { createConceptLink } from 'src/components/Link/Concept'
 import { AppContextValue } from 'src/components/AppContext'
-import {
-  ConceptUploader,
-  ConceptUploaderProps,
-} from 'src/components/Concept/ConceptUploader'
+import { FileUploader, FileUploaderProps } from 'src/components/FileUploader'
 import { Textarea } from 'src/ui-kit/controls/Textarea'
 
 const MarkdownEditor = dynamic(
@@ -190,9 +187,7 @@ export const ConceptEditForm: React.FC<ConceptEditFormProps> = ({
     ],
   )
 
-  const onChangeImage = useCallback<
-    NonNullable<ConceptUploaderProps['onChange']>
-  >(
+  const onChangeImage = useCallback<NonNullable<FileUploaderProps['onChange']>>(
     (file) => {
       if (file?.path) {
         form.setValue('image', file.path, {
@@ -273,7 +268,7 @@ export const ConceptEditForm: React.FC<ConceptEditFormProps> = ({
           EditorComponent = ({ value }: { value: string }) => {
             return (
               <>
-                <ConceptUploader
+                <FileUploader
                   value={value ? `/images/resized/middle/${value}` : ''}
                   onChange={onChangeImage}
                 />
