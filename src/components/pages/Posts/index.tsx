@@ -22,7 +22,11 @@ export const PostsPage: Page<PostsPageProps> = ({ page, siteOrigin }) => {
 
   return (
     <>
-      <SeoHeaders title="Posts" siteOrigin={siteOrigin} canonical={'/posts'} />
+      <SeoHeaders
+        title="Posts"
+        siteOrigin={siteOrigin}
+        canonical={`/posts${page > 1 ? `?page=${page}` : ''}`}
+      />
       <PostsPageView posts={posts ?? []} count={count} page={page} />
     </>
   )

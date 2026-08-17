@@ -32,7 +32,7 @@ export const ConceptsPage: Page<ConceptsPageProps> = ({
     <>
       <SeoHeaders
         title="Concepts"
-        canonical={`/concepts${page > 1 ? `` : `?page=${page}`}`}
+        canonical={`/concepts${page > 1 ? `?page=${page}` : ''}`}
         siteOrigin={siteOrigin}
       />
 
