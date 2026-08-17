@@ -1,4 +1,16 @@
+import fs from 'fs'
+import path from 'path'
 import { WorkflowBase } from '../interfaces'
+
+const fetchRequestCode = fs.readFileSync(
+  path.join(__dirname, 'fetchRequest.js'),
+  'utf-8',
+)
+
+const parseInputCode = fs.readFileSync(
+  path.join(__dirname, 'parseInput.js'),
+  'utf-8',
+)
 
 const workflow: WorkflowBase = {
   name: 'Tool: Fetch Request',
@@ -83,27 +95,13 @@ const workflow: WorkflowBase = {
       position: [-224, 544],
     },
     {
+      id: 'fetch-request',
+      name: 'Fetch Request',
+      type: 'n8n-nodes-base.code',
+      typeVersion: 2,
       parameters: {
-        method: '={{ $json.method }}',
-        url: '={{ $json.url }}',
-        sendHeaders: true,
-        specifyHeaders: 'json',
-        jsonHeaders: '={{ $json.headers || "{}" }}',
-        sendBody: true,
-        specifyBody: 'json',
-        jsonBody: '={{ $json.body || "{}" }}',
-        options: {
-          response: {
-            response: {
-              fullResponse: true,
-            },
-          },
-        },
+        jsCode: fetchRequestCode,
       },
-      id: 'http-request',
-      name: 'HTTP Request',
-      type: 'n8n-nodes-base.httpRequest',
-      typeVersion: 4.2,
       position: [208, 304],
     },
     {
@@ -112,26 +110,7 @@ const workflow: WorkflowBase = {
       type: 'n8n-nodes-base.code',
       typeVersion: 2,
       parameters: {
-        jsCode: `
-const input = $input.first().json
-return [
-  {
-    json: {
-      ...input,
-      headers: JSON.stringify(
-        typeof input.headers === 'string' && input.headers
-          ? JSON.parse(input.headers)
-          : input.headers || {},
-      ),
-      body: JSON.stringify(
-        typeof input.body === 'string' && input.body
-          ? JSON.parse(input.body)
-          : input.body || {},
-      ),
-    },
-  },
-]
-        `,
+        jsCode: parseInputCode,
       },
       position: [16, 304],
     },
@@ -147,7 +126,7 @@ return [
       main: [[{ node: 'Parse Input', type: 'main', index: 0 }]],
     },
     'Parse Input': {
-      main: [[{ node: 'HTTP Request', type: 'main', index: 0 }]],
+      main: [[{ node: 'Fetch Request', type: 'main', index: 0 }]],
     },
   },
   pinData: {},
