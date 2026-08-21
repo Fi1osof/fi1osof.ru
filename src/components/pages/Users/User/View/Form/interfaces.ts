@@ -12,4 +12,5 @@ export const userEditSchema: yup.ObjectSchema<UserFormData> = yup
     image: yup.string(),
     content: yup.string(),
     intro: yup.string(),
+    isAiAgent: yup.boolean().nullable(),
   })

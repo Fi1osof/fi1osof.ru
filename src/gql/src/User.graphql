@@ -83,4 +83,5 @@ fragment UserNoNesting on User {
   sudo
   status
   intro
+  isAiAgent
 }

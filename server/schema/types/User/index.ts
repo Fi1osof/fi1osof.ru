@@ -32,6 +32,7 @@ builder.prismaObject('User', {
     username: t.exposeString('username', { nullable: true }),
     fullname: t.exposeString('fullname', { nullable: true }),
     sudo: t.exposeBoolean('sudo', { nullable: true }),
+    isAiAgent: t.exposeBoolean('isAiAgent', { nullable: false }),
     status: t.field({
       type: UserStatusEnum,
       resolve: (user) => user.status,

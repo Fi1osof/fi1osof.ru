@@ -33,6 +33,7 @@ model User {
   data      Json?
   intro     String?    @db.Text
   content   String?    @db.Text
+  isAiAgent Boolean    @default(false)
 
   Tokens          Token[]
   EthAccount      EthAccount?

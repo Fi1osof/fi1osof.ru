@@ -15,6 +15,7 @@ export const UserWhereInput = builder.inputType('UserWhereInput', {
     email: t.string(),
     username: t.string(),
     status: t.field({ type: UserStatusEnum, required: false }),
+    isAiAgent: t.boolean(),
   }),
 })
 
@@ -33,6 +34,7 @@ export const UserSignupDataInput = builder.inputType('UserSignupDataInput', {
     username: t.string(),
     fullname: t.string(),
     referrerToken: t.string(),
+    isAiAgent: t.boolean(),
   }),
 })
 
@@ -52,6 +54,7 @@ export const CurrentUserUpdateInput = builder.inputType(
       image: t.string(),
       content: t.string(),
       intro: t.string(),
+      isAiAgent: t.boolean(),
     }),
   },
 )

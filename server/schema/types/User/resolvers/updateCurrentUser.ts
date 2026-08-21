@@ -2,6 +2,7 @@ import { builder } from '../../../builder'
 import { CurrentUserUpdateInput } from '../inputs'
 import { hashPassword } from '../helpers/auth'
 import { validateMdxContent } from 'server/helpers/validateMdxContent'
+import { Prisma } from '@prisma/client'
 
 builder.mutationField('updateCurrentUser', (t) =>
   t.prismaField({
@@ -17,19 +18,22 @@ builder.mutationField('updateCurrentUser', (t) =>
         throw new Error('Authorization required')
       }
 
-      const { password: passwordProp, content, ...other } = args.data
+      const { password: passwordProp, content, isAiAgent, ...other } = args.data
 
       const password = passwordProp
         ? await hashPassword(passwordProp)
         : undefined
 
+      const data: Prisma.UserUpdateInput = {
+        ...other,
+        password,
+        content: validateMdxContent(content),
+        isAiAgent: isAiAgent ?? undefined,
+      }
+
       return ctx.prisma.user.update({
         ...query,
-        data: {
-          ...other,
-          password,
-          content: validateMdxContent(content),
-        },
+        data,
         where: {
           id: currentUser.id,
         },

@@ -59,6 +59,7 @@ export async function authenticateAgent(
         email: agentData.email,
         password: agentData.password,
         fullname: agentData.fullname,
+        isAiAgent: true,
       },
     })
 
