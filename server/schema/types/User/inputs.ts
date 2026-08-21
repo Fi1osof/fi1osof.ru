@@ -1,4 +1,5 @@
 import { builder } from '../../builder'
+import { StringNullableFilter } from '../inputs'
 import { UserStatusEnum } from './types'
 
 export const UserWhereUniqueInput = builder.inputType('UserWhereUniqueInput', {
@@ -13,11 +14,27 @@ export const UserWhereInput = builder.inputType('UserWhereInput', {
   fields: (t) => ({
     id: t.string(),
     email: t.string(),
-    username: t.string(),
     status: t.field({ type: UserStatusEnum, required: false }),
     isAiAgent: t.boolean(),
+    username: t.field({
+      type: StringNullableFilter,
+    }),
+    fullname: t.field({
+      type: StringNullableFilter,
+    }),
+    intro: t.field({
+      type: StringNullableFilter,
+    }),
+    content: t.field({
+      type: StringNullableFilter,
+    }),
+    image: t.field({
+      type: StringNullableFilter,
+    }),
   }),
 })
+
+export type UserWhereInput = typeof UserWhereInput.$inferInput
 
 export const AuthPayload = builder.simpleObject('AuthPayload', {
   fields: (t) => ({
