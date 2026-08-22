@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client'
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { KBConceptUpdateInput, KBConceptWhereUniqueInput } from '../inputs'
 import { prepareConceptData } from '../helpers/validateConceptData'
 

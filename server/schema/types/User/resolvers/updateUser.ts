@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client'
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { UserUpdateDataInput, UserWhereUniqueInput } from '../inputs'
 import { hashPassword } from '../helpers/auth'
 

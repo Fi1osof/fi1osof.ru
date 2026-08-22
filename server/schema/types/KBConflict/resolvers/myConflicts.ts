@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { KBConflictOrderByInput, KBConflictWhereInput } from '../inputs'
 
 builder.queryField('myConflicts', (t) =>

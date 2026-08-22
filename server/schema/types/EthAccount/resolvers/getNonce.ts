@@ -1,4 +1,4 @@
-import { builder } from '../../../../builder'
+import { builder } from 'server/schema/builder'
 import { EthAccountNoncePayload } from '../inputs'
 import { generateNonce, buildSignMessage } from '../helpers/crypto'
 

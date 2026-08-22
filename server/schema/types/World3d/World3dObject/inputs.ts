@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 
 // World3dObject create input
 export const World3dObjectCreateInput = builder.inputType(

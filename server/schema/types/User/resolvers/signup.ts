@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { AuthPayload, UserSignupDataInput } from '../inputs'
 import { createToken, hashPassword, TokenType } from '../helpers/auth'
 import { Prisma, UserStatus } from '@prisma/client'

@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { KBIdentityOperationUpdateInput } from '../inputs'
 
 builder.mutationField('updateIdentityOperation', (t) =>

@@ -1,5 +1,5 @@
 import Web3 from 'web3'
-import { builder } from '../../../../builder'
+import { builder } from 'server/schema/builder'
 import { EthKeysPayload } from '../inputs'
 
 builder.mutationField('generateEthKeys', (t) =>

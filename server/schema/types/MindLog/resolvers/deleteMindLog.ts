@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { MindLogWhereUniqueInput } from '../inputs'
 
 builder.mutationField('deleteMindLog', (t) =>

@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { KBLabelCreateInput } from '../inputs'
 
 builder.mutationField('createLabel', (t) =>

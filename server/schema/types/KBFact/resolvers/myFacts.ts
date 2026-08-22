@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { KBFactOrderByInput, KBFactWhereInput } from '../inputs'
 
 builder.queryField('myFacts', (t) =>

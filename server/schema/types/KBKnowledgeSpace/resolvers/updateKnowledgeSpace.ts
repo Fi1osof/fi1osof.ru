@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { KBKnowledgeSpaceUpdateInput } from '../inputs'
 
 builder.mutationField('updateKnowledgeSpace', (t) =>

@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 
 export const TopUpRequestPayload = builder.simpleObject('TopUpRequestPayload', {
   fields: (t) => ({

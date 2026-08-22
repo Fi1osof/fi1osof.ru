@@ -1,4 +1,4 @@
-import { builder } from '../../../../builder'
+import { builder } from 'server/schema/builder'
 import { CreateTransferInput } from '../inputs'
 import { upsertBalance } from '../../Balance/helpers/upsertBalance'
 

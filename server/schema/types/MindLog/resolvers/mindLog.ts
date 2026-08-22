@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { MindLogWhereUniqueInput } from '../inputs'
 
 builder.queryField('mindLog', (t) =>

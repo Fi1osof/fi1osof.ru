@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 
 export const EthAccountAuthInput = builder.inputType('EthAccountAuthInput', {
   fields: (t) => ({

@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { EXReflexCreateInput } from '../inputs'
 
 builder.mutationField('createReflex', (t) =>

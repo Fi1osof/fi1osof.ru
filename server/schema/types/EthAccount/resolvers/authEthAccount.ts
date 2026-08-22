@@ -1,13 +1,13 @@
-import { builder } from '../../../../builder'
+import { builder } from 'server/schema/builder'
 import { EthAccountAuthInput, EthAccountAuthPayload } from '../inputs'
 import {
   verifyNonce,
   verifySignature,
   buildSignMessage,
 } from '../helpers/crypto'
-import { createToken, TokenType } from '../../../User/helpers/auth'
 import { Prisma } from '@prisma/client'
 import { checkReferrerToken } from 'server/schema/types/User/helpers/checkReferrerToken'
+import { createToken, TokenType } from '../../User/helpers/auth'
 
 builder.mutationField('authEthAccount', (t) =>
   t.field({

@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { KBDecisionOrderByInput, KBDecisionWhereInput } from '../inputs'
 
 builder.queryField('myDecisions', (t) =>

@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { TransactionType } from '@prisma/client'
 
 export const TransactionTypeEnum = builder.enumType('TransactionType', {

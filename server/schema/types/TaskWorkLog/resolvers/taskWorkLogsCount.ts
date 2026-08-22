@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { TaskWorkLogWhereInput } from '../inputs'
 import { buildTaskWorkLogWhere } from '../helpers'
 

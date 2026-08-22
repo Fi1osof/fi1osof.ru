@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { RedirectPatternTypeEnum } from '../types'
 
 const CreateRedirectRuleInput = builder.inputType('CreateRedirectRuleInput', {

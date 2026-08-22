@@ -1,10 +1,10 @@
 import crypto from 'crypto'
 import type { Prisma, TelegramAccount, User } from '@prisma/client'
-import { builder } from '../../../../builder'
+import { builder } from 'server/schema/builder'
 import { TelegramAuthDataInput } from '../inputs'
-import { createToken, TokenType } from '../../../User/helpers/auth'
-import { AuthPayload } from '../../../User/inputs'
 import { checkReferrerToken } from 'server/schema/types/User/helpers/checkReferrerToken'
+import { AuthPayload } from '../../User/inputs'
+import { createToken, TokenType } from '../../User/helpers/auth'
 
 interface TelegramAuthData {
   id: number

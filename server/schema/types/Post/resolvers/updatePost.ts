@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client'
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { PostUpdateDataInput, PostWhereUniqueInput } from '../inputs'
 import { validatePost } from '../helpers/validate'
 

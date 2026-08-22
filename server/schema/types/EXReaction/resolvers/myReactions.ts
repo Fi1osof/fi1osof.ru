@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { EXReactionOrderByInput, EXReactionWhereInput } from '../inputs'
 
 builder.queryField('myReactions', (t) =>

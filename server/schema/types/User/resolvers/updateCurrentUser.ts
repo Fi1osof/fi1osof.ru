@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { CurrentUserUpdateInput } from '../inputs'
 import { hashPassword } from '../helpers/auth'
 import { validateMdxContent } from 'server/helpers/validateMdxContent'

@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { World3dStatsType } from '../index'
 
 builder.queryField('world3dStats', (t) =>
