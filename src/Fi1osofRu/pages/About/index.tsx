@@ -40,7 +40,7 @@ export const AboutPageCustom: Page = (props) => {
       {siteUrl && (
         <JsonLd
           data={createPerson({
-            name: 'Николай Ланец',
+            name: 'Николай Fi1osof Ланец',
             url: pageUrl,
             image: `${siteUrl}${iAm.src}`,
             jobTitle: 'Fullstack AI Researcher',
