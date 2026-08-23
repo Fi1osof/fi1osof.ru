@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { CreateSystemLogInput } from '../inputs'
 import { detectRobot } from '../helpers/detectRobot'
 import { matchRedirectRule } from '../helpers/matchRedirectRule'

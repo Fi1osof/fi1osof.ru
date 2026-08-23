@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { saveFile } from '../helpers/saveFile'
 
 const SingleUploadInput = builder.inputType('SingleUploadInput', {

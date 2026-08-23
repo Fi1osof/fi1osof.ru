@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { buildUserWhere } from '../helpers/buildUserWhere'
 import { UserWhereInput } from '../inputs'
 

@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { KBProposalOrderByInput, KBProposalWhereInput } from '../inputs'
 
 builder.queryField('myProposals', (t) =>

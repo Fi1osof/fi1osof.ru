@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { TaskWorkLogUpdateInput, TaskWorkLogWhereUniqueInput } from '../inputs'
 
 builder.mutationField('updateTaskWorkLog', (t) =>

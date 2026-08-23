@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import type { LLMResponse } from '../../../../llm/client/interfaces'
 import { LlmProvider, LlmModel } from '../../../../llm/client/interfaces'
 import { PrismaContext } from 'server/context/interfaces'

@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { buildKBConceptWhere } from '../helpers/buildWhere'
 import { KBConceptWhereInput } from '../inputs'
 

@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { KBConstraintOrderByInput, KBConstraintWhereInput } from '../inputs'
 
 builder.queryField('myConstraints', (t) =>

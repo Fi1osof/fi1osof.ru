@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { KBLabelOrderByInput, KBLabelWhereInput } from '../inputs'
 
 builder.queryField('myLabels', (t) =>

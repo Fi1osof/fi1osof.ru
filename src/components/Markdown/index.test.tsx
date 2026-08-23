@@ -26,6 +26,56 @@ const renderWithTheme = (ui: React.ReactElement) => {
 }
 
 describe('Markdown component mechanics', () => {
+  describe('LaTeX rendering', () => {
+    it('renders inline math with $ delimiters', () => {
+      const content = 'The formula is $E = mc^2$ in physics.'
+
+      const { container } = renderWithTheme(<Markdown>{content}</Markdown>)
+
+      const katexSpan = container.querySelector('.katex')
+      expect(katexSpan).toBeTruthy()
+    })
+
+    it('renders block math with $$ delimiters', () => {
+      const content = `Block formula:
+
+$$
+x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}
+$$`
+
+      const { container } = renderWithTheme(<Markdown>{content}</Markdown>)
+
+      const katexDisplay = container.querySelector('.katex-display')
+      expect(katexDisplay).toBeTruthy()
+    })
+
+    it('renders multiple inline math expressions', () => {
+      const content = 'First $a^2$ and second $b^2$ formulas.'
+
+      const { container } = renderWithTheme(<Markdown>{content}</Markdown>)
+
+      const katexSpans = container.querySelectorAll('.katex')
+      expect(katexSpans.length).toBe(2)
+    })
+
+    it('renders mixed inline and block math', () => {
+      const content = `Inline $E = mc^2$ and block:
+
+$$
+\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}
+$$`
+
+      const { container } = renderWithTheme(<Markdown>{content}</Markdown>)
+
+      const inlineKatex = container.querySelectorAll(
+        '.katex:not(.katex-display .katex)',
+      )
+      const blockKatex = container.querySelector('.katex-display')
+      expect(inlineKatex.length).toBeGreaterThanOrEqual(1)
+      expect(blockKatex).toBeTruthy()
+    })
+  })
+
   describe('HTML tags with attributes', () => {
     it('renders span with data attributes', () => {
       const content = '<span data-id="123" data-type="button">some text</span>'

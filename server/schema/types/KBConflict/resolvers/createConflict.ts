@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { KBConflictCreateInput } from '../inputs'
 
 builder.mutationField('createConflict', (t) =>

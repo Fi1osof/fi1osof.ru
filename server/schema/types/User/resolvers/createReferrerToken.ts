@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { REFERRER_TOKEN_TTL } from '../interfaces'
 import { createToken, TokenType } from '../helpers/auth'
 

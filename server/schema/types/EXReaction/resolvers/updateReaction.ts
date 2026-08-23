@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { EXReactionUpdateInput } from '../inputs'
 
 builder.mutationField('updateReaction', (t) =>

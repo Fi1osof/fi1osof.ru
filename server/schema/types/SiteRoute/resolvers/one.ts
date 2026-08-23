@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { SiteRouteWhereUniqueInput } from '../inputs'
 
 builder.queryField('siteRoute', (t) =>

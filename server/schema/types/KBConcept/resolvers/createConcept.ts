@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client'
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { KBConceptCreateInput } from '../inputs'
 import { createCUID } from '../../helpers/createCUID'
 

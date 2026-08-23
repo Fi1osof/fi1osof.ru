@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { saveFile } from '../../File/helpers/saveFile'
 import { getFileTypeByMimetype } from '../helpers/getFileTypeByMimetype'
 

@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { MindLogWhereInput } from '../inputs'
 
 builder.queryField('mindLogsCount', (t) =>

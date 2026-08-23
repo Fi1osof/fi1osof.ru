@@ -1,4 +1,4 @@
-import { builder } from '../../../../builder'
+import { builder } from 'server/schema/builder'
 import { World3dObjectCreateInput } from '../inputs'
 
 builder.mutationField('world3dObjectCreate', (t) =>

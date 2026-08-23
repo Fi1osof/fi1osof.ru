@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { KBFactCreateInput } from '../inputs'
 
 builder.mutationField('createFact', (t) =>

@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { PostCreateInput } from '../inputs'
 import { validatePost } from '../helpers/validate'
 import { Post } from '@prisma/client'

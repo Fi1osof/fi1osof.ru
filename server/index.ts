@@ -48,11 +48,8 @@ async function startServer() {
   stopGraphql = stop
 
   if (withN8N) {
-    // Start n8n as child process (waits for API to be ready)
-    await initN8n()
-
-    // Run bootstrap (create owner, import credentials if needed)
-    await runBootstrap()
+    // Start n8n as child process in background (non-blocking)
+    initN8n().then(() => runBootstrap())
   }
 
   const server = express()

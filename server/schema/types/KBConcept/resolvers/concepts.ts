@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client'
 import { GraphQLResolveInfo } from 'graphql'
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { KBConceptOrderByInput, KBConceptWhereInput } from '../inputs'
 import { buildKBConceptWhere } from '../helpers/buildWhere'
 import { PrismaContext } from 'server/context/interfaces'

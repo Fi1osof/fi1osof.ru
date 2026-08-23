@@ -8,7 +8,10 @@ import ReactMarkdown, {
 } from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
 import rehypePrism from 'rehype-prism-plus'
+import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+import 'katex/dist/katex.min.css'
 import { visit } from 'unist-util-visit'
 import type { Root, Element } from 'hast'
 
@@ -172,12 +175,13 @@ export const Markdown: React.FC<MarkdownProps> = ({ children, ...other }) => {
     <MarkdownStyled {...other}>
       <ReactMarkdown
         urlTransform={urlTransform}
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkGfm, remarkMath]}
         components={components}
         // allowElement={allowElement}
         rehypePlugins={[
           rehypeRaw,
           rehypeUnwrapFilesUploader,
+          rehypeKatex,
           [rehypePrism, { ignoreMissing: true }],
         ]}
       >

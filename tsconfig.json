@@ -27,7 +27,9 @@
     "resolveJsonModule": true,
     "incremental": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      ".storybook/*": [".storybook/*"]
+    }
   },
   "include": [
     "next-env.d.ts",

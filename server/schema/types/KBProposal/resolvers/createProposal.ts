@@ -1,4 +1,4 @@
-import { builder } from '../../../builder'
+import { builder } from 'server/schema/builder'
 import { KBProposalCreateInput } from '../inputs'
 
 builder.mutationField('createProposal', (t) =>

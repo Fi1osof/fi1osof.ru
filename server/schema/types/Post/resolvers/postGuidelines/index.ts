@@ -1,4 +1,4 @@
-import { builder } from '../../../../builder'
+import { builder } from 'server/schema/builder'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 

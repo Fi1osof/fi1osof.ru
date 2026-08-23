@@ -259,3 +259,62 @@ console.log(data)
 `,
   },
 }
+
+export const WithLaTeX: Story = {
+  args: {
+    children: `# LaTeX Math Support
+
+## Inline Math
+
+The quadratic formula is $x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}$ and Einstein's famous equation is $E = mc^2$.
+
+Water formula: $H_2O$, and the Pythagorean theorem: $a^2 + b^2 = c^2$.
+
+## Block Math
+
+The integral of a function:
+
+$$
+\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}
+$$
+
+Maxwell's equations:
+
+$$
+\\nabla \\cdot \\mathbf{E} = \\frac{\\rho}{\\varepsilon_0}
+$$
+
+$$
+\\nabla \\times \\mathbf{B} - \\frac{1}{c^2}\\frac{\\partial \\mathbf{E}}{\\partial t} = \\mu_0 \\mathbf{J}
+$$
+
+## Matrix
+
+$$
+\\begin{pmatrix}
+a & b \\\\
+c & d
+\\end{pmatrix}
+\\begin{pmatrix}
+x \\\\
+y
+\\end{pmatrix}
+=
+\\begin{pmatrix}
+ax + by \\\\
+cx + dy
+\\end{pmatrix}
+$$
+
+## Sum and Product
+
+$$
+\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}
+$$
+
+$$
+\\prod_{i=1}^{n} i = n!
+$$
+`,
+  },
+}

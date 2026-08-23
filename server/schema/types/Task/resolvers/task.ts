@@ -1,5 +1,5 @@
-import { builder } from '../../../builder'
 import { hasFieldInSelection } from '../../helpers/hasFieldInSelection'
+import { builder } from 'server/schema/builder'
 import { TaskWhereUniqueInput } from '../inputs'
 
 builder.queryField('task', (t) =>
