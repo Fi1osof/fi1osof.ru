@@ -8,9 +8,9 @@ import {
 } from './styles'
 import { FormattedDate } from 'src/ui-kit/format/FormattedDate'
 import { Markdown } from 'src/components/Markdown'
-import Link from 'next/link'
 import { ConceptItemVariant } from './interfaces'
 import { UserLink } from 'src/components/Link/User'
+import { ConceptLink } from 'src/components/Link/Concept'
 
 type ConceptItemProps = {
   concept: KbConceptFragment
@@ -37,9 +37,9 @@ export const ConceptItem: React.FC<ConceptItemProps> = ({
 
   return (
     <ConceptItemStyled {...other} $variant={variant}>
-      <Link href={`/concepts/${id}`}>
+      <ConceptLink object={concept}>
         <ConceptItemTitleStyled>{name || id}</ConceptItemTitleStyled>
-      </Link>
+      </ConceptLink>
 
       {type && <ConceptItemTypeStyled>{type}</ConceptItemTypeStyled>}
 
@@ -52,9 +52,9 @@ export const ConceptItem: React.FC<ConceptItemProps> = ({
       {contentBlock}
 
       <ConceptItemMetaStyled>
-        <Link href={`/concepts/${id}`}>
+        <ConceptLink object={concept}>
           <FormattedDate value={concept.updatedAt} format="dateTimeShort" />
-        </Link>
+        </ConceptLink>
         {CreatedBy && <UserLink user={CreatedBy} />}
       </ConceptItemMetaStyled>
     </ConceptItemStyled>

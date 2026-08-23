@@ -31,5 +31,6 @@ builder.prismaObject('File', {
     createdById: t.exposeString('createdById', { nullable: true }),
     CreatedBy: t.relation('CreatedBy', { nullable: true }),
     KBConcepts: t.relation('KBConceptFiles'),
+    hash: t.exposeString('hash', { nullable: true }),
   }),
 })

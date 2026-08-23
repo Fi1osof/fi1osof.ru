@@ -1,7 +1,8 @@
-import { Container } from 'src/Fi1osofRu/lovable/src/ui-kit/Layout/Container'
 import styled from 'styled-components'
 
-export const WorkLogsViewStyled = styled(Container)``
+export const WorkLogsViewStyled = styled.div`
+  padding: ${({ theme }) => theme.spacing.lg};
+`
 
 export const WorkLogsViewListStyled = styled.div`
   display: flex;

@@ -1,4 +1,5 @@
 import { builder } from '../../builder'
+import { StringNullableFilter } from '../inputs'
 import { UserStatusEnum } from './types'
 
 export const UserWhereUniqueInput = builder.inputType('UserWhereUniqueInput', {
@@ -13,10 +14,27 @@ export const UserWhereInput = builder.inputType('UserWhereInput', {
   fields: (t) => ({
     id: t.string(),
     email: t.string(),
-    username: t.string(),
     status: t.field({ type: UserStatusEnum, required: false }),
+    isAiAgent: t.boolean(),
+    username: t.field({
+      type: StringNullableFilter,
+    }),
+    fullname: t.field({
+      type: StringNullableFilter,
+    }),
+    intro: t.field({
+      type: StringNullableFilter,
+    }),
+    content: t.field({
+      type: StringNullableFilter,
+    }),
+    image: t.field({
+      type: StringNullableFilter,
+    }),
   }),
 })
+
+export type UserWhereInput = typeof UserWhereInput.$inferInput
 
 export const AuthPayload = builder.simpleObject('AuthPayload', {
   fields: (t) => ({
@@ -33,6 +51,7 @@ export const UserSignupDataInput = builder.inputType('UserSignupDataInput', {
     username: t.string(),
     fullname: t.string(),
     referrerToken: t.string(),
+    isAiAgent: t.boolean(),
   }),
 })
 
@@ -52,6 +71,7 @@ export const CurrentUserUpdateInput = builder.inputType(
       image: t.string(),
       content: t.string(),
       intro: t.string(),
+      isAiAgent: t.boolean(),
     }),
   },
 )

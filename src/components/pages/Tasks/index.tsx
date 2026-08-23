@@ -11,13 +11,12 @@ const PAGE_SIZE = 20
 export const TasksPage: Page<TasksPageProps> = ({
   selectedStatus,
   page,
-  projectId,
+  siteOrigin,
 }) => {
   const variables = getTasksWithCountQueryVariables(
     selectedStatus,
     page,
     PAGE_SIZE,
-    projectId,
   )
 
   const response = useTasksWithCountQuery({
@@ -32,7 +31,13 @@ export const TasksPage: Page<TasksPageProps> = ({
 
   return (
     <>
-      <SeoHeaders title="Задачи" />
+      <SeoHeaders
+        title="Tasks"
+        siteOrigin={siteOrigin}
+        canonical={`/tasks${page > 1 ? `?page=${page}` : ''}`}
+        nofollow
+        noindex
+      />
       <TasksView
         tasks={tasks}
         loading={response.loading}

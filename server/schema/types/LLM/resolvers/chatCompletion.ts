@@ -42,6 +42,13 @@ const LLMToolCallInputType = builder.inputType('LLMToolCallInput', {
   }),
 })
 
+const LLMToolInputType = builder.inputType('LLMToolInput', {
+  fields: (t) => ({
+    type: t.string({ required: true }),
+    parameters: t.field({ type: 'Json' }),
+  }),
+})
+
 const LLMChatMessageInputType = builder.inputType('LLMChatMessageInput', {
   fields: (t) => ({
     role: t.field({ type: LLMChatMessageRoleEnum, required: true }),
@@ -57,10 +64,12 @@ const LLMChatCompletionInputType = builder.inputType('LLMChatCompletionInput', {
     provider: t.field({ type: LlmProviderEnum, required: true }),
     model: t.field({ type: LlmModelEnum, required: true }),
     messages: t.field({ type: [LLMChatMessageInputType], required: true }),
+    tools: t.field({ type: [LLMToolInputType] }),
     maxTokens: t.int(),
     temperature: t.float(),
     topP: t.float(),
     stop: t.stringList(),
+    providerOptions: t.field({ type: 'Json' }),
   }),
 })
 
@@ -82,10 +91,12 @@ export const llmChatCompletionResolver = async (
   const provider = input?.provider as LlmProvider
   const model = input?.model as LlmModel
   const messages = input?.messages ?? []
+  const tools = input?.tools
   const maxTokens = input?.maxTokens
   const temperature = input?.temperature
   const topP = input?.topP
   const stop = input?.stop
+  const providerOptions = input?.providerOptions
 
   const clientMessages: LLMClientChatMessage[] = messages.map((msg) => {
     const base: LLMClientChatMessage = {
@@ -127,12 +138,19 @@ export const llmChatCompletionResolver = async (
     return base
   })
 
+  const clientTools = tools?.map((tool) => ({
+    type: tool.type,
+    parameters: tool.parameters,
+  }))
+
   return llmClient.chatCompletion(provider, model, {
     messages: clientMessages,
+    tools: clientTools,
     max_tokens: maxTokens ?? undefined,
     temperature: temperature ?? undefined,
     top_p: topP ?? undefined,
     stop: stop ?? undefined,
+    providerOptions: providerOptions ?? undefined,
   })
 }
 

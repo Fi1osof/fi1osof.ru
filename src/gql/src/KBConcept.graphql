@@ -89,10 +89,12 @@ mutation deleteConcept($id: String!) {
   }
 }
 
-fragment KBConcept_ on KBConcept {
-  ...KBConceptNoNesting
-  CreatedBy {
-    ...UserNoNesting
+mutation uploadKbConcept(
+  $data: KbConceptUploadInput!
+  $detailedInfo: Boolean = true
+) {
+  response: uploadKbConcept(data: $data) {
+    ...KBConcept_
   }
 }
 
@@ -103,10 +105,23 @@ fragment KBConceptNoNesting on KBConcept {
   type
   name
   description
+  intro
   image
   createdById
   code
   parentId
   rootId
+  uri
+  path
+  quality
+  visibility
+  data
   content @include(if: $detailedInfo)
+}
+
+fragment KBConcept_ on KBConcept {
+  ...KBConceptNoNesting
+  CreatedBy {
+    ...UserNoNesting
+  }
 }

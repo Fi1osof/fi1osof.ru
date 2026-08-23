@@ -1,12 +1,7 @@
 import { UserStatus, Prisma } from '@prisma/client'
 import { PrismaContext } from 'server/context/interfaces'
-
-interface UserWhereInput {
-  id?: string | null
-  email?: string | null
-  username?: string | null
-  status?: UserStatus | null
-}
+import { UserWhereInput } from '../inputs'
+import { buildStringNullableFilterWhere } from '../../helpers/buildStringNullableFilterWhere'
 
 export function buildUserWhere(
   where: UserWhereInput | null | undefined,
@@ -14,11 +9,27 @@ export function buildUserWhere(
 ): Prisma.UserWhereInput {
   const { currentUser } = ctx || {}
 
-  const { status, id, ...other } = where || {}
+  const {
+    id,
+    status,
+    username,
+    image,
+    intro,
+    content,
+    fullname,
+    isAiAgent,
+    ...other
+  } = where || {}
 
   const result: Prisma.UserWhereInput = {
-    status: status ?? UserStatus.active,
     id: id ?? undefined,
+    status: status ?? UserStatus.active,
+    username: buildStringNullableFilterWhere(username),
+    image: buildStringNullableFilterWhere(image),
+    intro: buildStringNullableFilterWhere(intro),
+    content: buildStringNullableFilterWhere(content),
+    fullname: buildStringNullableFilterWhere(fullname),
+    isAiAgent: isAiAgent ?? undefined,
     ...other,
   }
 

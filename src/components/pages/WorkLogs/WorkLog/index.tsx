@@ -6,10 +6,12 @@ import { WorkLogPageStyled } from './styles'
 import { getWorkLogQueryVariables } from '../helpers'
 import { workLogPageGetInitialProps } from './workLogPageGetInitialProps'
 import { WorkLogCard } from 'src/components/WorkLogCard'
-import { TaskCard } from 'src/components/TaskCard'
-import { H1Styled } from 'src/Fi1osofRu/styles'
+import { createWorkLogLink } from 'src/components/Link/WorkLog'
 
-export const WorkLogPage: Page<WorkLogPageProps> = ({ workLogId }) => {
+export const WorkLogPage: Page<WorkLogPageProps> = ({
+  workLogId,
+  siteOrigin,
+}) => {
   const variables = getWorkLogQueryVariables(workLogId)
 
   const response = useTaskWorkLogQuery({
@@ -19,32 +21,16 @@ export const WorkLogPage: Page<WorkLogPageProps> = ({ workLogId }) => {
 
   const workLog = response.data?.response
 
-  let title: string
-
-  const { Task } = workLog || {}
-
-  if (Task) {
-    title = `Ворклог по задаче "${Task.title}"`
-  } else {
-    title = 'Ворклог'
-  }
-
-  const searchable = !!workLog
-
   return (
     <>
-      <SeoHeaders title={title} noindex={!searchable} nofollow={!searchable} />
+      <SeoHeaders
+        title="Work Log"
+        siteOrigin={siteOrigin}
+        canonical={workLog && createWorkLogLink(workLog)}
+      />
       {workLog && (
-        <WorkLogPageStyled size="wide">
-          <H1Styled>{title}</H1Styled>
-
+        <WorkLogPageStyled>
           <WorkLogCard workLog={workLog} variant="full" />
-
-          {Task && (
-            <>
-              <TaskCard task={Task} variant="list" titlePrefix="Задача: " />
-            </>
-          )}
         </WorkLogPageStyled>
       )}
     </>

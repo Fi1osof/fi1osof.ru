@@ -5,9 +5,13 @@ export const ConceptEditFormToolbarStyled = styled.div`
   gap: 1rem;
 `
 
-export const ConceptEditFormStyled = styled.form`
+export const ConceptEditFormFormStyled = styled.form`
   min-height: 100%;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+`
+
+export const ConceptEditFormStyled = styled.div`
+  display: contents;
 `

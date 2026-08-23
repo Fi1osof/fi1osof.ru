@@ -85,6 +85,13 @@ function mapUsage(raw: LLMClientRawUsage | undefined): LLMUsage | undefined {
           audioTokens: raw.completion_tokens_details.audio_tokens,
         }
       : undefined,
+    serverToolUseDetails: raw.server_tool_use_details
+      ? {
+          webSearchRequests: raw.server_tool_use_details.web_search_requests,
+          toolCallsRequested: raw.server_tool_use_details.tool_calls_requested,
+          toolCallsExecuted: raw.server_tool_use_details.tool_calls_executed,
+        }
+      : undefined,
   }
 }
 
@@ -131,27 +138,83 @@ export class LLMClient {
       headers['Authorization'] = `Bearer ${config.apiKey}`
     }
 
-    const response = await fetch(url, {
-      ...options,
-      headers,
-    }).catch((error) => {
+    const CONNECT_TIMEOUT_MS = 15_000
+
+    // TODO Add argument
+    const RESPONSE_TIMEOUT_MS = 60_000
+
+    const connectController = new AbortController()
+    const connectTimer = setTimeout(
+      () => connectController.abort(),
+      CONNECT_TIMEOUT_MS,
+    )
+
+    let response: Response
+    try {
+      response = await fetch(url, {
+        ...options,
+        headers,
+        signal: connectController.signal,
+      })
+    } catch (error) {
+      clearTimeout(connectTimer)
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error(
+          `[llmClient] ${method} ${url} connection timeout (${CONNECT_TIMEOUT_MS}ms)`,
+        )
+      }
       if (process.env.NODE_ENV === 'development') {
         console.error(error)
       }
-
       throw error
-    })
+    }
+    clearTimeout(connectTimer)
+
+    const responseController = new AbortController()
+    const responseTimer = setTimeout(
+      () => responseController.abort(),
+      RESPONSE_TIMEOUT_MS,
+    )
 
     if (!response.ok) {
+      clearTimeout(responseTimer)
       const errorText = await response.text()
       throw new Error(
         `[llmClient] ${method} ${url} failed with status ${response.status}: ${errorText}`,
       )
     }
 
-    const result: T = await response.json()
+    // const result: T = await response.json()
 
-    return result
+    let text: string
+    try {
+      text = await Promise.race([
+        response.text(),
+        new Promise<never>((_, reject) => {
+          responseController.signal.addEventListener('abort', () =>
+            reject(
+              new Error(
+                `[llmClient] ${method} ${url} response timeout (${RESPONSE_TIMEOUT_MS}ms)`,
+              ),
+            ),
+          )
+        }),
+      ])
+    } finally {
+      clearTimeout(responseTimer)
+    }
+
+    try {
+      const result: T = JSON.parse(text)
+
+      return result
+    } catch (error) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error(error)
+      }
+
+      throw new Error('Can not parse json')
+    }
   }
 
   async completion(
@@ -197,12 +260,20 @@ export class LLMClient {
     model: LlmModel,
     request: LLMClientChatCompletionRequest,
   ): Promise<LLMResponse> {
+    const { providerOptions, ...requestBody } = request
+
+    const body = {
+      ...requestBody,
+      model,
+      ...(providerOptions ? { provider: providerOptions } : {}),
+    }
+
     const raw = await this.fetch<LLMClientRawChatCompletionResponse>(
       provider,
       '/chat/completions',
       {
         method: 'POST',
-        body: JSON.stringify({ ...request, model }),
+        body: JSON.stringify(body),
       },
     )
 

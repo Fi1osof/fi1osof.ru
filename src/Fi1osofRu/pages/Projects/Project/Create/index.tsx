@@ -5,7 +5,13 @@ import { ProjectEditForm } from '../View/Form'
 export const ProjectCreatePage: Page = () => {
   return (
     <>
-      <SeoHeaders title="Создать проект" noindex nofollow />
+      <SeoHeaders
+        title="Создать проект"
+        noindex
+        nofollow
+        canonical={undefined}
+        siteOrigin={undefined}
+      />
 
       <ProjectEditForm project={undefined} cancelHandler={undefined} />
     </>

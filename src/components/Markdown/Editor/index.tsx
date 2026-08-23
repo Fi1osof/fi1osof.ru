@@ -28,6 +28,7 @@ import { MarkdownEditorStyled } from './styles'
 import { MarkdownEditorToolbar } from './Toolbar'
 import { useSingleUploadMutation } from 'src/gql/generated'
 import { useStopPropagationScroll } from 'src/hooks/useStopPropagationScroll'
+import { FilesUploaderEditor } from './FilesUploaderEditor'
 
 type MarkdownEditorEditorProps = {
   value: string | null | undefined
@@ -64,7 +65,22 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorEditorProps> = ({
   )
 
   const jsxComponentDescriptors = useMemo<JsxComponentDescriptor[]>(() => {
-    return []
+    return [
+      {
+        name: 'files-uploader',
+        kind: 'flow',
+        props: [],
+        hasChildren: true,
+        Editor: FilesUploaderEditor,
+      },
+      {
+        name: 'file',
+        kind: 'text',
+        props: [{ name: 'data-id', type: 'string' }],
+        hasChildren: true,
+        Editor: () => null,
+      },
+    ]
   }, [])
 
   const plugins = useMemo(() => {

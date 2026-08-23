@@ -7,7 +7,7 @@ import { PostsPageProps } from './interfaces'
 import { getPostsConnectionQueryVariables } from './helpers'
 import { useAppContext } from 'src/components/AppContext'
 
-export const PostsPage: Page<PostsPageProps> = ({ page }) => {
+export const PostsPage: Page<PostsPageProps> = ({ page, siteOrigin }) => {
   const { user: currentUser } = useAppContext()
 
   const postsResponse = usePostsConnectionQuery({
@@ -22,7 +22,11 @@ export const PostsPage: Page<PostsPageProps> = ({ page }) => {
 
   return (
     <>
-      <SeoHeaders title="Posts" />
+      <SeoHeaders
+        title="Posts"
+        siteOrigin={siteOrigin}
+        canonical={`/posts${page > 1 ? `?page=${page}` : ''}`}
+      />
       <PostsPageView posts={posts ?? []} count={count} page={page} />
     </>
   )

@@ -20,6 +20,7 @@ export const Default: Story = {
       createdAt: new Date('2026-04-08T17:55:58.261Z'),
       updatedAt: new Date('2026-04-08T17:55:58.261Z'),
       status: UserStatusEnum.NEWBIE,
+      isAiAgent: false,
     },
   },
 }
@@ -33,6 +34,21 @@ export const WithoutId: Story = {
       createdAt: new Date('2026-04-08T17:55:58.261Z'),
       updatedAt: new Date('2026-04-08T17:55:58.261Z'),
       status: UserStatusEnum.ACTIVE,
+      isAiAgent: false,
+    },
+  },
+}
+
+export const IsAiAgent: Story = {
+  args: {
+    user: {
+      id: 'agent-1',
+      fullname: 'Some Agent',
+      username: 'some-agent',
+      createdAt: new Date('2026-08-21T19:50:03.282Z'),
+      updatedAt: new Date('2026-08-21T19:50:03.282Z'),
+      status: UserStatusEnum.ACTIVE,
+      isAiAgent: true,
     },
   },
 }

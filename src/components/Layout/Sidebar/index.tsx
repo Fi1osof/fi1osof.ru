@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from 'react'
+import React, { memo, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {
@@ -18,6 +18,7 @@ import {
 } from './styles'
 import { useAppContext } from 'src/components/AppContext'
 import { UserLink } from 'src/components/Link/User'
+import { UserStatusEnum } from 'src/gql/generated'
 
 type SidebarProps = {
   isOpen: boolean
@@ -32,10 +33,17 @@ const LoginIcon: React.FC = () => (
   </svg>
 )
 
-const navItems = [
-  process.env.NEXT_PUBLIC_POSTS_ENABLED === 'true' && {
-    label: 'Posts',
-    href: '/posts',
+type NavItem = {
+  label: string
+  href: string
+  icon: React.ReactNode
+  accessPolicy?: 'active' | 'sudo'
+}
+
+const navItems: Array<NavItem | undefined> = [
+  {
+    label: 'Concepts',
+    href: '/concepts',
     icon: (
       <svg
         viewBox="0 0 24 24"
@@ -88,51 +96,8 @@ const navItems = [
     ),
   },
   {
-    label: 'Mind Logs',
-    href: '/mind-logs',
-    icon: (
-      <svg
-        height="800px"
-        width="800px"
-        version="1.1"
-        id="Layer_1"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 512 512"
-      >
-        <g>
-          <g>
-            <path
-              d="M497.914,193.994c0-46.26-29.749-86.151-72.024-100.349C423.339,41.574,380.176,0,327.483,0
-			C299.765,0,274.178,11.494,256,30.659C237.822,11.494,212.235,0,184.517,0c-52.693,0-95.856,41.574-98.405,93.645
-			c-42.274,14.199-72.026,54.09-72.026,100.349c0,23.883,7.951,46.643,22.328,65.06c-11.54,17.212-17.724,37.426-17.724,58.706
-			c0,44.488,27.311,83.143,67.347,98.661c1.562,52.973,45.138,95.58,98.481,95.58c27.716,0,53.305-11.495,71.485-30.659
-			C274.178,500.506,299.767,512,327.483,512c53.341,0,96.919-42.606,98.481-95.578c40.035-15.52,67.348-54.173,67.348-98.661
-			c0-21.282-6.184-41.494-17.726-58.706C489.962,240.638,497.914,217.876,497.914,193.994z M232.729,432.842
-			c-7.866,19.63-26.826,32.613-48.212,32.613c-28.661,0-51.979-23.318-51.979-51.98c0-3.278,0.32-6.609,0.954-9.899
-			c0.006-0.036,0.008-0.071,0.016-0.107c1.977-10.147,6.901-19.394,14.255-26.75c9.089-9.089,9.089-23.823,0-32.912
-			c-9.087-9.089-23.824-9.089-32.912,0c-7.692,7.694-13.978,16.493-18.705,26.072c-18.648-10.12-30.911-29.805-30.911-52.118
-			c0-16.389,6.555-31.652,18.458-42.98c0.074-0.07,0.137-0.151,0.209-0.223c11.048-10.404,25.477-16.137,40.67-16.137h38.336
-			c12.853,0,23.273-10.42,23.273-23.273c0-12.853-10.42-23.273-23.273-23.273h-38.335c-19.278,0-37.857,5.19-54.081,14.853
-			c-6.366-9.599-9.861-20.918-9.861-32.735c0-30.172,22.568-55.507,52.497-58.931c6.391-0.731,12.193-4.074,16.03-9.236
-			c3.838-5.162,5.368-11.681,4.228-18.012c-0.563-3.123-0.847-6.248-0.847-9.29c-0.002-28.658,23.316-51.976,51.977-51.976
-			c21.388,0,40.346,12.982,48.212,32.613V432.842z M349.094,258.423h38.336c15.191,0,29.617,5.73,40.662,16.13
-			c0.074,0.073,0.14,0.157,0.216,0.23c11.903,11.328,18.46,26.593,18.46,42.98c-0.002,22.312-12.263,41.995-30.911,52.115
-			c-4.727-9.581-11.013-18.381-18.707-26.073c-9.089-9.087-23.825-9.087-32.912,0.002c-9.087,9.089-9.087,23.825,0.002,32.912
-			c7.348,7.346,12.273,16.587,14.251,26.728c0.008,0.042,0.009,0.085,0.019,0.127c0.633,3.289,0.954,6.62,0.954,9.899
-			c0,28.663-23.318,51.98-51.979,51.98c-21.386,0-40.344-12.982-48.209-32.613V79.158c7.863-19.631,26.821-32.613,48.207-32.613
-			c28.661,0,51.979,23.318,51.979,51.979c0,3.047-0.285,6.173-0.846,9.29c-1.14,6.33,0.389,12.85,4.228,18.012
-			c3.837,5.162,9.64,8.505,16.03,9.238c29.927,3.426,52.495,28.76,52.495,58.931c0,11.816-3.496,23.135-9.86,32.734
-			c-16.223-9.661-34.8-14.851-54.08-14.851h-38.336c-12.853,0-23.273,10.42-23.273,23.273
-			C325.821,248.003,336.241,258.423,349.094,258.423z"
-            />
-          </g>
-        </g>
-      </svg>
-    ),
-  },
-  process.env.NEXT_PUBLIC_WORLD3D_ENABLED === 'true' && {
-    label: 'Metaverse',
-    href: '/world3d',
+    label: 'Admin',
+    href: '/admin',
     icon: (
       <svg
         viewBox="0 0 24 24"
@@ -142,13 +107,34 @@ const navItems = [
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <path d="M2 10a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-3.5a2 2 0 0 1-1.6-.8L14 15h-4l-.9 1.2a2 2 0 0 1-1.6.8H4a2 2 0 0 1-2-2v-5z" />
-        <path d="M7 8V6a5 5 0 0 1 10 0v2" />
-        <line x1="10" y1="10" x2="10" y2="15" />
-        <line x1="14" y1="10" x2="14" y2="15" />
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <line x1="3" y1="9" x2="21" y2="9" />
+        <line x1="9" y1="9" x2="9" y2="21" />
       </svg>
     ),
+    accessPolicy: 'sudo',
   },
+  process.env.NEXT_PUBLIC_WORLD3D_ENABLED === 'true'
+    ? {
+        label: 'Metaverse',
+        href: '/world3d',
+        icon: (
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M2 10a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-3.5a2 2 0 0 1-1.6-.8L14 15h-4l-.9 1.2a2 2 0 0 1-1.6.8H4a2 2 0 0 1-2-2v-5z" />
+            <path d="M7 8V6a5 5 0 0 1 10 0v2" />
+            <line x1="10" y1="10" x2="10" y2="15" />
+            <line x1="14" y1="10" x2="14" y2="15" />
+          </svg>
+        ),
+      }
+    : undefined,
 ]
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
@@ -162,6 +148,26 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
       onToggle()
     }
   }, [isOpen, onToggle, router])
+
+  const navItemsPrepared = useMemo<Array<NavItem | undefined>>(() => {
+    return navItems.filter((n) => {
+      let allow: boolean
+
+      switch (n?.accessPolicy) {
+        case undefined:
+          allow = true
+          break
+        case 'active':
+          allow = user?.status === UserStatusEnum.ACTIVE
+          break
+        case 'sudo':
+          allow = user?.sudo === true
+          break
+      }
+
+      return allow ? n : undefined
+    })
+  }, [user?.status, user?.sudo])
 
   return (
     <>
@@ -201,7 +207,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
         </SidebarHeader>
 
         <SidebarNav $isOpen={isOpen}>
-          {navItems.map(
+          {navItemsPrepared.map(
             (item) =>
               item && (
                 <SidebarNavItem key={item.href} $isOpen={isOpen}>

@@ -66,6 +66,8 @@ Email: [example@example.com](mailto:example@example.com)
 ## Internal links:
 
 [Link to another page](/about)
+
+<a href="#">Native HTML link</a>
 `,
   },
 }

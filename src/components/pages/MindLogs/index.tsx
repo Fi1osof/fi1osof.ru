@@ -23,7 +23,13 @@ export const MindLogsPage: Page<MindLogsPageProps> = ({ page }) => {
 
   return (
     <>
-      <SeoHeaders title="Mind Logs" />
+      <SeoHeaders
+        title="Mind Logs"
+        noindex
+        nofollow
+        canonical={undefined}
+        siteOrigin={undefined}
+      />
       <MindLogsView
         mindLogs={mindLogs}
         loading={response.loading}

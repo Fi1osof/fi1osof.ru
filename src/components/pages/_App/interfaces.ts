@@ -36,7 +36,7 @@ export interface PageProps extends React.PropsWithChildren<
    */
   statusCode?: number
 
-  origin?: string
+  siteOrigin?: string
 }
 
 /**

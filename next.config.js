@@ -14,7 +14,18 @@ const nextConfig = {
       displayName: process.env.NODE_ENV === 'development',
     },
   },
-  allowedDevOrigins: ['site-boilerplate.narasim.dev.localhost'],
+  async rewrites() {
+    return {
+      beforeFiles: [],
+      afterFiles: [],
+      fallback: [
+        {
+          source: '/:path*',
+          destination: '/_fallback/:path*',
+        },
+      ],
+    }
+  },
 }
 
 module.exports = withBundleAnalyzer(nextConfig)

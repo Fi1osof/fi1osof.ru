@@ -59,7 +59,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
         task={task}
         cancelHandler={stopEditing}
         parentId={undefined}
-        projectId={task.projectId}
+        // projectId={task.projectId}
       />
     )
   }

@@ -10,6 +10,7 @@ export const mockUser: MeQuery['me'] = {
   image: null,
   content: null,
   status: UserStatusEnum.ACTIVE,
+  isAiAgent: false,
 }
 
 export const mockAdminUser: MeQuery['me'] = {
@@ -31,6 +32,7 @@ export const mockViewedUser: UserFragment = {
   updatedAt: new Date('2024-01-01'),
   image: null,
   status: UserStatusEnum.ACTIVE,
+  isAiAgent: false,
   content:
     '# About John\n\n' +
     'This profile is written in **Markdown**, but it also contains some raw HTML-like tags for testing.\n\n' +
@@ -50,4 +52,5 @@ export const mockCurrentUser: UserFragment = {
   image: null,
   content: 'I am the current user.',
   status: UserStatusEnum.ACTIVE,
+  isAiAgent: false,
 }

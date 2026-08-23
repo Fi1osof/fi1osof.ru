@@ -158,6 +158,92 @@ docker compose exec mailserver postqueue -p
 docker compose exec mailserver postsuper -d ALL
 ```
 
+## Email Attachments in n8n
+
+### Email Trigger Configuration
+
+For processing attachments, use `format: 'resolved'`:
+
+```javascript
+{
+  parameters: {
+    format: 'resolved',        // Returns attachments as binary
+    downloadAttachments: true,
+    options: {},
+  },
+}
+```
+
+### Reading Binary Data
+
+n8n stores binary data internally. To access it, use `getBinaryDataBuffer()`:
+
+```javascript
+// In Code node
+const buffer = await this.helpers.getBinaryDataBuffer(itemIndex, binaryKey)
+```
+
+**Important:** Direct access to `item.binary[key].data` returns a storage reference, not actual data.
+
+### Saving Attachments
+
+```javascript
+const fs = require('fs')
+const STORAGE_DIR = '/app/storage/attachments'
+
+for (const binaryKey of Object.keys(item.binary ?? {})) {
+  const buffer = await this.helpers.getBinaryDataBuffer(itemIndex, binaryKey)
+  const fileName = item.binary[binaryKey].fileName || `${binaryKey}.bin`
+  
+  fs.writeFileSync(`${STORAGE_DIR}/${fileName}`, buffer)
+}
+```
+
+### Common Issues
+
+**Problem:** Saved file contains path like `/tmp/attachment.txt` instead of content.
+
+**Cause:** swaks sends path as text without `@` prefix.
+
+**Solution:**
+```bash
+# Wrong
+swaks --attach /tmp/file.txt
+
+# Correct
+swaks --attach @/tmp/file.txt
+```
+
+## Testing
+
+### Test Scripts
+
+```bash
+# Send test email with attachment
+./project/tasks/006--mailserver/scripts/send-test-mail.sh
+
+# Send to MailHog for debugging
+./project/tasks/006--mailserver/scripts/send-to-mailhog.sh
+```
+
+### MailHog
+
+Dev mail catcher with web UI:
+- **Web UI:** http://localhost:8025
+- **SMTP:** localhost:1025
+
+Useful for verifying email content before mailserver processing.
+
+### Verify Mailbox Content
+
+```bash
+# Check stored emails
+cat ./docker/mailserver/mail-data/domain/user/cur/* | tail -30
+
+# Check if attachment is base64-encoded path (problem)
+cat ./docker/mailserver/mail-data/domain/user/cur/* | grep -A5 "BASE64"
+```
+
 ## Next Steps
 
 1. Create SMTP/IMAP credentials in n8n bootstrap (`server/n8n/bootstrap/`)

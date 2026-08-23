@@ -20,7 +20,7 @@ const title =
   'Николай Ланец · Fi1osof. Инженер-исследователь · публичный журнал'
 const description = 'Официальный сайт программиста Николая Ланца.'
 
-export const Fi1osofRuMainPage: Page = ({ origin }) => {
+export const Fi1osofRuMainPage: Page = ({ siteOrigin }) => {
   const response = useMainPageDataQuery()
 
   const { projects, tasks, workLogs } = useMemo(() => {
@@ -113,12 +113,17 @@ export const Fi1osofRuMainPage: Page = ({ origin }) => {
 
   return (
     <>
-      <SeoHeaders title={title} description={description} />
-      {origin && (
+      <SeoHeaders
+        title={title}
+        description={description}
+        canonical={'/'}
+        siteOrigin={siteOrigin}
+      />
+      {siteOrigin && (
         <JsonLd
           data={createWebSite({
             name: title,
-            url: origin,
+            url: siteOrigin,
           })}
         />
       )}

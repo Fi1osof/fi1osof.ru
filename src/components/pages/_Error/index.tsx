@@ -5,7 +5,14 @@ export class ErrorPage extends NextError {
   render() {
     return (
       <div>
-        <SeoHeaders noindex nofollow title="Server error" description="" />
+        <SeoHeaders
+          noindex
+          nofollow
+          title="Server error"
+          description=""
+          canonical={undefined}
+          siteOrigin={undefined}
+        />
 
         <h2>Server error</h2>
       </div>

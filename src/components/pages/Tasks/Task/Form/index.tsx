@@ -34,17 +34,13 @@ const MarkdownEditor = dynamic(
   },
 )
 
-type FormData = Omit<TaskCreateInput, 'parentId'>
+type FormData = Omit<TaskCreateInput, 'parentId' | 'projectId'>
 
-function getDefaultValues(
-  task: TaskEditFormProps['task'],
-  projectId: string | null | undefined,
-): FormData {
+function getDefaultValues(task: TaskEditFormProps['task']): FormData {
   return {
     title: task?.title ?? '',
     description: task?.description ?? '',
     content: task?.content ?? '',
-    projectId: task?.projectId ?? projectId,
   }
 }
 
@@ -55,21 +51,18 @@ export const schema: yup.ObjectSchema<FormData> = yup.object().shape({
   assigneeId: yup.string(),
   startDatePlaning: yup.date(),
   endDatePlaning: yup.date(),
-  projectId: yup.string(),
 })
 
 type TaskEditFormProps = {
   task: TaskFragment | undefined
   parentId: string | null | undefined
   cancelHandler: (() => void) | undefined
-  projectId: string | null | undefined
 }
 
 export const TaskEditForm: React.FC<TaskEditFormProps> = ({
   task,
   cancelHandler,
   parentId,
-  projectId,
 }) => {
   const { user: currentUser } = useAppContext()
 
@@ -85,7 +78,7 @@ export const TaskEditForm: React.FC<TaskEditFormProps> = ({
   const loading = loadingCreateTask || loadingUpdateTask
 
   const form = useForm<FormData>({
-    defaultValues: getDefaultValues(task, projectId),
+    defaultValues: getDefaultValues(task),
     resolver: yupResolver(schema),
     shouldFocusError: false,
     reValidateMode: 'onChange',
@@ -169,28 +162,22 @@ export const TaskEditForm: React.FC<TaskEditFormProps> = ({
   )
 
   const fieldRenderer = useCallback<
-    ControllerProps<
-      FormData,
-      'content' | 'description' | 'title' | 'projectId'
-    >['render']
+    ControllerProps<FormData, 'content' | 'description' | 'title'>['render']
   >(({ field: { name, value, onChange, onBlur }, fieldState: { error } }) => {
     let label: string
     const helperText = undefined
     let EditorComponent: typeof TextField | typeof MarkdownEditor = TextField
 
     switch (name) {
-      case 'projectId':
-        label = 'Проект'
-        break
       case 'title':
-        label = 'Название'
+        label = 'Title'
         break
       case 'description':
-        label = 'Описание'
+        label = 'Description'
         EditorComponent = MarkdownEditor
         break
       case 'content':
-        label = 'Контент'
+        label = 'Content'
         EditorComponent = MarkdownEditor
         break
     }
@@ -215,7 +202,6 @@ export const TaskEditForm: React.FC<TaskEditFormProps> = ({
   return (
     <FormProvider {...form}>
       <TaskEditFormStyled onSubmit={onSubmit}>
-        <Controller name="projectId" render={fieldRenderer} />
         <Controller name="title" render={fieldRenderer} />
         <Controller name="description" render={fieldRenderer} />
         <Controller name="content" render={fieldRenderer} />

@@ -15,11 +15,20 @@ const {
 } = decompositorItem?.json || {}
 
 const {
-  chatInput: _chatInput,
+  chatInput,
   sessionId: _sessionId,
   token: _token,
   ...requestParams
 } = triggerData || {}
+
+// Validate input prompt length
+const MAX_PROMPT_LENGTH = 10000
+
+if (chatInput && chatInput.length > MAX_PROMPT_LENGTH) {
+  throw new Error(
+    `Input prompt exceeds maximum allowed length of ${MAX_PROMPT_LENGTH} characters. Current length: ${chatInput.length}`,
+  )
+}
 
 const usefulInfoOutput = usefulInfoData.output || ''
 

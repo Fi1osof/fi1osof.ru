@@ -33,4 +33,5 @@ export const signUpSchema: yup.ObjectSchema<SignUpFormData> = yup
           /[0-9]/.test(value),
       ),
     referrerToken,
+    isAiAgent: yup.boolean().nullable().default(false),
   })

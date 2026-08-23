@@ -1,0 +1,268 @@
+import React, { useCallback, useRef, useState } from 'react'
+import {
+  KbConceptFragment,
+  useLlmImageGenerationMutation,
+  useUploadKbConceptMutation,
+} from 'src/gql/generated'
+import {
+  ConceptUploaderStyled,
+  DropZoneStyled,
+  PreviewStyled,
+  RemoveButtonStyled,
+  ErrorMessageStyled,
+  LoadingOverlayStyled,
+  GeneratorActionsStyled,
+} from './styles'
+import { Button } from 'src/ui-kit/Button'
+import { ImageGenerator } from 'src/components/FileUploader/Generator'
+
+const ACCEPTED_IMAGE_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+]
+const MAX_FILE_SIZE = 10 * 1024 * 1024
+
+export interface ConceptUploaderProps {
+  value?: string | null
+  onChange?: (file: KbConceptFragment | null) => void
+  directory?: string
+  disabled?: boolean
+}
+
+export const ConceptUploader: React.FC<ConceptUploaderProps> = ({
+  value,
+  onChange,
+  directory,
+  disabled = false,
+}) => {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [preview, setPreview] = useState<string | null>(value || null)
+  const [error, setError] = useState<string | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
+
+  const [uploadConcept, { loading }] = useUploadKbConceptMutation()
+
+  const [generateImage, { loading: generating }] =
+    useLlmImageGenerationMutation()
+
+  const [prompt, setPrompt] = useState('')
+  const [generatedBase64, setGeneratedBase64] = useState<string | null>(null)
+
+  const handleConcept = useCallback(
+    async (file: File) => {
+      setError(null)
+
+      if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+        setError('Allowed types: JPEG, PNG, GIF, WebP')
+        return
+      }
+
+      if (file.size > MAX_FILE_SIZE) {
+        setError(`Max size — ${MAX_FILE_SIZE}MB`)
+        return
+      }
+
+      const localPreview = URL.createObjectURL(file)
+      setPreview(localPreview)
+
+      try {
+        const result = await uploadConcept({
+          variables: {
+            data: {
+              file,
+              directory,
+            },
+          },
+        })
+
+        if (result.data?.response) {
+          onChange?.(result.data.response)
+        } else {
+          setError('Unhandled error')
+          setPreview(value || null)
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unhandled error')
+        setPreview(value || null)
+      }
+    },
+    [uploadConcept, directory, onChange, value],
+  )
+
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0]
+      if (file) {
+        handleConcept(file)
+      }
+    },
+    [handleConcept],
+  )
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault()
+      setIsDragging(false)
+
+      if (disabled || loading) {
+        return
+      }
+
+      const file = e.dataTransfer.files?.[0]
+      if (file) {
+        handleConcept(file)
+      }
+    },
+    [handleConcept, disabled, loading],
+  )
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }, [])
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+  }, [])
+
+  const handleClick = useCallback(() => {
+    if (!disabled && !loading) {
+      inputRef.current?.click()
+    }
+  }, [disabled, loading])
+
+  const handleRemove = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation()
+      setPreview(null)
+      setError(null)
+      setGeneratedBase64(null)
+      onChange?.(null)
+      if (inputRef.current) {
+        inputRef.current.value = ''
+      }
+    },
+    [onChange],
+  )
+
+  const handleSaveGenerated = useCallback(async () => {
+    if (!generatedBase64) {
+      return
+    }
+
+    try {
+      const response = await fetch(generatedBase64)
+      const blob = await response.blob()
+      const file = new File([blob], 'generated-image.png', {
+        type: 'image/png',
+      })
+
+      const result = await uploadConcept({
+        variables: {
+          data: {
+            file,
+            directory,
+          },
+        },
+      })
+
+      if (result.data?.response) {
+        setPreview(generatedBase64)
+        setGeneratedBase64(null)
+        setPrompt('')
+        onChange?.(result.data.response)
+      } else {
+        setError('Save error')
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Save error')
+    }
+  }, [generatedBase64, uploadConcept, directory, onChange])
+
+  const handleCancelGenerated = useCallback(() => {
+    setGeneratedBase64(null)
+  }, [])
+
+  const isLoading = loading || generating
+
+  return (
+    <ConceptUploaderStyled>
+      <input
+        ref={inputRef}
+        type="file"
+        accept={ACCEPTED_IMAGE_TYPES.join(',')}
+        onChange={handleInputChange}
+        disabled={disabled || isLoading}
+        style={{ display: 'none' }}
+      />
+
+      {generatedBase64 ? (
+        <DropZoneStyled $hasPreview $disabled={isLoading}>
+          {isLoading && (
+            <LoadingOverlayStyled>
+              <span>Saving...</span>
+            </LoadingOverlayStyled>
+          )}
+          <PreviewStyled>
+            <img src={generatedBase64} alt="Generated preview" />
+          </PreviewStyled>
+          <GeneratorActionsStyled>
+            <Button onClick={handleSaveGenerated} disabled={isLoading}>
+              Save
+            </Button>
+            <Button onClick={handleCancelGenerated} disabled={isLoading}>
+              Cancel
+            </Button>
+          </GeneratorActionsStyled>
+        </DropZoneStyled>
+      ) : (
+        <DropZoneStyled
+          $isDragging={isDragging}
+          $hasPreview={!!preview}
+          $disabled={disabled || isLoading}
+          onClick={handleClick}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+        >
+          {isLoading && (
+            <LoadingOverlayStyled>
+              <span>Uploading...</span>
+            </LoadingOverlayStyled>
+          )}
+
+          {preview ? (
+            <PreviewStyled>
+              <img src={preview} alt="Preview" />
+              {!disabled && !isLoading && (
+                <RemoveButtonStyled onClick={handleRemove}>
+                  ×
+                </RemoveButtonStyled>
+              )}
+            </PreviewStyled>
+          ) : (
+            <span>
+              {isDragging
+                ? 'Drop file'
+                : 'Drop image here or click to select file'}
+            </span>
+          )}
+        </DropZoneStyled>
+      )}
+
+      <ImageGenerator
+        disabled={disabled}
+        generateImage={generateImage}
+        generating={generating}
+        prompt={prompt}
+        setGeneratedBase64={setGeneratedBase64}
+        setPrompt={setPrompt}
+      />
+
+      {error && <ErrorMessageStyled>{error}</ErrorMessageStyled>}
+    </ConceptUploaderStyled>
+  )
+}

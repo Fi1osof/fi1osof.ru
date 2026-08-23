@@ -3,14 +3,18 @@ import { SeoHeaders } from 'src/components/seo/SeoHeaders'
 import { ProjectsPageView } from './View'
 import { ProjectsDocument, useProjectsQuery } from 'src/gql/generated'
 
-export const ProjectsPage: Page = () => {
+export const ProjectsPage: Page = ({ siteOrigin }) => {
   const response = useProjectsQuery()
 
   const projects = response.data?.projects ?? []
 
   return (
     <>
-      <SeoHeaders title="Проекты" />
+      <SeoHeaders
+        title="Проекты"
+        canonical={'/projects'}
+        siteOrigin={siteOrigin}
+      />
 
       <ProjectsPageView projects={projects} />
     </>

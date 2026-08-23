@@ -1,1 +1,1 @@
-export { WorkLogPage as default } from 'src/components/pages/WorkLogs/WorkLog'
+export { WorkLogPageFi1osofRu as default } from 'src/Fi1osofRu/pages/WorkLogs/WorkLog'

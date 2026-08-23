@@ -1,1 +1,1 @@
-export { MainPage as default } from 'src/components/pages/MainPage'
+export { Fi1osofRuMainPage as default } from 'src/Fi1osofRu/pages/Mainpage'

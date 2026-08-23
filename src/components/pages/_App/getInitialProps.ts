@@ -9,6 +9,12 @@ import {
   withWs,
 } from './interfaces'
 import { getSiteOrigin } from 'src/helpers/getSiteOrigin'
+import {
+  CreateSystemLogDocument,
+  CreateSystemLogMutation,
+  CreateSystemLogMutationVariables,
+} from 'src/gql/generated/createSystemLog'
+import { SystemLogLevel, SystemLogSource } from 'src/gql/generated'
 
 export const getInitialProps: MainApp['getInitialProps'] = async (
   appContext,
@@ -44,7 +50,15 @@ export const getInitialProps: MainApp['getInitialProps'] = async (
   const { pageProps, ...otherProps } =
     await NextApp.getInitialProps(newAppContext)
 
-  const { statusCode } = pageProps as PageProps
+  let statusCode = (pageProps as PageProps | undefined)?.statusCode
+
+  if (statusCode === undefined) {
+    switch (ctx.pathname) {
+      case '/404':
+        statusCode = 404
+        break
+    }
+  }
 
   /**
    * If running on the server side
@@ -82,8 +96,56 @@ export const getInitialProps: MainApp['getInitialProps'] = async (
       ...pageProps,
       statusCode,
       initialApolloState: apolloClient.cache.extract(),
-      origin: getSiteOrigin(ctx.req),
+      siteOrigin: getSiteOrigin(ctx.req),
     },
+  }
+
+  if (
+    statusCode !== undefined &&
+    statusCode !== 200 &&
+    ctx.req?.url &&
+    ctx.res
+  ) {
+    const req = ctx.req
+    const res = ctx.res
+    const url = req.url || ''
+    const path = url.split('?')[0]
+
+    const skip = [
+      '/_next/static/chunks/pages/types.js.map',
+      '/.well-known/appspecific/com.chrome.devtools.json',
+    ].includes(url)
+
+    if (!skip) {
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
+      const response = await apolloClient.mutate<
+        CreateSystemLogMutation,
+        CreateSystemLogMutationVariables
+      >({
+        mutation: CreateSystemLogDocument,
+        variables: {
+          data: {
+            level: SystemLogLevel.ERROR,
+            source: SystemLogSource.CLIENT,
+            message: `HTTP ${statusCode}: ${path}`,
+            url,
+            path,
+            statusCode,
+            method: req.method,
+            userAgent: req.headers['user-agent'],
+            referer: req.headers.referer,
+          },
+        },
+      })
+
+      const result = response.data?.createSystemLog
+      if (result?.redirectTo && result.redirectStatusCode) {
+        res.writeHead(result.redirectStatusCode, {
+          Location: result.redirectTo,
+        })
+        res.end()
+      }
+    }
   }
 
   return newProps

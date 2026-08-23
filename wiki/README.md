@@ -18,6 +18,7 @@
 - [Computer Vision](./computer-vision/README.md) — image recognition with Qwen3.5 vision model
 - [Image Generation](./image-generation/README.md) — AI-powered image generation via LLM
 - [Jinja Templates](./jinja-templates/README.md) — chat templates for LLM
+- [Routing](./routing/README.md) — custom URL routing for SEO-friendly paths
 
 ## Architecture
 

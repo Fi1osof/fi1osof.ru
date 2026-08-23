@@ -6,11 +6,11 @@ builder.prismaObject('TaskWorkLog', {
     id: t.exposeID('id', {
       nullable: false,
     }),
-    createdAt: t.expose('createdAt', { type: 'DateTime' }),
+    createdAt: t.expose('createdAt', { type: 'DateTime', nullable: false }),
     content: t.exposeString('content'),
-    taskId: t.exposeID('taskId'),
+    taskId: t.exposeID('taskId', { nullable: false }),
     Task: t.relation('Task'),
-    createdById: t.exposeID('createdById'),
+    createdById: t.exposeID('createdById', { nullable: false }),
     CreatedBy: t.relation('CreatedBy'),
   }),
 })

@@ -17,6 +17,7 @@ import {
 import { memo } from 'react'
 import { MarkdownEditorToolbarStyled } from './styles'
 import { InsertGeneratedImage } from './InsertGeneratedImage'
+import { InsertFilesUploader } from './InsertFilesUploader'
 
 type MarkdownEditorToolbarProps = {
   editor: MDXEditorMethods | null
@@ -46,6 +47,7 @@ const MarkdownEditorToolbarComponent: React.FC<
       <CreateLink />
       {/* <InsertImage /> */}
       <InsertGeneratedImage />
+      <InsertFilesUploader />
 
       <Separator />
 

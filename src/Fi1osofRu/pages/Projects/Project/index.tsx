@@ -12,7 +12,7 @@ type ProjectPage = PageProps & {
   id: string | undefined
 }
 
-export const ProjectPage: Page<ProjectPage> = ({ id }) => {
+export const ProjectPage: Page<ProjectPage> = ({ id, siteOrigin }) => {
   const response = useProjectPageDataQuery({
     variables: {
       projectId: id || '',
@@ -28,7 +28,11 @@ export const ProjectPage: Page<ProjectPage> = ({ id }) => {
 
   return (
     <>
-      <SeoHeaders title={project.name} />
+      <SeoHeaders
+        title={project.name}
+        canonical={`/projects/${project.id}`}
+        siteOrigin={siteOrigin}
+      />
 
       <ProjectPageView project={project} tasks={tasks ?? []} />
     </>

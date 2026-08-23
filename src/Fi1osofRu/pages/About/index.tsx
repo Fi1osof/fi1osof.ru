@@ -22,20 +22,25 @@ import iAm from './img/i-am.jpg'
 
 import { useOpenChatWithMessage } from 'src/components/Chat/hooks/useOpenChatWithMessage'
 
-export const AboutPageCustom: Page = (props) => {
+export const AboutPageCustom: Page = ({ siteOrigin }) => {
   const siteTitle = 'Николай Ланец (Fi1osof) — Fullstack AI Researcher'
 
   const description =
     'Fullstack-разработчик с 2007 года, основатель MODX-Клуба. Исследую практическое применение ИИ и развиваю собственного ИИ-агента с памятью и обучением через общение.'
 
-  const siteUrl = props.origin
+  const siteUrl = siteOrigin
   const pageUrl = `${siteUrl}/about`
 
   const onClickHandler = useOpenChatWithMessage()
 
   return (
     <>
-      <SeoHeaders title={siteTitle} description={description} />
+      <SeoHeaders
+        title={siteTitle}
+        description={description}
+        siteOrigin={siteOrigin}
+        canonical={'/about'}
+      />
 
       {siteUrl && (
         <JsonLd
@@ -71,10 +76,10 @@ export const AboutPageCustom: Page = (props) => {
         />
       )}
 
-      {siteUrl && (
+      {siteOrigin && (
         <JsonLd
           data={createBreadcrumbList({
-            origin: siteUrl,
+            siteOrigin,
             items: [{ name: 'Главная', url: '/' }, { name: 'Обо мне' }],
           })}
         />
