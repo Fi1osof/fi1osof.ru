@@ -107,6 +107,34 @@ export const WithComplexContent: Story = {
   },
 }
 
+export const WithLaTeX: Story = {
+  args: {
+    value: `# LaTeX Math Support
+
+## Inline Math
+
+The quadratic formula is $x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}$ and Einstein's famous equation is $E = mc^2$.
+
+## Block Math
+
+$$
+\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}
+$$
+
+## Matrix
+
+$$
+\\begin{pmatrix}
+a & b \\\\
+c & d
+\\end{pmatrix}
+$$
+`,
+    // eslint-disable-next-line no-console
+    onChange: console.log,
+  },
+}
+
 export const MultyEditors: Story = {
   args: {
     value: `# Markdown Editor Demo

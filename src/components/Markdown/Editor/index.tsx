@@ -29,6 +29,7 @@ import { MarkdownEditorToolbar } from './Toolbar'
 import { useSingleUploadMutation } from 'src/gql/generated'
 import { useStopPropagationScroll } from 'src/hooks/useStopPropagationScroll'
 import { FilesUploaderEditor } from './FilesUploaderEditor'
+import { mathPlugin } from './mathPlugin'
 
 type MarkdownEditorEditorProps = {
   value: string | null | undefined
@@ -126,6 +127,7 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorEditorProps> = ({
       }),
       tablePlugin(),
       markdownShortcutPlugin(),
+      mathPlugin(),
       diffSourcePlugin({ viewMode: 'rich-text' }),
 
       toolbarPlugin({
