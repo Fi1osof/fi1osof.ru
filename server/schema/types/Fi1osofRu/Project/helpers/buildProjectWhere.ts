@@ -8,9 +8,9 @@ type ProjectWhereInputType = typeof ProjectWhereInput.$inferInput
 
 export function buildProjectWhere(
   where: ProjectWhereInputType | null | undefined,
-  ctx: PrismaContext | undefined,
+  _ctx: PrismaContext | undefined,
 ): Prisma.ProjectWhereInput {
-  const { currentUser } = ctx || {}
+  // const { currentUser } = ctx || {}
 
   const { id, name, createdById, commercial, status, createdAt, ...other } =
     where || {}
@@ -25,9 +25,9 @@ export function buildProjectWhere(
     createdAt: buildDateTimeFilterWhere(createdAt),
   }
 
-  if (currentUser && !currentUser.sudo) {
-    result.createdById = currentUser.id
-  }
+  // if (currentUser && !currentUser.sudo) {
+  //   result.createdById = currentUser.id
+  // }
 
   return result
 }
