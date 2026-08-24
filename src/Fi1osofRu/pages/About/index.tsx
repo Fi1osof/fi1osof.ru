@@ -21,12 +21,14 @@ import {
 import iAm from './img/i-am.jpg'
 
 import { useOpenChatWithMessage } from 'src/components/Chat/hooks/useOpenChatWithMessage'
+import { useLexicon } from 'src/Fi1osofRu/Lexicon'
+import { aboutLexicon } from './lexicon'
 
 export const AboutPageCustom: Page = ({ siteOrigin }) => {
-  const siteTitle = 'Николай Ланец (Fi1osof) — Fullstack AI Researcher'
+  const { t } = useLexicon(aboutLexicon)
 
-  const description =
-    'Fullstack-разработчик с 2007 года, основатель MODX-Клуба. Исследую практическое применение ИИ и развиваю собственного ИИ-агента с памятью и обучением через общение.'
+  const siteTitle = t('seo.title')
+  const description = t('seo.description')
 
   const siteUrl = siteOrigin
   const pageUrl = `${siteUrl}/about`
@@ -45,7 +47,7 @@ export const AboutPageCustom: Page = ({ siteOrigin }) => {
       {siteUrl && (
         <JsonLd
           data={createPerson({
-            name: 'Николай Fi1osof Ланец',
+            name: 'Nikolai Fi1osof Lanets',
             url: pageUrl,
             image: `${siteUrl}${iAm.src}`,
             jobTitle: 'Fullstack AI Researcher',
@@ -80,7 +82,10 @@ export const AboutPageCustom: Page = ({ siteOrigin }) => {
         <JsonLd
           data={createBreadcrumbList({
             siteOrigin,
-            items: [{ name: 'Главная', url: '/' }, { name: 'Обо мне' }],
+            items: [
+              { name: t('seo.breadcrumb.home'), url: '/' },
+              { name: t('seo.breadcrumb.about') },
+            ],
           })}
         />
       )}
@@ -89,36 +94,28 @@ export const AboutPageCustom: Page = ({ siteOrigin }) => {
         <AboutPageContentStyled>
           <AboutPageCustomOwnPhotoStyled
             src={iAm.src}
-            alt="Николай Ланец aka Fi1osof"
+            alt={t('image.alt')}
             width={iAm.width}
             height={iAm.height}
           />
 
           <AboutPageTextStyled>
             <AboutSectionStyled>
-              <AboutSectionTitleStyled>Кто я</AboutSectionTitleStyled>
-              <p>
-                Меня зовут Николай Ланец, также известен под ником Fi1osof.
-                Активно программирую с 2007 года и являюсь специалистом широкого
-                профиля с глубокой экспертизой, способным реализовывать проекты
-                под ключ с нуля.
-              </p>
+              <AboutSectionTitleStyled>
+                {t('section.who.title')}
+              </AboutSectionTitleStyled>
+              <p>{t('section.who.text')}</p>
             </AboutSectionStyled>
 
             <AboutSectionStyled>
-              <AboutSectionTitleStyled>Опыт</AboutSectionTitleStyled>
+              <AboutSectionTitleStyled>
+                {t('section.experience.title')}
+              </AboutSectionTitleStyled>
+              <p>{t('section.experience.text1')}</p>
               <p>
-                Работал как на фрилансе, так и в крупном бигтехе, включая
-                СберЛаб виртуальной и дополненной реальности. Там я проработал
-                полтора года в роли тимлида/техлида и ведущего программиста на
-                проекте собственной метавселенной Сбера.
-              </p>
-              <p>
-                В период с 2009 по 2015 год активно занимался MODX и являлся
-                одним из сильнейших специалистов в этой области. В 2013 году
-                запустил{' '}
+                {t('section.experience.text2')}{' '}
                 <a href="https://modx.club/about" target="_blank">
-                  MODX-Клуб
+                  {t('section.experience.modxClub')}
                 </a>
                 .
               </p>
@@ -126,32 +123,18 @@ export const AboutPageCustom: Page = ({ siteOrigin }) => {
 
             <AboutSectionStyled>
               <AboutSectionTitleStyled>
-                Чем занимаюсь сейчас
+                {t('section.current.title')}
               </AboutSectionTitleStyled>
-              <p>
-                В феврале 2026 года я уволился из европейской компании Bringo
-                Ltd, чтобы полностью погрузиться в исследования в области
-                практического применения ИИ.
-              </p>
-              <p>
-                Среди прочего развиваю собственного ИИ-агента, который гораздо
-                больше, чем просто «говорилка». Этот агент имеет собственную
-                память и обучается в формате, более близком к человеческому —
-                через общение, рассуждения и практику.
-              </p>
+              <p>{t('section.current.text1')}</p>
+              <p>{t('section.current.text2')}</p>
             </AboutSectionStyled>
           </AboutPageTextStyled>
         </AboutPageContentStyled>
 
         <CtaSectionStyled>
-          <CtaTitleStyled>Хотите узнать больше?</CtaTitleStyled>
-          <CtaDescriptionStyled>
-            Пообщайтесь с моим ИИ-агентом — он расскажет обо мне и моих проектах
-          </CtaDescriptionStyled>
-          <CraButtonStyled
-            onClick={onClickHandler}
-            value={'Расскажи подробней про Николая и о себе'}
-          >
+          <CtaTitleStyled>{t('cta.title')}</CtaTitleStyled>
+          <CtaDescriptionStyled>{t('cta.description')}</CtaDescriptionStyled>
+          <CraButtonStyled onClick={onClickHandler} value={t('cta.button')}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -163,7 +146,7 @@ export const AboutPageCustom: Page = ({ siteOrigin }) => {
             >
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
-            Начать диалог с ИИ
+            {t('cta.buttonIcon')}
           </CraButtonStyled>
         </CtaSectionStyled>
       </AboutPageCustomStyled>

@@ -18,6 +18,7 @@ import { KBConceptOrderByInput, KBConceptWhereInput } from './inputs'
 import { conceptsResolver } from './resolvers/concepts'
 import { SiteRoute } from '@prisma/client'
 import { KBConceptVisibilityEnum } from './types'
+import { getFieldValueByLang } from './helpers/getFieldValueByLang'
 
 // Export all types
 export * from './inputs'
@@ -28,10 +29,27 @@ builder.prismaObject('KBConcept', {
     createdAt: t.expose('createdAt', { type: 'DateTime', nullable: false }),
     updatedAt: t.expose('updatedAt', { type: 'DateTime', nullable: false }),
     type: t.exposeString('type', { nullable: true }),
-    name: t.exposeString('name', { nullable: false }),
-    description: t.exposeString('description', { nullable: true }),
-    intro: t.exposeString('intro'),
-    content: t.exposeString('content', { nullable: true }),
+    name: t.string({
+      nullable: false,
+      resolve(source, _, ctx) {
+        return getFieldValueByLang(source, 'name', ctx)
+      },
+    }),
+    description: t.string({
+      resolve(source, _, ctx) {
+        return getFieldValueByLang(source, 'description', ctx)
+      },
+    }),
+    intro: t.string({
+      resolve(source, _, ctx) {
+        return getFieldValueByLang(source, 'intro', ctx)
+      },
+    }),
+    content: t.string({
+      resolve(source, _, ctx) {
+        return getFieldValueByLang(source, 'content', ctx)
+      },
+    }),
     code: t.exposeString('code'),
     image: t.exposeString('image'),
     path: t.exposeString('path'),

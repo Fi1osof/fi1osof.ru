@@ -1,5 +1,7 @@
 import { Page, PageProps } from 'src/components/pages/_App/interfaces'
 import { SeoHeaders } from 'src/components/seo/SeoHeaders'
+import { useLexicon } from 'src/Fi1osofRu/Lexicon'
+import { projectLexicon } from './lexicon'
 import {
   ProjectPageDataDocument,
   ProjectPageDataQuery,
@@ -19,6 +21,7 @@ export const ProjectPage: Page<ProjectPage> = ({ id, siteOrigin }) => {
     },
     skip: !id,
   })
+  const { t } = useLexicon(projectLexicon)
 
   const { project, tasks } = response.data || {}
 
@@ -30,6 +33,7 @@ export const ProjectPage: Page<ProjectPage> = ({ id, siteOrigin }) => {
     <>
       <SeoHeaders
         title={project.name}
+        description={project.description || t('seo.description')}
         canonical={`/projects/${project.id}`}
         siteOrigin={siteOrigin}
       />

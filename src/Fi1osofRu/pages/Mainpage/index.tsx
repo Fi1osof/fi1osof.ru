@@ -3,6 +3,8 @@ import { Page } from 'src/components/pages/_App/interfaces'
 import { JsonLd } from 'src/components/seo/JsonLd'
 import { createWebSite } from 'src/components/seo/JsonLd/helpers'
 import { SeoHeaders } from 'src/components/seo/SeoHeaders'
+import { useLexicon } from 'src/Fi1osofRu/Lexicon'
+import { mainpageLexicon } from './lexicon'
 import { Project } from 'src/Fi1osofRu/lovable/src/mocks/projects'
 import { Task } from 'src/Fi1osofRu/lovable/src/mocks/tasks'
 import { LovableHomePage } from 'src/Fi1osofRu/lovable/src/pages/HomePage'
@@ -16,12 +18,9 @@ import {
 import { getResizedImagePath } from 'src/helpers/getResizedImagePath'
 import { formatDateIntl } from 'src/ui-kit/format/FormattedDate'
 
-const title =
-  'Николай Ланец · Fi1osof. Инженер-исследователь · публичный журнал'
-const description = 'Официальный сайт программиста Николая Ланца.'
-
 export const Fi1osofRuMainPage: Page = ({ siteOrigin }) => {
   const response = useMainPageDataQuery()
+  const { t } = useLexicon(mainpageLexicon)
 
   const { projects, tasks, workLogs } = useMemo(() => {
     const projects: Project[] =
@@ -114,15 +113,15 @@ export const Fi1osofRuMainPage: Page = ({ siteOrigin }) => {
   return (
     <>
       <SeoHeaders
-        title={title}
-        description={description}
+        title={t('seo.title')}
+        description={t('seo.description')}
         canonical={'/'}
         siteOrigin={siteOrigin}
       />
       {siteOrigin && (
         <JsonLd
           data={createWebSite({
-            name: title,
+            name: t('seo.title'),
             url: siteOrigin,
           })}
         />
@@ -134,7 +133,7 @@ export const Fi1osofRuMainPage: Page = ({ siteOrigin }) => {
           fixed: [
             {
               id: 'c1',
-              title: 'Веду курсы по ИИ',
+              title: t('availability.courseTitle'),
               from: '15 июл 2026',
               to: '2 сен 2026',
               load: '2 ч / день',

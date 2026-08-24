@@ -5,6 +5,7 @@ import { MeQuery } from 'src/gql/generated'
 
 import { useRouter } from 'next/router'
 import { AuthModal } from 'src/components/Auth/AuthModal'
+import { Locale } from 'src/Fi1osofRu/components/LocaleSwitcher/interfaces'
 
 export type AppContextValue = {
   user: MeQuery['me']
@@ -16,6 +17,8 @@ export type AppContextValue = {
   isLoginFormOpen: boolean
   openLoginForm: () => void
   closeLoginForm: () => void
+
+  locale: Locale
 }
 
 export const Context = React.createContext<AppContextValue | null>(null)
@@ -23,12 +26,14 @@ export const Context = React.createContext<AppContextValue | null>(null)
 type AppContextProviderProps = React.PropsWithChildren<{
   user: AppContextValue['user']
   userLoading: boolean
+  locale: AppContextValue['locale']
 }>
 
 export const AppContextProvider: React.FC<AppContextProviderProps> = ({
   user,
   userLoading,
   children,
+  locale,
 }) => {
   const router = useRouter()
   const [isLoginFormOpen, setIsLoginFormOpen] = useState(false)
@@ -73,6 +78,7 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({
       isLoginFormOpen,
       openLoginForm,
       closeLoginForm,
+      locale,
     }
   }, [
     onAuth,
@@ -82,6 +88,7 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({
     isLoginFormOpen,
     openLoginForm,
     closeLoginForm,
+    locale,
   ])
 
   return (

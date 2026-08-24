@@ -15,10 +15,22 @@ import {
   CreateSystemLogMutationVariables,
 } from 'src/gql/generated/createSystemLog'
 import { SystemLogLevel, SystemLogSource } from 'src/gql/generated'
+import {
+  isLocale,
+  Locale,
+} from 'src/Fi1osofRu/components/LocaleSwitcher/interfaces'
 
 export const getInitialProps: MainApp['getInitialProps'] = async (
   appContext,
 ) => {
+  const { router } = appContext
+
+  const locale: Locale = isLocale(router.locale)
+    ? router.locale
+    : isLocale(router.defaultLocale)
+      ? router.defaultLocale
+      : 'ru'
+
   /**
    * In order to be able to assemble a common apollo state
    * from the application and then from pages and documents,
@@ -27,6 +39,7 @@ export const getInitialProps: MainApp['getInitialProps'] = async (
   const apolloClient = initializeApollo({
     withWs: withWs,
     appContext,
+    locale,
   })
 
   /**
@@ -35,6 +48,23 @@ export const getInitialProps: MainApp['getInitialProps'] = async (
   const ctx: NextPageContextCustom = {
     ...appContext.ctx,
     apolloClient,
+  }
+
+  // Normalize asPath: on client-side navigation Next.js includes locale prefix,
+  // but on server-side it doesn't. Remove locale prefix for consistency.
+  const { defaultLocale } = router
+
+  if (ctx.asPath && locale && locale !== defaultLocale) {
+    const localePrefix = `/${locale}`
+    // Check for exact match: /vi or /vi/ or /vi? or /vi/path or /vi?query
+    if (
+      ctx.asPath === localePrefix ||
+      ctx.asPath.startsWith(`${localePrefix}/`) ||
+      ctx.asPath.startsWith(`${localePrefix}?`)
+    ) {
+      const stripped = ctx.asPath.slice(localePrefix.length)
+      ctx.asPath = stripped.startsWith('?') ? `/${stripped}` : stripped || '/'
+    }
   }
 
   const newAppContext = {
@@ -67,29 +97,6 @@ export const getInitialProps: MainApp['getInitialProps'] = async (
     newAppContext.ctx.res.statusCode = statusCode
   }
 
-  /**
-   * Если страница была не найдена, проверяем ее на фрикоде,
-   * так как много контента переехало в свое время туда.
-   */
-  if (
-    (statusCode === 404 || ctx.pathname === '/404') &&
-    ctx.req?.url &&
-    ctx.res
-  ) {
-    const res = ctx.res
-
-    const url = `https://freecode.academy${ctx.req.url}`
-
-    const response = await fetch(url).catch(console.error)
-
-    if (response?.ok) {
-      res.writeHead(301, {
-        Location: url,
-      })
-      res.end()
-    }
-  }
-
   const newProps: AppInitialProps = {
     ...otherProps,
     pageProps: {
@@ -98,17 +105,25 @@ export const getInitialProps: MainApp['getInitialProps'] = async (
       initialApolloState: apolloClient.cache.extract(),
       siteOrigin: getSiteOrigin(ctx.req),
     },
+    locale,
   }
 
   if (
-    statusCode !== undefined &&
-    statusCode !== 200 &&
+    // statusCode !== undefined &&
+    // statusCode !== 200 &&
     ctx.req?.url &&
     ctx.res
   ) {
     const req = ctx.req
     const res = ctx.res
-    const url = req.url || ''
+    const url =
+      'originalUrl' in req &&
+      req.originalUrl &&
+      req.originalUrl &&
+      typeof req.originalUrl === 'string'
+        ? req.originalUrl
+        : req.url || ''
+
     const path = url.split('?')[0]
 
     const skip = [
@@ -117,6 +132,10 @@ export const getInitialProps: MainApp['getInitialProps'] = async (
     ].includes(url)
 
     if (!skip) {
+      const isError = statusCode && statusCode !== 200 ? true : false
+      const siteOrigin = getSiteOrigin(req)
+      const fullUrl = siteOrigin ? `${siteOrigin}${url}` : url
+
       // eslint-disable-next-line @typescript-eslint/no-deprecated
       const response = await apolloClient.mutate<
         CreateSystemLogMutation,
@@ -125,12 +144,12 @@ export const getInitialProps: MainApp['getInitialProps'] = async (
         mutation: CreateSystemLogDocument,
         variables: {
           data: {
-            level: SystemLogLevel.ERROR,
+            level: isError ? SystemLogLevel.ERROR : SystemLogLevel.INFO,
             source: SystemLogSource.CLIENT,
-            message: `HTTP ${statusCode}: ${path}`,
-            url,
+            message: `HTTP ${statusCode ?? 200}: ${path}`,
+            url: fullUrl,
             path,
-            statusCode,
+            statusCode: statusCode ?? 200,
             method: req.method,
             userAgent: req.headers['user-agent'],
             referer: req.headers.referer,

@@ -3,6 +3,8 @@ import { TaskWorkLogFragment } from 'src/gql/generated'
 import { Pagination } from 'src/components/Pagination'
 import { WorkLogCard } from 'src/components/WorkLogCard'
 import { WorkLogsViewStyled, WorkLogsViewListStyled } from './styles'
+import { useLexicon } from 'src/Fi1osofRu/Lexicon'
+import { workLogsViewLexicon } from './lexicon'
 
 type WorkLogsViewProps = {
   workLogs: TaskWorkLogFragment[]
@@ -16,9 +18,11 @@ export const WorkLogsView: React.FC<WorkLogsViewProps> = ({
   currentPage,
   totalPages,
 }) => {
+  const { t } = useLexicon(workLogsViewLexicon)
+
   return (
     <WorkLogsViewStyled size="wide">
-      <h1>Ворклоги</h1>
+      <h1>{t('title')}</h1>
 
       <WorkLogsViewListStyled>
         {workLogs.map((workLog) => (

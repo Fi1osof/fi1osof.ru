@@ -2,7 +2,11 @@ import Link from 'next/link'
 import React from 'react'
 import { KbConceptNoNestingFragment } from 'src/gql/generated'
 
-export function createConceptLink(object: KbConceptNoNestingFragment): string {
+export function createConceptLink(
+  object: Pick<KbConceptNoNestingFragment, 'id'> & {
+    uri: string | null | undefined
+  },
+): string {
   const { id, uri } = object
 
   return uri || `/concepts/${id}`

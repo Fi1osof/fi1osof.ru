@@ -2,7 +2,9 @@ import Link from 'next/link'
 import React from 'react'
 import { TaskNoNestingFragment } from 'src/gql/generated'
 
-export function createTaskLink(object: TaskNoNestingFragment): string {
+export function createTaskLink(
+  object: Pick<TaskNoNestingFragment, 'id'>,
+): string {
   const { id } = object
 
   return `/tasks/${id}`

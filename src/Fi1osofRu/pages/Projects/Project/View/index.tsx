@@ -36,6 +36,8 @@ import { TaskList } from 'src/Fi1osofRu/lovable/src/ui-kit/Lists/TaskList'
 import { useMemo } from 'react'
 import { TaskListItem } from 'src/Fi1osofRu/lovable/src/ui-kit/Lists/TaskList/types'
 import { ActivityKindMap } from 'src/Fi1osofRu/lovable/src/mocks/tasks'
+import { useLexicon } from 'src/Fi1osofRu/Lexicon'
+import { projectViewLexicon } from './lexicon'
 
 interface ProjectPageViewProps {
   project: ProjectFragment
@@ -63,6 +65,7 @@ export const ProjectPageView: React.FC<ProjectPageViewProps> = ({
   const { name: title, intro, image, content, createdAt } = project
 
   const { user: currentUser } = useAppContext()
+  const { t } = useLexicon(projectViewLexicon)
 
   const [inEditMode, inEditModeOn, inEditModeOff] = useBoolean()
 
@@ -113,8 +116,12 @@ export const ProjectPageView: React.FC<ProjectPageViewProps> = ({
         <HeroStyled>
           <Breadcrumbs
             items={[
-              { id: 'home', label: 'Fi1osof', href: '/' },
-              { id: 'projects', label: 'Проекты', href: '/projects' },
+              { id: 'home', label: t('breadcrumbs.home'), href: '/' },
+              {
+                id: 'projects',
+                label: t('breadcrumbs.projects'),
+                href: '/projects',
+              },
               { id: 'this', label: title },
             ]}
             // onNavigate={(item) => item.href && onOpen(item.href)}
@@ -132,11 +139,11 @@ export const ProjectPageView: React.FC<ProjectPageViewProps> = ({
                   }}
                 >
                   <Button variant={ComponentVariant.DEFAULT}>
-                    Создать задачу
+                    {t('hero.createTask')}
                   </Button>
                 </Link>
 
-                <Button onClick={inEditModeOn}>Редактировать</Button>
+                <Button onClick={inEditModeOn}>{t('hero.edit')}</Button>
               </>
             )}
           </TitleStyled>
@@ -147,7 +154,7 @@ export const ProjectPageView: React.FC<ProjectPageViewProps> = ({
           <MetaRowStyled>
             <ActivityIndicator kind={'active'} />
             <span>
-              с{' '}
+              {t('meta.from')}{' '}
               {formatDateIntl({
                 value: createdAt,
                 format: 'dateShort',
@@ -172,7 +179,10 @@ export const ProjectPageView: React.FC<ProjectPageViewProps> = ({
         </HeroStyled>
 
         {content && (
-          <Section eyebrow="о проекте" title="Описание">
+          <Section
+            eyebrow={t('sections.aboutProject')}
+            title={t('sections.description')}
+          >
             <ContentWrapStyled>
               <Markdown>{content}</Markdown>
             </ContentWrapStyled>
@@ -211,8 +221,8 @@ export const ProjectPageView: React.FC<ProjectPageViewProps> = ({
       )} */}
 
         <Section
-          eyebrow="работа"
-          title={`Активные задачи · ${activeTasks.length}`}
+          eyebrow={t('sections.work')}
+          title={`${t('sections.activeTasks')} · ${activeTasks.length}`}
         >
           {activeTasks.length > 0 ? (
             <TaskList
@@ -228,12 +238,12 @@ export const ProjectPageView: React.FC<ProjectPageViewProps> = ({
               // onOpen={onOpen}
             />
           ) : (
-            <DescStyled>Нет активных задач.</DescStyled>
+            <DescStyled>{t('sections.noActiveTasks')}</DescStyled>
           )}
 
           <p>
             <Link href={`/tasks?projectId=${project.id}`}>
-              Смотреть все задачи проекта
+              {t('sections.viewAllTasks')}
             </Link>
           </p>
         </Section>

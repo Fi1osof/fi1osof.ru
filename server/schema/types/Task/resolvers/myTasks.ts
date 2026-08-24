@@ -21,7 +21,10 @@ builder.queryField('myTasks', (t) =>
         where: buildTaskWhere(args.where, { myOnly: true }, ctx),
         skip: args.skip ?? undefined,
         take: args.take ?? undefined,
-        orderBy: { createdAt: args.orderBy?.createdAt ?? 'asc' },
+        orderBy: {
+          createdAt: args.orderBy?.createdAt ?? undefined,
+          updatedAt: args.orderBy?.updatedAt ?? undefined,
+        },
       })
     },
   }),

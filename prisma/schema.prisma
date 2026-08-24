@@ -75,6 +75,10 @@ model User {
 
   IncidentsResolved Incident[] @relation(name: "IncidentResolvedBy")
 
+  // Langs
+  en Json?
+  vi Json?
+
   @@unique([email])
   @@unique([username])
 }
@@ -251,6 +255,10 @@ model Task {
 
   projectId String?  @db.VarChar(36)
   Project   Project? @relation(fields: [projectId], references: [id])
+
+  // Langs
+  en Json?
+  vi Json?
 }
 
 model TaskWorkLog {
@@ -263,6 +271,10 @@ model TaskWorkLog {
 
   createdById String @db.VarChar(36)
   CreatedBy   User   @relation(fields: [createdById], references: [id], onDelete: Cascade, name: "TaskWorkLogCreatedBy")
+
+  // Langs
+  en Json?
+  vi Json?
 }
 
 // ============================================
@@ -339,6 +351,10 @@ model KBConcept {
 
   quality    Float               @default(0.7)
   visibility KBConceptVisibility @default(hidden)
+
+  // Langs
+  en Json?
+  vi Json?
 
   @@unique([rootId, code])
   @@unique([parentId, code])
@@ -942,6 +958,10 @@ model Post {
   parentId String? @db.VarChar(36)
   rootId   String? @db.VarChar(36)
 
+  // Langs
+  en Json?
+  vi Json?
+
   @@index([createdById])
   @@index([createdAt])
   @@index([status])
@@ -1020,6 +1040,10 @@ model Project {
   CreatedBy   User   @relation(fields: [createdById], references: [id])
 
   Tasks Task[]
+
+  // Langs
+  en Json?
+  vi Json?
 
   @@index([createdById])
 }

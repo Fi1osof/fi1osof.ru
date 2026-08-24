@@ -8,6 +8,8 @@ import { Flex1, Toolbar } from 'src/styles'
 import { useAppContext } from 'src/components/AppContext'
 import Link from 'next/link'
 import { Button } from 'src/ui-kit/Button'
+import { useLexicon } from 'src/Fi1osofRu/Lexicon'
+import { tasksViewLexicon } from './lexicon'
 
 type TasksViewProps = {
   tasks: TaskFragment[]
@@ -22,16 +24,17 @@ export const TasksView: React.FC<TasksViewProps> = ({
   totalPages,
 }) => {
   const { user: currentUser } = useAppContext()
+  const { t } = useLexicon(tasksViewLexicon)
 
   return (
     <TasksViewStyled>
       <Toolbar>
-        <h1>Tasks</h1>
+        <h1>{t('title')}</h1>
         <Flex1 />
 
         {currentUser?.status === UserStatusEnum.ACTIVE && (
           <Link href={'/tasks/create'}>
-            <Button>Create</Button>
+            <Button>{t('create')}</Button>
           </Link>
         )}
       </Toolbar>

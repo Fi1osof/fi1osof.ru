@@ -1,6 +1,8 @@
 import { useTaskWorkLogsWithCountQuery } from 'src/gql/generated'
 import { WorkLogsView } from './View'
 import { SeoHeaders } from 'src/components/seo/SeoHeaders'
+import { useLexicon } from 'src/Fi1osofRu/Lexicon'
+import { workLogsLexicon } from './lexicon'
 import { getWorkLogsWithCountQueryVariables } from './helpers'
 import { workLogsPageGetInitialProps } from './workLogsPageGetInitialProps'
 import { WorkLogsPageProps } from './interfaces'
@@ -18,6 +20,7 @@ export const WorkLogsPageFi1osofRu: Page<WorkLogsPageProps> = ({
     variables,
     fetchPolicy: 'cache-and-network',
   })
+  const { t } = useLexicon(workLogsLexicon)
 
   const workLogs = response.data?.taskWorkLogs || []
   const totalCount = response.data?.taskWorkLogCount || 0
@@ -26,7 +29,8 @@ export const WorkLogsPageFi1osofRu: Page<WorkLogsPageProps> = ({
   return (
     <>
       <SeoHeaders
-        title="Ворклоги"
+        title={t('seo.title')}
+        description={t('seo.description')}
         canonical={'/worklogs'}
         siteOrigin={siteOrigin}
       />

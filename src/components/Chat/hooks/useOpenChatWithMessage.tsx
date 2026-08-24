@@ -6,9 +6,7 @@ export function useOpenChatWithMessage() {
 
   const eventHandler = useCallback(
     (
-      event:
-        | React.MouseEvent<HTMLButtonElement>
-        | React.SubmitEvent<HTMLFormElement>,
+      event: React.MouseEvent<HTMLElement> | React.SubmitEvent<HTMLFormElement>,
     ) => {
       event.preventDefault()
       event.stopPropagation()
@@ -21,8 +19,7 @@ export function useOpenChatWithMessage() {
         const submitButton = form.querySelector(
           'button[type="submit"]',
         ) as HTMLButtonElement
-        const buttonText =
-          submitButton?.value || submitButton?.textContent || ''
+        const buttonText = submitButton?.value || ''
 
         const fields: string[] = []
 
@@ -47,7 +44,10 @@ export function useOpenChatWithMessage() {
 
         form.reset()
       } else {
-        message = event.currentTarget.value
+        message =
+          event.currentTarget instanceof HTMLButtonElement
+            ? event.currentTarget.value
+            : ''
       }
 
       initialMessageSetter(message)

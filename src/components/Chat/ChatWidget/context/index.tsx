@@ -11,6 +11,8 @@ import { ChatMessage, CHAT_SESSION_STORAGE_KEY } from '../interfaces'
 import { useSnackbar } from 'src/ui-kit/Snackbar/context'
 import { sendMessageStream } from '../../lib/streamClient'
 import { useRouter } from 'next/router'
+import { useLexicon } from 'src/Fi1osofRu/Lexicon'
+import { chatLexicon } from '../lexicon'
 
 type ChatContextValue = {
   messages: ChatMessage[]
@@ -51,10 +53,11 @@ type ChatProviderProps = {
 
 export const ChatProvider: React.FC<ChatProviderProps> = ({
   children,
-  welcomeTitle = 'Привет! Чем могу помочь?',
-  welcomeText = 'Спросите меня что угодно',
-  placeholder = 'Введите ваше сообщение...',
+  welcomeTitle,
+  welcomeText,
+  placeholder,
 }) => {
+  const { t } = useLexicon(chatLexicon)
   const snackbar = useSnackbar()
   const [isOpen, setIsOpen] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
@@ -201,7 +204,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
                       msg.id === streamingMessageIdRef.current
                         ? {
                             ...msg,
-                            text: 'Извините, что-то пошло не так. Попробуйте снова.',
+                            text: t('error.somethingWentWrong'),
                           }
                         : msg,
                     ),
@@ -211,7 +214,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
                     ...prev,
                     {
                       id: Date.now().toString(),
-                      text: 'Извините, что-то пошло не так. Попробуйте снова.',
+                      text: t('error.somethingWentWrong'),
                       isUser: false,
                     },
                   ])
@@ -227,7 +230,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
         )
       } catch (error) {
         const errorMessage =
-          error instanceof Error ? error.message : 'Неизвестная ошибка'
+          error instanceof Error ? error.message : t('error.unknown')
         snackbar?.addMessage(errorMessage, { variant: 'error' })
         setIsLoading(false)
         clearTypingTimer()
@@ -240,6 +243,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
       startTypingTimer,
       resetTypingTimer,
       clearTypingTimer,
+      t,
     ],
   )
 
@@ -265,9 +269,9 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
       handleClose,
       handleExpand,
       handleToggle,
-      welcomeTitle,
-      welcomeText,
-      placeholder,
+      welcomeTitle: welcomeTitle || t('chat.welcomeTitle'),
+      welcomeText: welcomeText || t('chat.welcomeText'),
+      placeholder: placeholder || t('chat.placeholder'),
       initialMessage,
       initialMessageSetter,
     }),
@@ -287,6 +291,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
       placeholder,
       initialMessage,
       initialMessageSetter,
+      t,
     ],
   )
 

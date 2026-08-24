@@ -16,6 +16,7 @@ import {
 import { typePolicies } from './typePolicies'
 import { createApolloClientProps } from './interfaces'
 import type { IncomingHttpHeaders } from 'http'
+import { Locale } from 'src/Fi1osofRu/components/LocaleSwitcher/interfaces'
 
 export * from './interfaces'
 
@@ -71,21 +72,32 @@ const fetchWithUploadProgress: FetchWithProgress = (input, init) => {
 
 let wsLink: GraphQLWsLink | undefined
 
-function getEndpoint() {
+function getEndpoint(locale: Locale) {
   let endpoint
   const origin =
     typeof window !== 'undefined' ? window.location?.origin : undefined
 
   if (origin && process.env.NODE_ENV !== 'test') {
-    endpoint = `${origin}/api/`
+    // На клиенте локаль определяется по домену, добавляем только для не-ru
+    let path = 'api/'
+    if (locale !== 'ru') {
+      path = `${path}${locale}/`
+    }
+    endpoint = `${origin}/${path}`
   } else if (typeof window === 'undefined' && typeof require !== 'undefined') {
+    // На сервере всегда localhost, поэтому всегда добавляем локаль в path
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const os = require('os')
     const hostname = os.hostname()
     const PORT = (process.env.PORT && parseInt(process.env.PORT, 10)) || 3000
-    endpoint = `http://${hostname}:${PORT}/api/`
+    const path = `api/${locale}/`
+    endpoint = `http://${hostname}:${PORT}/${path}`
   } else {
-    endpoint = `${window.location.origin}/api/`
+    let path = 'api/'
+    if (locale !== 'ru') {
+      path = `${path}${locale}/`
+    }
+    endpoint = `${window.location.origin}/${path}`
   }
 
   return endpoint
@@ -94,12 +106,12 @@ function getEndpoint() {
 /**
  * Creates and returns WebSocket client for GraphQL
  */
-export function getWsClient(withWs: boolean) {
+export function getWsClient(withWs: boolean, locale: Locale) {
   if (typeof window === 'undefined' || !withWs) {
     return undefined
   }
 
-  const endpoint = getEndpoint()
+  const endpoint = getEndpoint(locale)
   const wsUri = new URL(endpoint)
 
   let protocol = wsUri.protocol
@@ -136,7 +148,7 @@ export function getWsClient(withWs: boolean) {
  * Function for getting WebSocket connection.
  * Used for GraphQL subscriptions.
  */
-export function getWsLink(withWs: boolean) {
+export function getWsLink(withWs: boolean, locale: Locale) {
   /**
    * On the server side we don't need WebSocket support.
    * We connect websockets only on the browser side.
@@ -152,7 +164,7 @@ export function getWsLink(withWs: boolean) {
     return wsLink
   }
 
-  const wsClient = getWsClient(withWs)
+  const wsClient = getWsClient(withWs, locale)
 
   if (wsClient) {
     wsLink = new GraphQLWsLink(wsClient)
@@ -161,8 +173,12 @@ export function getWsLink(withWs: boolean) {
   return wsLink
 }
 
-function createApolloClient({ withWs, appContext }: createApolloClientProps) {
-  const endpoint = getEndpoint()
+function createApolloClient({
+  withWs,
+  appContext,
+  locale,
+}: createApolloClientProps) {
+  const endpoint = getEndpoint(locale)
 
   const errorLink = new ErrorLink(({ error }) => {
     if (CombinedGraphQLErrors.is(error)) {
@@ -225,7 +241,7 @@ function createApolloClient({ withWs, appContext }: createApolloClientProps) {
 
   let wsHttpLink: ApolloLink = httpLink
 
-  const wsLink = withWs ? getWsLink(withWs) : undefined
+  const wsLink = withWs ? getWsLink(withWs, locale) : undefined
 
   if (wsLink) {
     wsHttpLink = ApolloLink.split(

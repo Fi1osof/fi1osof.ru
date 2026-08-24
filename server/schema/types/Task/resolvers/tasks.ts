@@ -18,7 +18,10 @@ builder.queryField('tasks', (t) =>
         where: buildTaskWhere(args.where),
         skip: args.skip ?? undefined,
         take: args.take ?? undefined,
-        orderBy: { createdAt: args.orderBy?.createdAt ?? 'asc' },
+        orderBy: {
+          createdAt: args.orderBy?.createdAt ?? undefined,
+          updatedAt: args.orderBy?.updatedAt ?? undefined,
+        },
         include: {
           Project: hasFieldInSelection(info, 'Project'),
         },

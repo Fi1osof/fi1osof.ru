@@ -1,4 +1,5 @@
 import { AppContext } from 'next/app'
+import { Locale } from 'src/Fi1osofRu/components/LocaleSwitcher/interfaces'
 
 export type createApolloClientProps = {
   withWs: boolean
@@ -9,4 +10,6 @@ export type createApolloClientProps = {
    * on the server side in SSR mode
    */
   appContext?: AppContext
+
+  locale: Locale
 }

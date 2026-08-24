@@ -7,6 +7,8 @@ import {
   StopButtonStyled,
 } from './styles'
 import type { TimerIndicatorProps } from './types'
+import { useLexicon } from 'src/Fi1osofRu/Lexicon'
+import { timerIndicatorLexicon } from './lexicon'
 
 export const TimerIndicator: React.FC<TimerIndicatorProps> = ({
   active,
@@ -15,14 +17,21 @@ export const TimerIndicator: React.FC<TimerIndicatorProps> = ({
   href,
   // onOpen,
   onClickStop,
-  idleLabel = 'таймер не запущен',
+  idleLabel,
 }) => {
+  const { t } = useLexicon(timerIndicatorLexicon)
+
+  const resolvedIdleLabel = idleLabel || t('idle.label')
+
   if (active) {
     return (
       <TimerWrapStyled
         $active
         role="status"
-        aria-label={`Активный таймер: ${taskTitle}, ${elapsedLabel}`}
+        aria-label={t('active.ariaLabel', {
+          title: taskTitle,
+          elapsed: elapsedLabel,
+        })}
       >
         <DotStyled $active />
         <TimeStyled $active>{elapsedLabel}</TimeStyled>
@@ -42,7 +51,7 @@ export const TimerIndicator: React.FC<TimerIndicatorProps> = ({
         {onClickStop && (
           <StopButtonStyled
             type="button"
-            aria-label="Остановить таймер"
+            aria-label={t('active.stop')}
             onClick={onClickStop}
             value={active.id}
           >
@@ -54,14 +63,11 @@ export const TimerIndicator: React.FC<TimerIndicatorProps> = ({
   }
 
   return (
-    <TimerWrapStyled
-      role="status"
-      aria-label="Таймер не запущен — открыть журнал таймеров"
-    >
+    <TimerWrapStyled role="status" aria-label={t('idle.ariaLabel')}>
       <DotStyled />
       <TitleLinkStyled
         href={href}
-        title={idleLabel}
+        title={resolvedIdleLabel}
         // onClick={(e) => {
         //   if (onOpen) {
         //     e.preventDefault()
@@ -69,7 +75,7 @@ export const TimerIndicator: React.FC<TimerIndicatorProps> = ({
         //   }
         // }}
       >
-        {idleLabel}
+        {resolvedIdleLabel}
       </TitleLinkStyled>
     </TimerWrapStyled>
   )

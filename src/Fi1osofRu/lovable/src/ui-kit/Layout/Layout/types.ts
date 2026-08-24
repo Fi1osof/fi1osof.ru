@@ -9,7 +9,6 @@ export interface LayoutNavItem {
 
 export interface LayoutProps {
   children: ReactNode
-  nav: LayoutNavItem[]
   currentPath: string
   // onNavigate: (href: string) => void
   brandName?: string

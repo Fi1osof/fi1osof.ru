@@ -47,6 +47,7 @@ export const conceptsResolver = (
     take: args.take ?? undefined,
     orderBy: {
       createdAt: args.orderBy?.createdAt ?? undefined,
+      updatedAt: args.orderBy?.updatedAt ?? undefined,
       name: args.orderBy?.name ?? undefined,
       type: args.orderBy?.type ?? undefined,
     },

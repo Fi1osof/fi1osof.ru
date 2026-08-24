@@ -3,6 +3,8 @@ import { TasksPageProps } from './interfaces'
 import { Page } from 'src/components/pages/_App/interfaces'
 import { TasksView } from './View'
 import { SeoHeaders } from 'src/components/seo/SeoHeaders'
+import { useLexicon } from 'src/Fi1osofRu/Lexicon'
+import { tasksLexicon } from './lexicon'
 import { getTasksWithCountQueryVariables } from './helpers'
 import { tasksPageGetInitialProps } from './tasksPageGetInitialProps'
 
@@ -26,6 +28,7 @@ export const TasksPageFi1osofRu: Page<TasksPageProps> = ({
     pollInterval: 60000,
     fetchPolicy: 'cache-and-network',
   })
+  const { t } = useLexicon(tasksLexicon)
 
   const tasks = response.data?.tasks || []
   const totalCount = response.data?.tasksCount || 0
@@ -33,7 +36,12 @@ export const TasksPageFi1osofRu: Page<TasksPageProps> = ({
 
   return (
     <>
-      <SeoHeaders title="Задачи" canonical={'/tasks'} siteOrigin={siteOrigin} />
+      <SeoHeaders
+        title={t('seo.title')}
+        description={t('seo.description')}
+        canonical={'/tasks'}
+        siteOrigin={siteOrigin}
+      />
       <TasksView
         tasks={tasks}
         loading={response.loading}

@@ -1,8 +1,14 @@
 import { NextConfig } from 'next'
 
 import withBundleAnalyzer from '@next/bundle-analyzer'
+import { LOCALE_CODES } from 'src/Fi1osofRu/components/LocaleSwitcher/interfaces'
 
 const nextConfig: NextConfig = {
+  i18n: {
+    locales: LOCALE_CODES,
+    defaultLocale: 'ru',
+    localeDetection: false,
+  },
   /**
    * reactStrictMode: false — in dev mode, React Strict Mode causes double rendering of components, leading to duplicate useEffect calls, API requests, and other side effects.
    */

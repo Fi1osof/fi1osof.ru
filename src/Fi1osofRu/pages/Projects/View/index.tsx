@@ -12,6 +12,8 @@ import { getResizedImagePath } from 'src/helpers/getResizedImagePath'
 import { useAppContext } from 'src/components/AppContext'
 import { Button } from 'src/ui-kit/Button'
 import Link from 'next/link'
+import { useLexicon } from 'src/Fi1osofRu/Lexicon'
+import { projectsViewLexicon } from './lexicon'
 
 type ProjectCardItem = ProjectListProps['items'][number]
 
@@ -23,6 +25,7 @@ export const ProjectsPageView: React.FC<ProjectsPageViewProps> = ({
   projects,
 }) => {
   const { user: currentUser } = useAppContext()
+  const { t } = useLexicon(projectsViewLexicon)
 
   const canEdit = currentUser?.sudo === true
 
@@ -70,31 +73,27 @@ export const ProjectsPageView: React.FC<ProjectsPageViewProps> = ({
       <HeroStyled>
         <Breadcrumbs
           items={[
-            { id: 'home', label: 'Fi1osof', href: '/' },
-            { id: 'this', label: 'Проекты' },
+            { id: 'home', label: t('breadcrumbs.home'), href: '/' },
+            { id: 'this', label: t('breadcrumbs.this') },
           ]}
         />
         <TitleStyled>
-          <span>Проекты</span>
+          <span>{t('hero.title')}</span>
 
           {canEdit && (
             <Link href={'/projects/create'}>
-              <Button>Создать</Button>
+              <Button>{t('hero.create')}</Button>
             </Link>
           )}
         </TitleStyled>
-        <DescStyled>
-          Всё, над чем я работаю или работал: исследовательские, инженерные,
-          коммерческие. Каждый проект — это история со своей эволюцией задач,
-          заметок и решений.
-        </DescStyled>
+        <DescStyled>{t('hero.description')}</DescStyled>
       </HeroStyled>
 
-      <Section title="Коммерческие проекты">
+      <Section title={t('sections.commercial')}>
         <ProjectList items={commercialProjects} />
       </Section>
 
-      <Section title="Личные проекты">
+      <Section title={t('sections.personal')}>
         <ProjectList items={ownProjects} />
       </Section>
     </Container>

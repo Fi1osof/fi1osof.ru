@@ -2,6 +2,7 @@ import React from 'react'
 import { NextComponentType, NextPageContext } from 'next'
 import { ApolloClient } from '@apollo/client'
 import { AppContext, AppInitialProps as NextAppInitialProps } from 'next/app'
+import { Locale } from 'src/Fi1osofRu/components/LocaleSwitcher/interfaces'
 
 export type LayoutStyledProps = React.PropsWithChildren<{
   variant?: 'default' | 'fullwidth' | 'office'
@@ -45,6 +46,7 @@ export interface PageProps extends React.PropsWithChildren<
 export type AppProps = {
   Component: Page
   pageProps: PageProps
+  locale: Locale
 }
 
 /**

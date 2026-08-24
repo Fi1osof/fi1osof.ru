@@ -2,6 +2,8 @@ import { ProjectStatus } from '@prisma/client'
 import { builder } from '../../../builder'
 import { User } from '../../User'
 import { ProjectStatusEnum } from './enums'
+import { getFieldValueByLang } from '../../KBConcept/helpers/getFieldValueByLang'
+import { JsonValue } from '@prisma/client/runtime/library'
 
 export type ProjectDbModel = {
   id: string
@@ -17,6 +19,9 @@ export type ProjectDbModel = {
   createdById: string
 
   CreatedBy?: typeof User.$inferType
+
+  en?: JsonValue
+  vi?: JsonValue
 }
 
 export const Project = builder.objectType(
@@ -29,17 +34,26 @@ export const Project = builder.objectType(
         }),
         createdAt: t.expose('createdAt', { type: 'DateTime', nullable: false }),
         updatedAt: t.expose('updatedAt', { type: 'DateTime', nullable: false }),
-        name: t.exposeString('name', {
+        name: t.string({
           nullable: false,
+          resolve(source, _, ctx) {
+            return getFieldValueByLang(source, 'name', ctx)
+          },
         }),
-        description: t.exposeString('description', {
-          nullable: true,
+        description: t.string({
+          resolve(source, _, ctx) {
+            return getFieldValueByLang(source, 'description', ctx)
+          },
         }),
-        intro: t.exposeString('intro', {
-          nullable: true,
+        intro: t.string({
+          resolve(source, _, ctx) {
+            return getFieldValueByLang(source, 'intro', ctx)
+          },
         }),
-        content: t.exposeString('content', {
-          nullable: true,
+        content: t.string({
+          resolve(source, _, ctx) {
+            return getFieldValueByLang(source, 'content', ctx)
+          },
         }),
         image: t.exposeString('image', {
           nullable: true,

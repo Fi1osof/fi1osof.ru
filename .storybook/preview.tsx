@@ -8,7 +8,7 @@ import { withMsw } from './addons/msw/msw-decorator'
 import { useApollo } from 'src/gql/apolloClient'
 
 const WithProviders: Decorator = (Story) => {
-  const apolloClient = useApollo(undefined, false)
+  const apolloClient = useApollo(undefined, false, 'ru')
 
   return (
     <ApolloProvider client={apolloClient}>

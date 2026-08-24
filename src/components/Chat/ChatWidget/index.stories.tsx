@@ -102,7 +102,7 @@ export const MessageUser: StoryObj = {
   render: () => (
     <div style={{ width: 380, padding: 16, background: '#f5f5f5' }}>
       <Message $isUser={true}>
-        <Markdown>Привет! Как мне выучить React?</Markdown>
+        <Markdown>Hello! How can I learn React?</Markdown>
       </Message>
     </div>
   ),
@@ -114,9 +114,9 @@ export const MessageBot: StoryObj = {
       <Message $isUser={false}>
         <Markdown>
           Отличный вопрос! Вот шаги для изучения React: 1. **Изучите основы
-          JavaScript** - функции ES6+ 2. **Поймите JSX** - расширение синтаксиса
-          React 3. **Компоненты и Props** - строительные блоки 4. **State и
-          Hooks** - Управление данными
+          JavaScript** - возможности ES6+ 2. **Поймите JSX** - расширение
+          синтаксиса React 3. **Компоненты и Props** - Строительные блоки 4.
+          **State и Hooks** - Управление данными
         </Markdown>
       </Message>
     </div>
@@ -127,7 +127,9 @@ export const MessageBotStreaming: StoryObj = {
   render: () => (
     <div style={{ width: 380, padding: 16, background: '#f5f5f5' }}>
       <Message $isUser={false}>
-        <Markdown>Отличный вопрос! Вот шаги для изучения React...</Markdown>
+        <Markdown>
+          Great question! Here are some steps to learn React...
+        </Markdown>
       </Message>
     </div>
   ),
@@ -199,7 +201,7 @@ export const ChatWindowDefault: StoryObj = {
         <ChatContentContainer $hasMessages={false}>
           <WelcomeMessage>
             <h4>Привет! Чем могу помочь?</h4>
-            <p>Спросите меня что угодно</p>
+            <p>Спросите что угодно</p>
           </WelcomeMessage>
           <ChatInputContainer>
             <PreventDefault>
@@ -310,7 +312,7 @@ export const ChatWindowStreaming: StoryObj = {
           <ChatInputContainer>
             <PreventDefault>
               <ChatTextarea
-                placeholder="Type your question..."
+                placeholder="Введите ваш вопрос..."
                 rows={1}
                 disabled
               />

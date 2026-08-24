@@ -15,6 +15,7 @@ import './resolvers/createTask'
 import './resolvers/updateTask'
 import './resolvers/deleteTask'
 import { Project } from '../Fi1osofRu/Project/types'
+import { getFieldValueByLang } from '../KBConcept/helpers/getFieldValueByLang'
 
 // TaskStatus enum
 export const TaskStatusEnum = builder.enumType('TaskStatusEnum', {
@@ -29,9 +30,22 @@ export const Task = builder.prismaObject('Task', {
     }),
     createdAt: t.expose('createdAt', { type: 'DateTime', nullable: false }),
     updatedAt: t.expose('updatedAt', { type: 'DateTime', nullable: false }),
-    title: t.exposeString('title', { nullable: false }),
-    description: t.exposeString('description', { nullable: true }),
-    content: t.exposeString('content', { nullable: true }),
+    title: t.string({
+      nullable: false,
+      resolve(source, _, ctx) {
+        return getFieldValueByLang(source, 'title', ctx)
+      },
+    }),
+    description: t.string({
+      resolve(source, _, ctx) {
+        return getFieldValueByLang(source, 'description', ctx)
+      },
+    }),
+    content: t.string({
+      resolve(source, _, ctx) {
+        return getFieldValueByLang(source, 'content', ctx)
+      },
+    }),
     status: t.expose('status', { type: TaskStatusEnum, nullable: false }),
     startDatePlaning: t.expose('startDatePlaning', {
       type: 'DateTime',

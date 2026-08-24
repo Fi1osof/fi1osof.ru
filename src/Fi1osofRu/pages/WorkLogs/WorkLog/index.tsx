@@ -1,6 +1,8 @@
 import { useTaskWorkLogQuery } from 'src/gql/generated'
 import { WorkLogPageProps } from './interfaces'
 import { SeoHeaders } from 'src/components/seo/SeoHeaders'
+import { useLexicon } from 'src/Fi1osofRu/Lexicon'
+import { workLogLexicon } from './lexicon'
 import { WorkLogPageStyled } from './styles'
 import { getWorkLogQueryVariables } from '../helpers'
 import { workLogPageGetInitialProps } from './workLogPageGetInitialProps'
@@ -20,6 +22,7 @@ export const WorkLogPageFi1osofRu: Page<WorkLogPageProps> = ({
     variables,
     skip: !workLogId,
   })
+  const { t } = useLexicon(workLogLexicon)
 
   const workLog = response.data?.response
 
@@ -28,17 +31,22 @@ export const WorkLogPageFi1osofRu: Page<WorkLogPageProps> = ({
   const { Task } = workLog || {}
 
   if (Task) {
-    title = `Ворклог по задаче "${Task.title}"`
+    title = t('titleWithTask', { taskTitle: Task.title })
   } else {
-    title = 'Ворклог'
+    title = t('title')
   }
 
   const searchable = !!workLog
+
+  const description = Task?.title
+    ? t('seo.descriptionWithTask', { taskTitle: Task.title })
+    : t('seo.description')
 
   return (
     <>
       <SeoHeaders
         title={title}
+        description={description}
         noindex={!searchable}
         nofollow={!searchable}
         canonical={workLog ? createWorkLogLink(workLog) : undefined}
@@ -52,7 +60,11 @@ export const WorkLogPageFi1osofRu: Page<WorkLogPageProps> = ({
 
           {Task && (
             <>
-              <TaskCard task={Task} variant="list" titlePrefix="Задача: " />
+              <TaskCard
+                task={Task}
+                variant="list"
+                titlePrefix={t('taskPrefix')}
+              />
             </>
           )}
         </WorkLogPageStyled>

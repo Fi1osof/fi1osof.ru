@@ -27,6 +27,8 @@ import {
 } from './styles'
 import type { HomePageProps } from './types'
 import Link from 'next/link'
+import { useLexicon } from 'src/Fi1osofRu/Lexicon'
+import { homePageLexicon } from './lexicon'
 
 const focusAreas = [
   'Agent Systems',
@@ -46,6 +48,7 @@ export const LovableHomePage: React.FC<HomePageProps> = ({
   // hrefForTopic,
   // onOpen,
 }) => {
+  const { t } = useLexicon(homePageLexicon)
   // const { active, activeTasks } = useMemo(() => {
   //   const active = projects.filter((p) => p.status === 'active')
   //   const activeTasks = tasks.filter(
@@ -92,7 +95,7 @@ export const LovableHomePage: React.FC<HomePageProps> = ({
 
     {
       key: 'availabily',
-      title: 'Карта доступности',
+      title: t('availability.title'),
       aside: <AvailabilityIndicator status={availability.status} />,
       content: (
         <AvailabilityWrapStyled>
@@ -103,7 +106,7 @@ export const LovableHomePage: React.FC<HomePageProps> = ({
             }}
           >
             <StatLabelStyled style={{ marginBottom: 12 }}>
-              фиксированные обязательства
+              {t('availability.fixedCommitments')}
             </StatLabelStyled>
             <CommitTimelineStyled>
               {availability.fixed.map((c) => (
@@ -115,23 +118,27 @@ export const LovableHomePage: React.FC<HomePageProps> = ({
                     </CommitMetaStyled>
                     <CommitBarStyled />
                   </div>
-                  <Tag tone="warm">обязательство</Tag>
+                  <Tag tone="warm">{t('availability.commitment')}</Tag>
                 </CommitItemStyled>
               ))}
             </CommitTimelineStyled>
           </div>
           <div>
             <StatLabelStyled style={{ marginBottom: 12 }}>
-              текущая нагрузка
+              {t('availability.currentLoad')}
             </StatLabelStyled>
             <ActivityGridStyled style={{ gridTemplateColumns: '1fr 1fr' }}>
               <StatCardStyled>
                 <StatNumberStyled>{availability.commercial}</StatNumberStyled>
-                <StatLabelStyled>коммерческих задач</StatLabelStyled>
+                <StatLabelStyled>
+                  {t('availability.commercialTasks')}
+                </StatLabelStyled>
               </StatCardStyled>
               <StatCardStyled>
                 <StatNumberStyled>{availability.personal}</StatNumberStyled>
-                <StatLabelStyled>личных исследований</StatLabelStyled>
+                <StatLabelStyled>
+                  {t('availability.personalResearch')}
+                </StatLabelStyled>
               </StatCardStyled>
             </ActivityGridStyled>
           </div>
@@ -141,7 +148,7 @@ export const LovableHomePage: React.FC<HomePageProps> = ({
 
     {
       key: 'projects',
-      title: 'Активные проекты',
+      title: t('projects.title'),
       content: (
         <BlockStyled>
           <ProjectList
@@ -158,14 +165,14 @@ export const LovableHomePage: React.FC<HomePageProps> = ({
             // onOpen={onOpen}
           />
 
-          <Link href={'/projects'}>смотреть все</Link>
+          <Link href={'/projects'}>{t('projects.viewAll')}</Link>
         </BlockStyled>
       ),
     },
 
     {
       key: 'tasks',
-      title: 'Активные задачи',
+      title: t('tasks.title'),
       content: (
         <BlockStyled>
           <TaskList
@@ -180,13 +187,13 @@ export const LovableHomePage: React.FC<HomePageProps> = ({
             }))}
             // onOpen={onOpen}
           />
-          <Link href={'/tasks'}>смотреть все</Link>
+          <Link href={'/tasks'}>{t('tasks.viewAll')}</Link>
         </BlockStyled>
       ),
     },
     {
       key: '',
-      title: 'Последние ворклоги',
+      title: t('worklogs.title'),
       content: (
         <BlockStyled>
           <WorklogList
@@ -201,7 +208,7 @@ export const LovableHomePage: React.FC<HomePageProps> = ({
             // onOpen={onOpen}
           />
 
-          <Link href={'/worklogs'}>смотреть все</Link>
+          <Link href={'/worklogs'}>{t('worklogs.viewAll')}</Link>
         </BlockStyled>
       ),
     },
@@ -229,15 +236,9 @@ export const LovableHomePage: React.FC<HomePageProps> = ({
   return (
     <Container size="wide">
       <HeroStyled>
-        <HeroEyebrowStyled>
-          журнал инженерной деятельности · fi1osof.ru
-        </HeroEyebrowStyled>
-        <HeroNameStyled>Николай Ланец</HeroNameStyled>
-        <HeroDescStyled>
-          Я веду публичный рабочий журнал: проекты, задачи, ворклоги и заметки.
-          Здесь видно, чем я занят сейчас, как развиваются идеи и какие решения
-          принимаю в процессе.
-        </HeroDescStyled>
+        <HeroEyebrowStyled>{t('hero.eyebrow')}</HeroEyebrowStyled>
+        <HeroNameStyled>{t('hero.name')}</HeroNameStyled>
+        <HeroDescStyled>{t('hero.description')}</HeroDescStyled>
         <FocusRowStyled>
           {focusAreas.map((f) => (
             <Tag key={f} tone="accent">

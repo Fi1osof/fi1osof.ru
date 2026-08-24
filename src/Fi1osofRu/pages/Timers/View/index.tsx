@@ -25,6 +25,8 @@ import { Container } from 'src/Fi1osofRu/lovable/src/ui-kit/Layout/Container'
 import { Breadcrumbs } from 'src/Fi1osofRu/lovable/src/ui-kit/Navigation/Breadcrumbs'
 import { formatDateTime } from '../helpers'
 import { Section } from 'src/Fi1osofRu/lovable/src/ui-kit/Layout/Section'
+import { useLexicon } from 'src/Fi1osofRu/Lexicon'
+import { timersViewLexicon } from './lexicon'
 
 interface TimersPageViewProps {
   active: TimerFragment | null
@@ -43,6 +45,8 @@ export const TimersPageView: React.FC<TimersPageViewProps> = ({
   // onOpen,
   // onStopActive,
 }) => {
+  const { t } = useLexicon(timersViewLexicon)
+
   // const totalMs =
   // entries?.reduce((s, e) => s + (e.stoppedAt - e.startedAt), 0) ?? []
   // const liveMs = active ? Date.now() - active.startedAt : 0
@@ -57,18 +61,13 @@ export const TimersPageView: React.FC<TimersPageViewProps> = ({
       <HeroStyled>
         <Breadcrumbs
           items={[
-            { id: 'home', label: 'Fi1osof', href: '/' },
-            { id: 'this', label: 'Таймеры' },
+            { id: 'home', label: t('breadcrumbs.home'), href: '/' },
+            { id: 'this', label: t('breadcrumbs.this') },
           ]}
           // onNavigate={(item) => item.href && onOpen(item.href)}
         />
-        <TitleStyled>Журнал таймеров</TitleStyled>
-        <DescStyled>
-          Прозрачный учёт времени над задачами. Каждый запуск — публичная
-          запись: когда начал, когда остановил, над чем работал. Это не
-          таск-трекер для команды, а след инженерной деятельности в реальном
-          времени.
-        </DescStyled>
+        <TitleStyled>{t('hero.title')}</TitleStyled>
+        <DescStyled>{t('hero.description')}</DescStyled>
 
         {/*
         TODO Проработать статистику?
@@ -89,7 +88,7 @@ export const TimersPageView: React.FC<TimersPageViewProps> = ({
         </StatsRowStyled> */}
       </HeroStyled>
 
-      <Section eyebrow="лог" title="История сессий">
+      <Section eyebrow={t('sections.log')} title={t('sections.history')}>
         {/* {!active && entries.length === 0 && (
           <EmptyStyled>
             Пока ни одного запуска. Откройте любую задачу и нажмите «Запустить
@@ -120,15 +119,16 @@ export const TimersPageView: React.FC<TimersPageViewProps> = ({
 
                 <EntryMetaStyled>
                   <span>
-                    <b>запущен:</b> {formatDateTime(active.startedAt)}
+                    <b>{t('entry.started')}:</b>{' '}
+                    {formatDateTime(active.startedAt)}
                   </span>
                   <span>
-                    <b>остановлен:</b> —
+                    <b>{t('entry.stopped')}:</b> —
                   </span>
                 </EntryMetaStyled>
               </EntryMainStyled>
               <EntryAsideStyled>
-                <LiveBadgeStyled>в работе</LiveBadgeStyled>
+                <LiveBadgeStyled>{t('entry.inProgress')}</LiveBadgeStyled>
                 {active.Task?.title && (
                   <DurationStyled $live>{active.Task.title}</DurationStyled>
                 )}
@@ -137,7 +137,7 @@ export const TimersPageView: React.FC<TimersPageViewProps> = ({
                   // TODO Fix
                   // onClick={onStopActive}
                 >
-                  остановить
+                  {t('entry.stop')}
                 </StopBtnStyled>
               </EntryAsideStyled>
             </EntryStyled>
@@ -167,11 +167,11 @@ export const TimersPageView: React.FC<TimersPageViewProps> = ({
                   )}
                   <EntryMetaStyled>
                     <span>
-                      <b>запущен:</b> {formatDateTime(startedAt)}
+                      <b>{t('entry.started')}:</b> {formatDateTime(startedAt)}
                     </span>
                     {stoppedAt && (
                       <span>
-                        <b>остановлен:</b> {formatDateTime(stoppedAt)}
+                        <b>{t('entry.stopped')}:</b> {formatDateTime(stoppedAt)}
                       </span>
                     )}
                   </EntryMetaStyled>

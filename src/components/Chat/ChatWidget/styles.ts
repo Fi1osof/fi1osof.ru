@@ -54,7 +54,7 @@ export const ChatContentContainer = styled.div<ChatContentContainerProps>`
 
 export const ChatWindow = styled.div<{ $isExpanded?: boolean }>`
   position: fixed;
-  z-index: 1000;
+  z-index: 10000;
   bottom: 20px;
   right: 20px;
   width: ${({ $isExpanded }) => ($isExpanded ? '100vw' : '380px')};
@@ -97,18 +97,52 @@ export const ChatWindow = styled.div<{ $isExpanded?: boolean }>`
 
 export const ChatHeader = styled.div`
   padding: 16px 20px;
-  background: #f9fafb;
+  background: #ffffff;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid #e5e7eb;
+  gap: 12px;
+  border-bottom: 1px solid #f3f4f6;
+`
+
+export const ChatHeaderAvatar = styled.div`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    fill: white;
+  }
+`
+
+export const ChatHeaderInfo = styled.div`
+  flex: 1;
+  min-width: 0;
 `
 
 export const ChatTitle = styled.h3`
   margin: 0;
-  font-size: 1rem;
+  font-size: 15px;
   font-weight: 600;
-  color: #1f2937;
+  color: #111827;
+`
+
+export const ChatHeaderSubtitle = styled.div`
+  font-size: 13px;
+  color: #6b7280;
+`
+
+export const ChatHeaderStatus = styled.div`
+  font-size: 13px;
+  color: #22c55e;
+  font-weight: 500;
+  flex-shrink: 0;
 `
 
 export const HeaderButtons = styled.div`
@@ -361,7 +395,7 @@ export const ChatButton = styled.button<{ $isOpen?: boolean }>`
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: #3b82f6;
+  background: ${({ theme }) => theme.colors.primary};
   border: none;
   cursor: pointer;
   display: ${({ $isOpen }) => ($isOpen ? 'none' : 'flex')};

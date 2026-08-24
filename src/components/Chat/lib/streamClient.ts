@@ -13,10 +13,16 @@ type StreamChunk = {
   }
 }
 
+export type TranslateFn = (
+  key: string,
+  params?: Record<string, string | number>,
+) => string
+
 export type StreamCallbacks = {
   onChunk: (text: string) => void
   onDone: () => void
   onError: (error: Error) => void
+  t?: TranslateFn
 }
 
 function parseStreamChunks(data: string): StreamChunk[] {
@@ -28,7 +34,7 @@ function parseStreamChunks(data: string): StreamChunk[] {
       const parsed = JSON.parse(line) as StreamChunk
       chunks.push(parsed)
     } catch {
-      // incomplete JSON, skip
+      // неполный JSON, пропускаем
     }
   }
 
@@ -41,7 +47,7 @@ export async function sendMessageStream(
   callbacks: StreamCallbacks,
   abortSignal?: AbortSignal,
 ): Promise<void> {
-  const { onChunk, onDone, onError } = callbacks
+  const { onChunk, onDone, onError, t } = callbacks
 
   try {
     const response = await fetch(CHAT_WEBHOOK_URL, {
@@ -59,11 +65,14 @@ export async function sendMessageStream(
     })
 
     if (!response.ok) {
-      throw new Error(`HTTP ошибка: ${response.status}`)
+      throw new Error(
+        t?.('error.http', { status: response.status }) ??
+          `HTTP Error: ${response.status}`,
+      )
     }
 
     if (!response.body) {
-      throw new Error('Нет тела ответа')
+      throw new Error(t?.('error.noResponseBody') ?? 'No response body')
     }
 
     const reader = response.body.getReader()
@@ -82,7 +91,10 @@ export async function sendMessageStream(
             } else if (chunk.type === 'error') {
               const msg =
                 chunk.metadata?.message ||
-                `Ошибка в ${chunk.metadata?.nodeName || 'агенте'}`
+                t?.('error.inAgent', {
+                  nodeName: chunk.metadata?.nodeName || 'agent',
+                }) ||
+                `Error in ${chunk.metadata?.nodeName || 'agent'}`
               onError(new Error(msg))
               return
             }
@@ -106,7 +118,10 @@ export async function sendMessageStream(
           } else if (chunk.type === 'error') {
             const msg =
               chunk.metadata?.message ||
-              `Ошибка в ${chunk.metadata?.nodeName || 'агенте'}`
+              t?.('error.inAgent', {
+                nodeName: chunk.metadata?.nodeName || 'agent',
+              }) ||
+              `Error in ${chunk.metadata?.nodeName || 'agent'}`
             onError(new Error(msg))
             return
           }

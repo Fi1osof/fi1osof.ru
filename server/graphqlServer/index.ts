@@ -15,6 +15,7 @@ import { schema } from '../schema'
 import { createContext } from '../context'
 import { permissions } from './permissions'
 import { PrismaContext } from 'server/context/interfaces'
+import { getLocaleFromRequest } from 'server/helpers/getLocaleFromRequest'
 
 // Schema with permissions middleware
 const schemaWithPermissions = applyMiddleware(schema, permissions)
@@ -53,7 +54,10 @@ export async function setupGraphqlServer(): Promise<{
             headers: {
               authorization: tokenRaw,
             },
+            originalUrl: '/api',
           },
+          // TODO Fix locales
+          locale: 'ru',
         })
       },
       onError: async (_ctx, message, errors) => {
@@ -100,7 +104,8 @@ export async function setupGraphqlServer(): Promise<{
     graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }),
     express.json(),
     expressMiddleware(apolloServer, {
-      context: ({ req }) => createContext({ req }),
+      context: ({ req }) =>
+        createContext({ req, locale: getLocaleFromRequest(req) }),
     }),
   )
 

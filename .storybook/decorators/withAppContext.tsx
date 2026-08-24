@@ -20,6 +20,7 @@ export const withAppContext: Decorator = (Story, context) => {
     openLoginForm: () => undefined,
     closeLoginForm: () => undefined,
     userLoading: false,
+    locale: 'ru',
   }
 
   return (

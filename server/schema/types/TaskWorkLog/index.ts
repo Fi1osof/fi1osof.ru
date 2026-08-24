@@ -1,4 +1,5 @@
 import { builder } from '../../builder'
+import { getFieldValueByLang } from '../KBConcept/helpers/getFieldValueByLang'
 
 // TaskWorkLog object type
 builder.prismaObject('TaskWorkLog', {
@@ -7,7 +8,11 @@ builder.prismaObject('TaskWorkLog', {
       nullable: false,
     }),
     createdAt: t.expose('createdAt', { type: 'DateTime', nullable: false }),
-    content: t.exposeString('content'),
+    content: t.string({
+      resolve(source, _, ctx) {
+        return getFieldValueByLang(source, 'content', ctx)
+      },
+    }),
     taskId: t.exposeID('taskId', { nullable: false }),
     Task: t.relation('Task'),
     createdById: t.exposeID('createdById', { nullable: false }),

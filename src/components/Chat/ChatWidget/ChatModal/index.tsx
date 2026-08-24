@@ -3,12 +3,17 @@ import { createPortal } from 'react-dom'
 import {
   ChatWindow,
   ChatHeader,
+  ChatHeaderAvatar,
+  ChatHeaderInfo,
   ChatTitle,
+  ChatHeaderSubtitle,
+  ChatHeaderStatus,
   HeaderButtons,
   ExpandButton,
   CloseButton,
 } from '../styles'
-import { useStopPropagationScroll } from 'src/hooks/useStopPropagationScroll'
+import { useLexicon } from 'src/Fi1osofRu/Lexicon'
+// import { useStopPropagationScroll } from 'src/hooks/useStopPropagationScroll'
 
 export type ChatModalProps = {
   children: React.ReactNode
@@ -23,11 +28,12 @@ export const ChatModal: React.FC<ChatModalProps> = ({
   onClose,
   onExpand,
 }) => {
+  const { t } = useLexicon()
   const stopPropagation = useCallback((e: React.SyntheticEvent) => {
     e.stopPropagation()
   }, [])
 
-  const { containerRef } = useStopPropagationScroll()
+  // const { containerRef } = useStopPropagationScroll()
 
   const modalContent = (
     <ChatWindow
@@ -36,10 +42,20 @@ export const ChatModal: React.FC<ChatModalProps> = ({
       onMouseDown={stopPropagation}
       onTouchStart={stopPropagation}
       onTouchMove={stopPropagation}
-      ref={containerRef}
+      // TODO Restore
+      // ref={containerRef}
     >
       <ChatHeader>
-        <ChatTitle>ИИ Ассистент</ChatTitle>
+        <ChatHeaderAvatar>
+          <svg viewBox="0 0 24 24">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+        </ChatHeaderAvatar>
+        <ChatHeaderInfo>
+          <ChatTitle>{t('chat.title')}</ChatTitle>
+          <ChatHeaderSubtitle>{t('chat.subtitle')}</ChatHeaderSubtitle>
+        </ChatHeaderInfo>
+        <ChatHeaderStatus>{t('chat.status')}</ChatHeaderStatus>
         <HeaderButtons>
           <ExpandButton onClick={onExpand}>
             {isExpanded ? (

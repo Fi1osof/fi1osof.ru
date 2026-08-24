@@ -6,7 +6,7 @@ import { ServerStyleSheet } from 'styled-components'
 export default class MyDocument extends Document {
   render() {
     return (
-      <Html lang="ru-RU">
+      <Html>
         <Head>
           {/* Google Font: Nunito */}
           <link
@@ -14,7 +14,7 @@ export default class MyDocument extends Document {
             rel="stylesheet"
           />
 
-          <link rel="icon" href="/favicon.png" />
+          <link rel="icon" href="/favicon.jpg" />
         </Head>
         <body>
           <Main />

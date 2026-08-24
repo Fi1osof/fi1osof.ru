@@ -18,6 +18,9 @@ import {
 import type { HeaderProps } from './types'
 import { useBoolean } from 'src/hooks/useBoolean'
 import { HeaderTimer } from './Timer'
+import { LocaleSwitcher } from 'src/Fi1osofRu/components/LocaleSwitcher'
+import { useLexicon } from 'src/Fi1osofRu/Lexicon'
+import { headerLexicon } from './lexicon'
 
 export const Header: React.FC<HeaderProps> = ({
   name,
@@ -26,6 +29,7 @@ export const Header: React.FC<HeaderProps> = ({
   // onNavigate,
   ...other
 }) => {
+  const { t } = useLexicon(headerLexicon)
   const [opened, , openedOff, openedToggle] = useBoolean(false)
 
   const handle = useCallback(() => {
@@ -73,9 +77,11 @@ export const Header: React.FC<HeaderProps> = ({
             ))}
           </HeaderNavStyled>
 
+          <LocaleSwitcher />
+
           <BurgerButtonStyled
             type="button"
-            aria-label="меню"
+            aria-label={t('aria.menu')}
             aria-expanded={opened}
             $open={opened}
             onClick={openedToggle}

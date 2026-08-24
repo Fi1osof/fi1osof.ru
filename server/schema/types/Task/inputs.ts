@@ -6,6 +6,7 @@ import { StringNullableFilter } from '../inputs'
 export const TaskOrderByInput = builder.inputType('TaskOrderByInput', {
   fields: (t) => ({
     createdAt: t.field({ type: SortOrder }),
+    updatedAt: t.field({ type: SortOrder }),
   }),
 })
 

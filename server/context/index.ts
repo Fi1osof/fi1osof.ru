@@ -6,11 +6,13 @@ import { llmClient } from '../llm/client'
 import { PrismaContext } from './interfaces'
 
 type CreateContextArgs = {
-  req: PrismaContext['req'] | { headers: { authorization: string | undefined } }
+  req: PrismaContext['req']
+  locale: PrismaContext['locale']
 }
 
 export async function createContext({
   req,
+  locale,
 }: CreateContextArgs): Promise<PrismaContext> {
   let currentUser: User | null = null
   let token: string | null = null
@@ -40,5 +42,6 @@ export async function createContext({
     req,
     world3dClient,
     llmClient,
+    locale,
   }
 }

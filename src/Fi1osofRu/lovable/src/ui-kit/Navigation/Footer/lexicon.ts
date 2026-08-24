@@ -1,0 +1,46 @@
+import { LexiconDict } from 'src/Fi1osofRu/Lexicon'
+
+export const footerLexicon: LexiconDict = {
+  ru: {
+    title: 'fi1osof',
+    meta: {
+      description: 'Николай Ланец — инженер-исследователь.',
+      journal: 'Публичный журнал проектов, задач и идей.',
+    },
+    nav: {
+      title: 'навигация',
+    },
+    contact: {
+      title: 'контакт',
+    },
+    copyright: 'журнал инженерной деятельности',
+  },
+  en: {
+    title: 'fi1osof',
+    meta: {
+      description: 'Nikolai Lanets — research engineer.',
+      journal: 'Public journal of projects, tasks, and ideas.',
+    },
+    nav: {
+      title: 'navigation',
+    },
+    contact: {
+      title: 'contact',
+    },
+    copyright: 'engineering activity journal',
+  },
+  vi: {
+    title: 'fi1osof',
+    meta: {
+      description: 'Nikolai Lanets — kỹ sư nghiên cứu.',
+      journal: 'Nhật ký công khai về các dự án, nhiệm vụ và ý tưởng.',
+    },
+    nav: {
+      title: 'điều hướng',
+    },
+    contact: {
+      title: 'liên hệ',
+    },
+    copyright: 'nhật ký hoạt động kỹ thuật',
+  },
+}
