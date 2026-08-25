@@ -1,9 +1,9 @@
 import { Page } from 'src/components/pages/_App/interfaces'
 import { SeoHeaders } from 'src/components/seo/SeoHeaders'
-import { TaskEditForm } from '../Form'
 import { useSearchParams } from 'next/navigation'
+import { TaskEditFormFi1osofRu } from '../Form'
 
-export const TaskCreatePage: Page = () => {
+export const TaskCreatePageFi1osofRu: Page = () => {
   const params = useSearchParams()
 
   const projectId = params.get('projectId')
@@ -18,7 +18,7 @@ export const TaskCreatePage: Page = () => {
         siteOrigin={undefined}
       />
 
-      <TaskEditForm
+      <TaskEditFormFi1osofRu
         task={undefined}
         cancelHandler={undefined}
         parentId={undefined}

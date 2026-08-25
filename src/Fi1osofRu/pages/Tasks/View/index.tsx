@@ -1,6 +1,5 @@
 import React from 'react'
 import { TaskFragment, UserStatusEnum } from 'src/gql/generated'
-import { TaskCard } from 'src/components/TaskCard'
 import { TaskStatusFilter } from 'src/components/TaskStatusFilter'
 import { TasksViewStyled, TasksViewGridStyled } from './styles'
 import { Pagination } from 'src/components/Pagination'
@@ -10,6 +9,7 @@ import Link from 'next/link'
 import { Button } from 'src/ui-kit/Button'
 import { useLexicon } from 'src/Fi1osofRu/Lexicon'
 import { tasksViewLexicon } from './lexicon'
+import { TaskCardFi1osofRu } from 'src/Fi1osofRu/components/TaskCard'
 
 type TasksViewProps = {
   tasks: TaskFragment[]
@@ -43,7 +43,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
 
       <TasksViewGridStyled>
         {tasks.map((task) => (
-          <TaskCard key={task.id} task={task} variant="list" />
+          <TaskCardFi1osofRu key={task.id} task={task} variant="list" />
         ))}
       </TasksViewGridStyled>
 

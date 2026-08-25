@@ -1,1 +1,1 @@
-export { TaskCreatePage as default } from 'src/components/pages/Tasks/Task/Create'
+export { TaskCreatePageFi1osofRu as default } from 'src/Fi1osofRu/pages/Tasks/Task/Create'
