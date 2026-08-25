@@ -15,7 +15,6 @@ builder.mutationField('createTaskWorkLog', (t) =>
       const task = await ctx.prisma.task.findUnique({
         where: {
           id: args.data.taskId,
-          assigneeId: ctx.currentUser.id,
         },
       })
 
