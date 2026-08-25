@@ -20,7 +20,7 @@ export const TaskPageView: React.FC<TaskPageViewProps> = ({ task }) => {
   return (
     <TaskPageViewStyled size="wide">
       <H1Styled>
-        {t('title')} {task.title}
+        {t('title')}: {task.title}
       </H1Styled>
 
       <TaskCardFi1osofRu task={task} variant="full" />

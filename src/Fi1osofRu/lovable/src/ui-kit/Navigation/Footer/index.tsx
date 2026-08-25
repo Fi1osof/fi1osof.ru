@@ -28,15 +28,15 @@ export const Footer: React.FC<FooterProps> = ({
       <Container size="wide">
         <FooterInnerStyled>
           <FooterColStyled>
-            <FooterTitleStyled>{t('title')}</FooterTitleStyled>
+            <FooterTitleStyled>{t('footer.title')}</FooterTitleStyled>
             <FooterMetaStyled>
-              {t('meta.description')}
+              {t('footer.meta.description')}
               <br />
-              {t('meta.journal')}
+              {t('footer.meta.journal')}
             </FooterMetaStyled>
           </FooterColStyled>
           <FooterColStyled>
-            <FooterTitleStyled>{t('nav.title')}</FooterTitleStyled>
+            <FooterTitleStyled>{t('footer.nav.title')}</FooterTitleStyled>
             {nav.map((item) => (
               <FooterLinkStyled
                 key={item.id}
@@ -53,7 +53,7 @@ export const Footer: React.FC<FooterProps> = ({
             ))}
           </FooterColStyled>
           <FooterColStyled>
-            <FooterTitleStyled>{t('contact.title')}</FooterTitleStyled>
+            <FooterTitleStyled>{t('footer.contact.title')}</FooterTitleStyled>
             <FooterLinkStyled
               href="https://github.com/fi1osof"
               target="_blank"
@@ -72,7 +72,7 @@ export const Footer: React.FC<FooterProps> = ({
           </FooterColStyled>
         </FooterInnerStyled>
         <FooterMetaStyled style={{ marginTop: 24, opacity: 0.7 }}>
-          © {year} fi1osof.ru · {t('copyright')}
+          © {year} fi1osof.ru · {t('footer.copyright')}
         </FooterMetaStyled>
       </Container>
     </FooterStyled>

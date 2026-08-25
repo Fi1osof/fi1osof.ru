@@ -81,7 +81,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <BurgerButtonStyled
             type="button"
-            aria-label={t('aria.menu')}
+            aria-label={t('header.aria.menu')}
             aria-expanded={opened}
             $open={opened}
             onClick={openedToggle}
