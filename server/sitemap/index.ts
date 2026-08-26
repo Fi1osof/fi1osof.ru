@@ -48,6 +48,10 @@ const generateHreflangLinks = (
   return links
 }
 
+function prepareLatsMod(value: string | Date) {
+  return new Date(value).toISOString()
+}
+
 const generateUrlBlocks = (
   siteOrigin: string,
   item: UrlItem,
@@ -59,7 +63,7 @@ const generateUrlBlocks = (
 
     xml += '  <url>\n'
     xml += `    <loc>${siteOrigin}${locPrefix}${item.url}</loc>\n`
-    xml += `    <lastmod>${item.updatedAt}</lastmod>\n`
+    xml += `    <lastmod>${prepareLatsMod(item.updatedAt)}</lastmod>\n`
     xml += `    <priority>${priority}</priority>\n`
     xml += generateHreflangLinks(siteOrigin, item.url, 'ru')
     xml += '  </url>\n'
@@ -130,7 +134,7 @@ const generateSitemapXML = (
     } else {
       xml += '  <url>\n'
       xml += `    <loc>${siteOrigin}${item.url}</loc>\n`
-      xml += `    <lastmod>${item.updatedAt instanceof Date ? item.updatedAt.toISOString() : item.updatedAt}</lastmod>\n`
+      xml += `    <lastmod>${prepareLatsMod(item.updatedAt)}</lastmod>\n`
       xml += `    <priority>${priority}</priority>\n`
       xml += '  </url>\n'
     }
