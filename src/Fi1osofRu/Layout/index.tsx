@@ -1,7 +1,12 @@
-import { ChatWidget } from 'src/components/Chat/ChatWidget'
 import { Fi1osofRuGlobalStyles } from '../lovable/src/ui-kit/GlobalStyles'
 import { useRouter } from 'next/router'
 import { Fi1osofRuLayoutStyled } from './styles'
+import dynamic from 'next/dynamic'
+
+const ChatWidget = dynamic(
+  () => import('src/components/Chat/ChatWidget').then((r) => r.ChatWidget),
+  { ssr: false },
+)
 
 export const Fi1osofRuLayout: React.FC<React.PropsWithChildren> = ({
   children,
