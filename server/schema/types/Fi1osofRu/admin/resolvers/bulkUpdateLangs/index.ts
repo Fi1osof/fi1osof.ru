@@ -20,8 +20,9 @@ builder.mutationField('adminBulkUpdateLangs', (t) =>
     args: {
       entities: t.arg({ type: [BulkUpdateLangsEntityType], required: true }),
       // where: t.arg({ type: KBConceptWhereInput }),
+      ids: t.arg.stringList(),
       limit: t.arg.int({ required: true }),
-      langsLimit: t.arg.int({ required: true }),
+      langsLimit: t.arg.int({ required: false }),
       processAllLangs: t.arg.boolean({ required: true }),
       force: t.arg.boolean({ required: true }),
     },
@@ -30,6 +31,7 @@ builder.mutationField('adminBulkUpdateLangs', (t) =>
       {
         entities,
         // where: whereArg,
+        ids,
         limit,
         langsLimit,
         processAllLangs,
@@ -56,6 +58,7 @@ builder.mutationField('adminBulkUpdateLangs', (t) =>
             results[entityType] = await processConcepts({
               ctx,
               // whereArg,
+              ids: ids ?? undefined,
               limit,
               langsLimit,
               processAllLangs,
@@ -67,6 +70,7 @@ builder.mutationField('adminBulkUpdateLangs', (t) =>
           case EntityType.Project:
             results[entityType] = await processProjects({
               ctx,
+              ids: ids ?? undefined,
               limit,
               langsLimit,
               processAllLangs,
@@ -78,6 +82,7 @@ builder.mutationField('adminBulkUpdateLangs', (t) =>
           case EntityType.Task:
             results[entityType] = await processTasks({
               ctx,
+              ids: ids ?? undefined,
               limit,
               langsLimit,
               processAllLangs,
@@ -89,6 +94,7 @@ builder.mutationField('adminBulkUpdateLangs', (t) =>
           case EntityType.TaskWorkLog:
             results[entityType] = await processTaskWorkLogs({
               ctx,
+              ids: ids ?? undefined,
               limit,
               langsLimit,
               processAllLangs,

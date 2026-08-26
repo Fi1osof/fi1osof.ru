@@ -13,6 +13,7 @@ import {
   // RelatedRowStyled,
 } from './styles'
 import {
+  BulkUpdateLangsEntityType,
   // Post,
   ProjectFragment,
   TaskFragment,
@@ -38,6 +39,7 @@ import { TaskListItem } from 'src/Fi1osofRu/lovable/src/ui-kit/Lists/TaskList/ty
 import { ActivityKindMap } from 'src/Fi1osofRu/lovable/src/mocks/tasks'
 import { useLexicon } from 'src/Fi1osofRu/Lexicon'
 import { projectViewLexicon } from './lexicon'
+import { useTranslateButton } from 'src/Fi1osofRu/hooks/useTranslateButton'
 
 interface ProjectPageViewProps {
   project: ProjectFragment
@@ -70,6 +72,12 @@ export const ProjectPageView: React.FC<ProjectPageViewProps> = ({
   const [inEditMode, inEditModeOn, inEditModeOff] = useBoolean()
 
   const canEdit = currentUser?.sudo || currentUser?.id === project.createdById
+
+  const { translateButton } =
+    useTranslateButton({
+      entities: BulkUpdateLangsEntityType.PROJECT,
+      id: project.id,
+    }) || {}
 
   const { activeTasks } = useMemo(() => {
     const activeTasks: TaskListItem[] = tasks.map<TaskListItem>((n) => {
@@ -131,6 +139,7 @@ export const ProjectPageView: React.FC<ProjectPageViewProps> = ({
 
             {canEdit && (
               <>
+                {translateButton}
                 <Link
                   href={`/tasks/create?projectId=${project.id}`}
                   style={{

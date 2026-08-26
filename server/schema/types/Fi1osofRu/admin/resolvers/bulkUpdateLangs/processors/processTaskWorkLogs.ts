@@ -9,8 +9,9 @@ import { langKey, ProcessorResult } from '../interfaces'
 
 type ProcessTaskWorkLogsArgs = {
   ctx: PrismaContext
+  ids?: string[]
   limit: number
-  langsLimit: number
+  langsLimit: number | null | undefined
   processAllLangs: boolean
   force: boolean
   validUris: Set<string>
@@ -18,6 +19,7 @@ type ProcessTaskWorkLogsArgs = {
 
 export async function processTaskWorkLogs({
   ctx,
+  ids,
   limit,
   langsLimit,
   processAllLangs,
@@ -27,6 +29,10 @@ export async function processTaskWorkLogs({
   const { prisma } = ctx
 
   const where: Prisma.TaskWorkLogWhereInput = {}
+
+  if (ids && ids.length > 0) {
+    where.id = { in: ids }
+  }
 
   if (!force) {
     const langConditions = LOCALE_CODES.filter((c) => c !== 'ru')
@@ -83,7 +89,7 @@ export async function processTaskWorkLogs({
       continue
     }
 
-    const batchSize = langsLimit === 0 ? langsToProcess.length : langsLimit
+    const batchSize = !langsLimit ? langsToProcess.length : langsLimit
     const batches: langKey[][] = []
 
     if (processAllLangs) {

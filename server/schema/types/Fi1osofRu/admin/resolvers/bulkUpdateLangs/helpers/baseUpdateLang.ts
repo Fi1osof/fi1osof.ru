@@ -72,16 +72,19 @@ export async function baseUpdateLang({
 
   const fieldNames = fieldsToTranslate.map((f) => f.field)
 
-  const prompt = `You are a professional translator. Translate the following fields from Russian to the specified languages.
+  const prompt = `# You are a professional translator.
+
+Translate the following fields from Russian to the specified languages.
 
 ---
 
-Source fields (in Russian):
+# Source fields (in Russian):
+
 ${fieldsYaml}
 
 ---
 
-Target languages: ${targetLangs.join(', ')}
+# Target languages: ${targetLangs.join(', ')}
 
 Respond ONLY with valid YAML in the following format (no markdown code blocks, just raw YAML):
 ${targetLangs
@@ -91,7 +94,9 @@ ${targetLangs
   )
   .join('\n')}
 
-Only include fields that were provided in the source. Preserve markdown and HTML formatting.`
+Only include fields that were provided in the source. Preserve markdown and HTML formatting.
+
+Important: Proper nouns, brand names, company names, product names, and similar should be transliterated to Latin script (not translated).`
 
   const chatResponse = await llmChatCompletionResolver(
     null,

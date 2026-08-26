@@ -1,9 +1,14 @@
 import React from 'react'
 import { TaskWorkLogFragment } from 'src/gql/generated'
 import { FormattedDate } from 'src/ui-kit/format/FormattedDate'
-import { WorkLogCardStyled, WorkLogCardMeta } from './styles'
+import {
+  WorkLogCardStyled,
+  WorkLogCardMeta,
+  WorkLogCardHeaderStyled,
+} from './styles'
 import Link from 'next/link'
 import { Markdown } from '../Markdown'
+import { WorkLogTranslateButton } from './TranslateButton'
 
 type WorkLogCardProps = {
   workLog: TaskWorkLogFragment
@@ -17,12 +22,15 @@ export const WorkLogCard: React.FC<WorkLogCardProps> = ({
   return (
     <WorkLogCardStyled>
       <WorkLogCardMeta>
-        {variant === 'list' && workLog.id ? (
+        {variant === 'list' ? (
           <Link href={`/worklogs/${workLog.id}`}>
             <FormattedDate value={workLog.createdAt} format="dateTimeMedium" />
           </Link>
         ) : (
-          <FormattedDate value={workLog.createdAt} format="dateTimeMedium" />
+          <WorkLogCardHeaderStyled>
+            <FormattedDate value={workLog.createdAt} format="dateTimeMedium" />
+            <WorkLogTranslateButton workLog={workLog} />
+          </WorkLogCardHeaderStyled>
         )}
       </WorkLogCardMeta>
 

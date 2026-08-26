@@ -1,0 +1,17 @@
+mutation adminBulkUpdateLangs(
+  $limit: Int!
+  $langsLimit: Int
+  $processAllLangs: Boolean = true
+  $force: Boolean!
+  $entities: [BulkUpdateLangsEntityType!]!
+  $ids: [String!]
+) {
+  response: adminBulkUpdateLangs(
+    limit: $limit
+    langsLimit: $langsLimit
+    processAllLangs: $processAllLangs
+    force: $force
+    entities: $entities
+    ids: $ids
+  )
+}

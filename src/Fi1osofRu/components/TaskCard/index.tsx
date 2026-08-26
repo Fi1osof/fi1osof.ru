@@ -1,4 +1,4 @@
-import { TaskFragment } from 'src/gql/generated'
+import { BulkUpdateLangsEntityType, TaskFragment } from 'src/gql/generated'
 import { FormattedDate } from 'src/ui-kit/format/FormattedDate'
 import {
   TaskCardStyled,
@@ -16,6 +16,7 @@ import { TaskCardStatus } from './TaskStatus'
 import { TaskStartTimer } from './Buttons/StartTimer'
 import { useAppContext } from 'src/components/AppContext'
 import { TaskEditFormFi1osofRu } from 'src/Fi1osofRu/pages/Tasks/Task/Form'
+import { useTranslateButton } from 'src/Fi1osofRu/hooks/useTranslateButton'
 
 type TaskCardProps = {
   task: TaskFragment
@@ -36,6 +37,12 @@ export const TaskCardFi1osofRu: React.FC<TaskCardProps> = ({
     (currentUser && task.createdById === currentUser.id && variant === 'full')
       ? true
       : false
+
+  const { translateButton } =
+    useTranslateButton({
+      entities: BulkUpdateLangsEntityType.TASK,
+      id: task.id,
+    }) || {}
 
   // const {} = useMemo(() => {
   //   if (!canEdit) {
@@ -78,6 +85,7 @@ export const TaskCardFi1osofRu: React.FC<TaskCardProps> = ({
 
         {canEdit && (
           <>
+            {translateButton}
             <TaskStartTimer taskId={task.id} />
             <Button onClick={startEditing}>Редактировать</Button>
           </>

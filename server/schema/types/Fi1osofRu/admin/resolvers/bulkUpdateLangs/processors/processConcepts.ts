@@ -11,8 +11,9 @@ import { langKey, ProcessorResult } from '../interfaces'
 type ProcessConceptsArgs = {
   ctx: PrismaContext
   // whereArg: Parameters<typeof buildKBConceptWhere>[0]
+  ids?: string[]
   limit: number
-  langsLimit: number
+  langsLimit: number | null | undefined
   processAllLangs: boolean
   force: boolean
   validUris: Set<string>
@@ -21,6 +22,7 @@ type ProcessConceptsArgs = {
 export async function processConcepts({
   ctx,
   // whereArg,
+  ids,
   limit,
   langsLimit,
   processAllLangs,
@@ -35,6 +37,10 @@ export async function processConcepts({
 
   const where: Prisma.KBConceptWhereInput = {
     AND: [prismaWhere],
+  }
+
+  if (ids && ids.length > 0) {
+    where.id = { in: ids }
   }
 
   if (!force) {
@@ -92,7 +98,7 @@ export async function processConcepts({
       continue
     }
 
-    const batchSize = langsLimit === 0 ? langsToProcess.length : langsLimit
+    const batchSize = !langsLimit ? langsToProcess.length : langsLimit
     const batches: langKey[][] = []
 
     if (processAllLangs) {
