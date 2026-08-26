@@ -47,17 +47,30 @@ export const AboutPageCustom: Page = ({ siteOrigin }) => {
       {siteUrl && (
         <JsonLd
           data={createPerson({
-            name: 'Nikolai Fi1osof Lanets',
+            name: 'Nikolay Lanets',
+            alternateName: 'Fi1osof',
             url: pageUrl,
             image: `${siteUrl}${iAm.src}`,
             jobTitle: 'Fullstack AI Researcher',
             description,
             sameAs: [
-              'https://t.me/Fi1osof',
+              'https://fi1osof.ru',
+              'https://fi1osof.ru/about',
               'https://github.com/fi1osof',
-              'https://www.linkedin.com/in/fi1osof/',
+              'https://www.linkedin.com/in/fi1osof',
+              'https://habr.com/ru/users/fi1osof/',
+              'https://habr.com/en/users/fi1osof/',
+              'https://pikabu.ru/@fi1osof',
+              'https://modx.pro/users/real-fi1osof',
+              'https://gist.github.com/fi1osof',
+              'https://npmx.dev/~fi1osof',
+              'https://freecode.academy',
+              'https://haih.net',
+              'https://explore.market.dev/experts/fi1osof',
+              'https://web3.bio/fi1osof.lens',
             ],
             knowsAbout: [
+              'ChatGPT',
               'React',
               'Next.js',
               'TypeScript',
