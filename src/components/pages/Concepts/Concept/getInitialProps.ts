@@ -40,7 +40,7 @@ export const preloadConcept = async ({
 
 export const conceptPageGetInitialProps: Page<ConceptPageProps>['getInitialProps'] =
   async ({ apolloClient, asPath }) => {
-    const uri = asPath?.split('?')[0]
+    const uri = asPath ? decodeURI(asPath).split('?')[0] : undefined
 
     return preloadConcept({
       uri,
