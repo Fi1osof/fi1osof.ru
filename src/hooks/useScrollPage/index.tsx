@@ -19,7 +19,7 @@ export const scrollToTop = (_pathname: string) => {
 export function useScrollPage() {
   const router = useRouter()
 
-  const uri = decodeURI(router.asPath)
+  const uri = decodeURIComponent(router.asPath)
 
   const path = uri.split('?')[0]
   const hash = uri.replace(/^.*?(#(.*)|$)/, '$2')
