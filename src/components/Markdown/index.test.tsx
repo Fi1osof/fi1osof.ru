@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render } from '@testing-library/react'
 import { ThemeProvider } from 'styled-components'
 import { theme } from 'src/theme'
+import { validateSelfClosingTags } from './helpers/validateSelfClosingTags'
 
 vi.mock('next/link', () => ({
   default: ({
@@ -106,5 +107,53 @@ $$`
       const span = container.querySelector('span.highlight')
       expect(span).toBeTruthy()
     })
+  })
+})
+
+describe('validateSelfClosingTags', () => {
+  it('allows void elements with self-closing syntax', () => {
+    const content = '<br/><hr/><img src="test.png"/><input type="text"/>'
+    expect(() => validateSelfClosingTags(content)).not.toThrow()
+  })
+
+  it('allows void elements with spaces before slash', () => {
+    const content = '<br /><hr /><img src="test.png" />'
+    expect(() => validateSelfClosingTags(content)).not.toThrow()
+  })
+
+  it('throws error for non-void self-closing tags', () => {
+    const content = '<div/>'
+    expect(() => validateSelfClosingTags(content)).toThrow(
+      /Invalid self-closing tags found: <div\/>/,
+    )
+  })
+
+  it('throws error for span self-closing tag', () => {
+    const content = '<span data-id="123"/>'
+    expect(() => validateSelfClosingTags(content)).toThrow(
+      /Invalid self-closing tags found/,
+    )
+  })
+
+  it('throws error for multiple invalid self-closing tags', () => {
+    const content = '<div/><span/><p/>'
+    expect(() => validateSelfClosingTags(content)).toThrow(
+      /Invalid self-closing tags found: <div\/>, <span\/>, <p\/>/,
+    )
+  })
+
+  it('allows content without any self-closing tags', () => {
+    const content = '<div>content</div><span>text</span>'
+    expect(() => validateSelfClosingTags(content)).not.toThrow()
+  })
+
+  it('allows mixed void and regular tags', () => {
+    const content = '<div>text<br/>more text</div><img src="a.png"/>'
+    expect(() => validateSelfClosingTags(content)).not.toThrow()
+  })
+
+  it('is case-insensitive for void elements', () => {
+    const content = '<BR/><HR/><IMG src="test.png"/>'
+    expect(() => validateSelfClosingTags(content)).not.toThrow()
   })
 })

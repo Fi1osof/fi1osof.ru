@@ -3,6 +3,9 @@ import { builder } from 'server/schema/builder'
 import { KBConceptCreateInput } from '../inputs'
 import { createCUID } from '../../helpers/createCUID'
 import { slugifyUri } from '../../helpers/slugifyUri'
+import { buildValidUrisSet } from '../helpers/buildValidUrisSet'
+import { removeInvalidLinks } from '../helpers/validateInternalLinks'
+import { normalizeMarkdownContent } from '../helpers/normalizeMarkdownContent'
 
 builder.mutationField('createConcept', (t) =>
   t.prismaField({
@@ -16,7 +19,15 @@ builder.mutationField('createConcept', (t) =>
       }
 
       const {
-        data: { name, quality, data: dataArg, visibility, uri, ...other },
+        data: {
+          name,
+          quality,
+          data: dataArg,
+          visibility,
+          uri,
+          content,
+          ...other
+        },
       } = args
 
       if (!name) {
@@ -38,6 +49,20 @@ builder.mutationField('createConcept', (t) =>
             id: ctx.currentUser.id,
           },
         },
+      }
+
+      if (content) {
+        const validUris = await buildValidUrisSet(ctx)
+
+        // 1. Remove invalid internal links
+        let processedContent = (
+          await removeInvalidLinks(content, validUris, true)
+        ).content
+
+        // 2. Normalize markdown: add blank lines after opening tags for proper rendering
+        processedContent = await normalizeMarkdownContent(processedContent)
+
+        data.content = processedContent
       }
 
       return ctx.prisma.kBConcept.create({
