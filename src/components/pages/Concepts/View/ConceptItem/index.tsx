@@ -24,6 +24,7 @@ export const ConceptItem: React.FC<ConceptItemProps> = ({
   const { id, name, description, intro, content, CreatedBy } = concept
 
   let contentBlock: React.ReactNode | null
+  let title = <ConceptItemTitleStyled>{name || id}</ConceptItemTitleStyled>
 
   switch (variant) {
     case 'full':
@@ -37,14 +38,14 @@ export const ConceptItem: React.FC<ConceptItemProps> = ({
           <Markdown>{description}</Markdown>
         </ConceptItemDescriptionStyled>
       ) : null
+
+      title = <ConceptLink object={concept}>{title}</ConceptLink>
     }
   }
 
   return (
     <ConceptItemStyled {...other} variant={variant}>
-      <ConceptLink object={concept}>
-        <ConceptItemTitleStyled>{name || id}</ConceptItemTitleStyled>
-      </ConceptLink>
+      {title}
 
       {contentBlock}
 
