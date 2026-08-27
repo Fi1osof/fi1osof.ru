@@ -88,7 +88,7 @@ async function getKbConcepts(): Promise<UrlItem[]> {
     Pick<KBConcept, 'id' | 'uri' | 'updatedAt'>[]
   >`
     SELECT id, uri, "updatedAt" FROM "KBConcept" 
-    WHERE visibility != ${Prisma.raw(`'${KBConceptVisibility.unpublished}'`)} AND "en" IS NOT NULL AND uri IS NOT NULL
+    WHERE visibility = ${Prisma.raw(`'${KBConceptVisibility.public}'`)} AND "en" IS NOT NULL AND uri IS NOT NULL
     ORDER BY "updatedAt" DESC
   `
 
@@ -153,6 +153,9 @@ const generateSitemapIndex = async ({
         <loc>${siteOrigin}/sitemap/main.xml</loc>
     </sitemap>
     <sitemap>
+        <loc>${siteOrigin}${SitemapSection.concepts}</loc>
+    </sitemap>
+    <sitemap>
         <loc>${siteOrigin}${SitemapSection.projects}</loc>
     </sitemap>
     <sitemap>
@@ -206,8 +209,6 @@ const generateSitemapConcepts = async (
 
   return generateSitemapXML(xmlData, props)
 }
-
-generateSitemapConcepts
 
 const generateSitemapProjects = async (
   props: SitemapGeneratorProps,
@@ -345,9 +346,9 @@ export const generateSitemap = async (req: Request, res: Response) => {
   const props = { siteOrigin, locale }
 
   switch (req.url) {
-    // case SitemapSection.concepts:
-    //   res.send(await generateSitemapConcepts(props))
-    //   break
+    case SitemapSection.concepts:
+      res.send(await generateSitemapConcepts(props))
+      break
 
     case SitemapSection.projects:
       res.send(await generateSitemapProjects(props))

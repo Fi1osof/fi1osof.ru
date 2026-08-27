@@ -1,9 +1,14 @@
-import { KbConceptFragment, MeUserFragment } from 'src/gql/generated'
+import {
+  BulkUpdateLangsEntityType,
+  KbConceptFragment,
+  MeUserFragment,
+} from 'src/gql/generated'
 import { ConceptItem } from '../../View/ConceptItem'
 import { useBoolean } from 'src/hooks/useBoolean'
 import { ConceptEditForm } from '../Form'
 import { Button } from 'src/ui-kit/Button'
 import { ConceptViewStyled } from './styles'
+import { useTranslateButton } from 'src/Fi1osofRu/hooks/useTranslateButton'
 
 type ConceptViewProps = {
   concept: KbConceptFragment
@@ -17,6 +22,12 @@ export const ConceptView: React.FC<ConceptViewProps> = ({
   const [inEditMode, startEdit, stopEdit] = useBoolean()
 
   const canEdit = currentUser?.sudo || currentUser?.id === concept.createdById
+
+  const { translateButton } =
+    useTranslateButton({
+      entities: BulkUpdateLangsEntityType.CONCEPT,
+      id: concept.id,
+    }) || {}
 
   return (
     <ConceptViewStyled>
@@ -32,6 +43,8 @@ export const ConceptView: React.FC<ConceptViewProps> = ({
 
           {canEdit && (
             <div>
+              {translateButton}
+
               <Button onClick={startEdit}>Edit</Button>
             </div>
           )}
