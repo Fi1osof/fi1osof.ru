@@ -4,7 +4,6 @@ import {
   ConceptItemMetaStyled,
   ConceptItemTitleStyled,
   ConceptItemDescriptionStyled,
-  ConceptItemTypeStyled,
 } from './styles'
 import { FormattedDate } from 'src/ui-kit/format/FormattedDate'
 import { Markdown } from 'src/components/Markdown'
@@ -22,7 +21,7 @@ export const ConceptItem: React.FC<ConceptItemProps> = ({
   variant,
   ...other
 }) => {
-  const { id, name, description, type, content, CreatedBy } = concept
+  const { id, name, description, intro, content, CreatedBy } = concept
 
   let contentBlock: React.ReactNode | null
 
@@ -31,23 +30,21 @@ export const ConceptItem: React.FC<ConceptItemProps> = ({
       contentBlock = <>{content && <Markdown>{content}</Markdown>}</>
       break
 
-    default:
-      contentBlock = null
-  }
-
-  return (
-    <ConceptItemStyled {...other} $variant={variant}>
-      <ConceptLink object={concept}>
-        <ConceptItemTitleStyled>{name || id}</ConceptItemTitleStyled>
-      </ConceptLink>
-
-      {type && <ConceptItemTypeStyled>{type}</ConceptItemTypeStyled>}
-
-      {description && (
+    case 'list': {
+      const text = intro || description
+      contentBlock = text ? (
         <ConceptItemDescriptionStyled>
           <Markdown>{description}</Markdown>
         </ConceptItemDescriptionStyled>
-      )}
+      ) : null
+    }
+  }
+
+  return (
+    <ConceptItemStyled {...other} variant={variant}>
+      <ConceptLink object={concept}>
+        <ConceptItemTitleStyled>{name || id}</ConceptItemTitleStyled>
+      </ConceptLink>
 
       {contentBlock}
 
