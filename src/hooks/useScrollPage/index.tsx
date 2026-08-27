@@ -19,8 +19,10 @@ export const scrollToTop = (_pathname: string) => {
 export function useScrollPage() {
   const router = useRouter()
 
-  const path = router.asPath.replace(/\?.*/, '')
-  const hash = router.asPath.replace(/^.*?(#(.*)|$)/, '$2')
+  const uri = decodeURIComponent(router.asPath)
+
+  const path = uri.split('?')[0]
+  const hash = uri.replace(/^.*?(#(.*)|$)/, '$2')
 
   useEffect(() => {
     if (hash) {

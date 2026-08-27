@@ -12,7 +12,7 @@ export const SiteRouterPage: Page<SiteRouterPageProps> = (props) => {
 }
 
 SiteRouterPage.getInitialProps = async ({ asPath, apolloClient }) => {
-  const uri = asPath?.split('?')[0]
+  const uri = asPath ? decodeURIComponent(asPath).split('?')[0] : undefined
 
   return await preloadConcept({
     uri,

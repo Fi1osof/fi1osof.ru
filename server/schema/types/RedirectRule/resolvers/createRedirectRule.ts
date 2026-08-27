@@ -1,5 +1,6 @@
 import { builder } from 'server/schema/builder'
 import { RedirectPatternTypeEnum } from '../types'
+import { createRedirectRuleData } from '../helpers/createRedirectRuleData'
 
 const CreateRedirectRuleInput = builder.inputType('CreateRedirectRuleInput', {
   fields: (t) => ({
@@ -27,31 +28,7 @@ builder.mutationField('createRedirectRule', (t) =>
         throw new Error('Access denied')
       }
 
-      const {
-        name,
-        pattern,
-        patternType,
-        replacement,
-        statusCode,
-        priority,
-        enabled,
-        comment,
-      } = args.data
-
-      const rule = await prisma.redirectRule.create({
-        data: {
-          name,
-          pattern,
-          patternType,
-          replacement,
-          statusCode: statusCode ?? 301,
-          priority: priority ?? 0,
-          enabled: enabled ?? true,
-          comment,
-        },
-      })
-
-      return rule
+      return createRedirectRuleData(prisma, args.data)
     },
   }),
 )

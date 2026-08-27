@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client'
 import { builder } from 'server/schema/builder'
 import { KBConceptCreateInput } from '../inputs'
 import { createCUID } from '../../helpers/createCUID'
+import { slugifyUri } from '../../helpers/slugifyUri'
 
 builder.mutationField('createConcept', (t) =>
   t.prismaField({
@@ -31,7 +32,7 @@ builder.mutationField('createConcept', (t) =>
         quality: quality ?? undefined,
         visibility: visibility ?? undefined,
         data: dataArg as Prisma.KBConceptCreateInput['data'],
-        uri: uri || `/concepts/${id}`,
+        uri: slugifyUri(uri || `/concepts/${name}`),
         CreatedBy: {
           connect: {
             id: ctx.currentUser.id,

@@ -4,7 +4,7 @@ import { KbConceptNoNestingFragment } from 'src/gql/generated'
 
 export function createConceptLink(
   object: Pick<KbConceptNoNestingFragment, 'id'> & {
-    uri: string | null | undefined
+    uri: KbConceptNoNestingFragment['uri'] | null | undefined
   },
 ): string {
   const { id, uri } = object
