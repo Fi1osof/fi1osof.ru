@@ -4,6 +4,9 @@ import { KBConceptUpdateInput, KBConceptWhereUniqueInput } from '../inputs'
 import { prepareConceptData } from '../helpers/validateConceptData'
 import { processUriChange } from '../../helpers/processUriChange'
 import { createConceptLink } from 'src/components/Link/Concept'
+import { buildValidUrisSet } from '../helpers/buildValidUrisSet'
+import { removeInvalidLinks } from '../helpers/validateInternalLinks'
+import { normalizeMarkdownContent } from '../helpers/normalizeMarkdownContent'
 
 builder.mutationField('updateConcept', (t) =>
   t.prismaField({
@@ -20,7 +23,15 @@ builder.mutationField('updateConcept', (t) =>
       }
 
       const {
-        data: { name, quality, data: dataArg, visibility, uri, ...other },
+        data: {
+          name,
+          quality,
+          data: dataArg,
+          visibility,
+          uri,
+          content,
+          ...other
+        },
         where: { id, uri: uriWhere },
       } = args
 
@@ -56,6 +67,20 @@ builder.mutationField('updateConcept', (t) =>
         const oldUri = createConceptLink(existing)
 
         data.uri = await processUriChange(ctx.prisma, oldUri, uri)
+      }
+
+      if (content) {
+        const validUris = await buildValidUrisSet(ctx)
+
+        // 1. Remove invalid internal links
+        let processedContent = (
+          await removeInvalidLinks(content, validUris, true)
+        ).content
+
+        // 2. Normalize markdown: add blank lines after opening tags for proper rendering
+        processedContent = await normalizeMarkdownContent(processedContent)
+
+        data.content = processedContent
       }
 
       prepareConceptData(data)

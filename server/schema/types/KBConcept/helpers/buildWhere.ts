@@ -10,7 +10,7 @@ type KBConceptsWhereInputType = typeof KBConceptWhereInput.$inferInput
 
 export function buildKBConceptWhere(
   where: KBConceptsWhereInputType | null | undefined,
-  _ctx: PrismaContext | undefined,
+  _ctx?: PrismaContext | undefined,
 ): Prisma.KBConceptWhereInput {
   const {
     // TODO Remove ids

@@ -13,6 +13,7 @@ import './resolvers/createConcept'
 import './resolvers/updateConcept'
 import './resolvers/deleteConcept'
 import './resolvers/upload'
+import './resolvers/validateConcepts'
 
 import { KBConceptOrderByInput, KBConceptWhereInput } from './inputs'
 import { conceptsResolver } from './resolvers/concepts'
