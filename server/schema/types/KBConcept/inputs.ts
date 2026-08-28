@@ -8,6 +8,7 @@ export const KBConceptOrderByInput = builder.inputType(
   {
     fields: (t) => ({
       createdAt: t.field({ type: SortOrder }),
+      updatedAt: t.field({ type: SortOrder }),
       name: t.field({ type: SortOrder }),
       type: t.field({ type: SortOrder }),
     }),
