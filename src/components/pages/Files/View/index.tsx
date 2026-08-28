@@ -17,7 +17,7 @@ export const FilesView: React.FC<FilesViewProps> = ({
   page,
   ...other
 }) => {
-  const totalPages = count ? Math.floor(count / limit) + 1 : 0
+  const totalPages = count ? Math.ceil(count / limit) : 0
 
   return (
     <FilesViewStyled {...other}>
