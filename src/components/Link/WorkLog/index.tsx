@@ -3,7 +3,7 @@ import React from 'react'
 import { TaskWorkLogNoNestingFragment } from 'src/gql/generated'
 
 export function createWorkLogLink(
-  object: TaskWorkLogNoNestingFragment,
+  object: Pick<TaskWorkLogNoNestingFragment, 'id'>,
 ): string {
   const { id } = object
 

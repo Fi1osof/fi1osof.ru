@@ -8,7 +8,7 @@ import {
 import { llmChatCompletionResolver } from 'server/schema/types/LLM/resolvers/chatCompletion'
 import YAML from 'yaml'
 import { FieldToTranslate, LangFields, langKey } from '../interfaces'
-import { removeInvalidLinks } from 'server/schema/types/Fi1osofRu/helpers/validateInternalLinks'
+import { removeInvalidLinks } from 'server/schema/types/KBConcept/helpers/validateInternalLinks'
 
 const MARKDOWN_FIELDS = ['intro', 'content']
 

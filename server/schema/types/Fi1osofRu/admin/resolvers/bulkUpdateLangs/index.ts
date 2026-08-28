@@ -1,6 +1,6 @@
 import { builder } from 'server/schema/builder'
 // import { KBConceptWhereInput } from 'server/schema/types/KBConcept'
-import { buildValidUrisSet } from '../../../helpers/buildValidUrisSet'
+import { buildValidUrisSetFi1osofRu } from '../../../helpers/buildValidUrisSet'
 import { EntityType, ProcessorResult } from './interfaces'
 import { processConcepts } from './processors/processConcepts'
 import { processProjects } from './processors/processProjects'
@@ -45,7 +45,7 @@ builder.mutationField('adminBulkUpdateLangs', (t) =>
         throw new Error('Unauthorized')
       }
 
-      const validUris = await buildValidUrisSet(ctx)
+      const validUris = await buildValidUrisSetFi1osofRu(ctx)
 
       const results: Record<string, ProcessorResult> = {}
 
