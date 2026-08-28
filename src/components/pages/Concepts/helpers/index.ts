@@ -2,6 +2,7 @@ import { AppContextValue } from 'src/components/AppContext'
 import {
   ConceptsConnectionQueryVariables,
   KbConceptVisibility,
+  SortOrder,
 } from 'src/gql/generated'
 
 type getConceptsConnectionQueryVariablesProps =
@@ -20,7 +21,7 @@ export function getConceptsConnectionQueryVariables({
 }: getConceptsConnectionQueryVariablesProps): ConceptsConnectionQueryVariables & {
   take: number
 } {
-  const variable = {
+  const variable: ReturnType<typeof getConceptsConnectionQueryVariables> = {
     ...other,
     where: {
       visibility: KbConceptVisibility.PUBLIC,
@@ -28,6 +29,9 @@ export function getConceptsConnectionQueryVariables({
     },
     skip: (page - 1) * take,
     take,
+    orderBy: {
+      updatedAt: SortOrder.DESC,
+    },
   }
 
   return variable

@@ -24,7 +24,7 @@ export const UsersView: React.FC<UsersViewProps> = ({
   limit,
   page,
 }) => {
-  const totalPages = count ? Math.floor(count / limit) : 0
+  const totalPages = count ? Math.ceil(count / limit) : 0
 
   return (
     <UsersViewStyled>

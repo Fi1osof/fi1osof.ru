@@ -17,7 +17,7 @@ export const ConceptsView: React.FC<ConceptsViewProps> = ({
   page,
   ...other
 }) => {
-  const totalPages = count ? Math.floor(count / limit) : 0
+  const totalPages = count ? Math.ceil(count / limit) : 0
 
   return (
     <ConceptsViewStyled {...other}>
