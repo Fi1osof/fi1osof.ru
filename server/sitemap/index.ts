@@ -182,6 +182,10 @@ const generateSitemapMain = async (
       updatedAt: monday.toISOString().split('T')[0],
     },
     {
+      url: `/concepts`,
+      updatedAt: monday.toISOString().split('T')[0],
+    },
+    {
       url: `/projects`,
       updatedAt: monday.toISOString().split('T')[0],
     },

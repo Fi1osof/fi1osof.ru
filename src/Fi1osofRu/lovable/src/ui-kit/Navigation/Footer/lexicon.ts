@@ -10,6 +10,11 @@ export const footerLexicon: LexiconDict = {
       },
       nav: {
         title: 'навигация',
+        links: {
+          concepts: {
+            title: 'Концепты',
+          },
+        },
       },
       contact: {
         title: 'контакт',
@@ -26,6 +31,11 @@ export const footerLexicon: LexiconDict = {
       },
       nav: {
         title: 'navigation',
+        links: {
+          concepts: {
+            title: 'Concepts',
+          },
+        },
       },
       contact: {
         title: 'contact',
@@ -42,6 +52,11 @@ export const footerLexicon: LexiconDict = {
       },
       nav: {
         title: 'điều hướng',
+        links: {
+          concepts: {
+            title: 'Các khái niệm',
+          },
+        },
       },
       contact: {
         title: 'liên hệ',
