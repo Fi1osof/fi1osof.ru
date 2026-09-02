@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Prisma } from '@prisma/client'
 import { PrismaContext } from 'server/context/interfaces'
 import {
@@ -72,31 +73,51 @@ export async function baseUpdateLang({
 
   const fieldNames = fieldsToTranslate.map((f) => f.field)
 
-  const prompt = `# You are a professional translator.
+  const systemPrompt = `You are a professional translator specializing in technical documentation and web content.
 
-Translate the following fields from Russian to the specified languages.
+# YAML OUTPUT RULES (CRITICAL)
 
----
+You MUST output valid YAML with this EXACT structure:
 
-# Source fields (in Russian):
+\`\`\`
+<lang_code>:
+  <field_name>: |
+    <translated text line 1>
+    <translated text line 2>
+\`\`\`
+
+**STRICT REQUIREMENTS:**
+1. Each language code (en, de, etc.) MUST be at the ROOT level (no indentation)
+2. Each field (name, description, content) MUST be indented with exactly 2 spaces under its language
+3. Field values MUST use the literal block scalar (|) syntax
+4. Text content MUST be indented with exactly 4 spaces (2 for field + 2 for content)
+5. NEVER put fields at the root level - they MUST always be nested under a language code
+
+# TRANSLATION RULES
+
+1. **Translate, do not transliterate.** Convert meaning, not just letters.
+2. Only include fields that were provided in the source.
+3. Preserve all markdown and HTML formatting exactly.
+4. Exception: Proper nouns, brand names, company names, and product names should be transliterated to Latin script.
+
+# OUTPUT FORMAT
+
+Respond ONLY with valid YAML. No markdown code blocks, no explanations, no comments - just raw YAML.`
+
+  const userPrompt = `Translate the following fields from Russian into: ${targetLangs.join(', ')}
+
+## Source fields:
 
 ${fieldsYaml}
 
----
+## Expected output structure:
 
-# Target languages: ${targetLangs.join(', ')}
-
-Respond ONLY with valid YAML in the following format (no markdown code blocks, just raw YAML):
 ${targetLangs
   .map(
     (lang) =>
-      `${lang}:\n${fieldNames.map((f) => `  ${f}: |\n    translated ${f}`).join('\n')}`,
+      `${lang}:\n${fieldNames.map((f) => `  ${f}: |\n    <translated ${f}>`).join('\n')}`,
   )
-  .join('\n')}
-
-Only include fields that were provided in the source. Preserve markdown and HTML formatting.
-
-Important: Proper nouns, brand names, company names, product names, and similar should be transliterated to Latin script (not translated).`
+  .join('\n')}`
 
   const chatResponse = await llmChatCompletionResolver(
     null,
@@ -105,8 +126,12 @@ Important: Proper nouns, brand names, company names, product names, and similar 
         provider: LlmProvider.OpenRouter,
         messages: [
           {
+            role: LLMChatMessageRole.system,
+            content: systemPrompt,
+          },
+          {
             role: LLMChatMessageRole.user,
-            content: prompt,
+            content: userPrompt,
           },
         ],
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -118,11 +143,15 @@ Important: Proper nouns, brand names, company names, product names, and similar 
 
   const responseContent = chatResponse.choices?.[0]?.message?.content
 
+  console.log('baseUpdateLang responseContent', responseContent)
+
   if (!responseContent) {
     throw new Error('Can not get llm response')
   }
 
   const parsed: Record<string, LangFields> = YAML.parse(responseContent)
+
+  console.log('baseUpdateLang parsed', parsed)
 
   const updates: Record<string, LangFields> = {}
 
