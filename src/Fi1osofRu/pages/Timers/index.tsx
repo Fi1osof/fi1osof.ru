@@ -2,11 +2,26 @@ import { Page } from 'src/components/pages/_App/interfaces'
 import { SeoHeaders } from 'src/components/seo/SeoHeaders'
 import { useLexicon } from 'src/Fi1osofRu/Lexicon'
 import { timersLexicon } from './lexicon'
-import { TimersDocument, useTimersQuery } from 'src/gql/generated'
+import {
+  SortOrder,
+  TimersDocument,
+  TimersQuery,
+  TimersQueryVariables,
+  useTimersQuery,
+} from 'src/gql/generated'
 import { TimersPageView } from './View'
 
+const variables: TimersQueryVariables = {
+  orderBy: {
+    createdAt: SortOrder.DESC,
+  },
+  take: 30,
+}
+
 export const TimersPage: Page = ({ siteOrigin }) => {
-  const reponse = useTimersQuery()
+  const reponse = useTimersQuery({
+    variables,
+  })
   const { t } = useLexicon(timersLexicon)
 
   // TODO: Add pagination
@@ -27,9 +42,12 @@ export const TimersPage: Page = ({ siteOrigin }) => {
 }
 
 TimersPage.getInitialProps = async ({ apolloClient }) => {
-  await apolloClient.query({
-    query: TimersDocument,
-  })
+  await apolloClient
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
+    .query<TimersQuery, TimersQueryVariables>({
+      query: TimersDocument,
+      variables,
+    })
 
   return {}
 }
