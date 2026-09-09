@@ -23,8 +23,12 @@ export const LayoutRootStyled = styled.div`
 
 export const LayoutBodyStyled = styled.main`
   flex: 1;
-  padding: ${({ theme }) => theme.space(8)} 0;
+  padding: ${({ theme }) => `${theme.space(8)} ${theme.space(4)}`};
+  max-width: 1260px;
+  width: 100%;
+  margin: 0 auto;
+
   @media (max-width: ${({ theme }) => theme.breakpoint.mobile}) {
-    padding: ${({ theme }) => theme.space(4)} 0;
+    padding: ${({ theme }) => theme.space(4)};
   }
 `

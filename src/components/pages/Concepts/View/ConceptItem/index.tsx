@@ -24,7 +24,11 @@ export const ConceptItem: React.FC<ConceptItemProps> = ({
   const { id, name, description, intro, content, CreatedBy } = concept
 
   let contentBlock: React.ReactNode | null
-  let title = <ConceptItemTitleStyled>{name || id}</ConceptItemTitleStyled>
+  let title = (
+    <ConceptItemTitleStyled as={variant === 'full' ? 'h1' : undefined}>
+      {name || id}
+    </ConceptItemTitleStyled>
+  )
 
   switch (variant) {
     case 'full':
