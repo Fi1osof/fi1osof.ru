@@ -5,8 +5,9 @@ export interface WithContext<T> {
 
 export interface PersonSchema {
   '@type': 'Person'
+  '@id'?: string
   name?: string
-  alternateName?: string
+  alternateName?: string | string[]
   url?: string
   image?: string
   jobTitle?: string
