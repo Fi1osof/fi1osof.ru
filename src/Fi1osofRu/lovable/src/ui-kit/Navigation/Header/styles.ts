@@ -66,6 +66,11 @@ export const HeaderNavStyled = styled.nav`
   display: flex;
   gap: ${({ theme }) => theme.space(5)};
   flex-wrap: nowrap;
+
+  a {
+    white-space: nowrap;
+  }
+
   @media (max-width: ${({ theme }) => theme.breakpoint.tablet}) {
     display: none;
   }

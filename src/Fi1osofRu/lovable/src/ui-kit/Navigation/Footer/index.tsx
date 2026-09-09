@@ -51,10 +51,6 @@ export const Footer: React.FC<FooterProps> = ({
                 {item.label}
               </FooterLinkStyled>
             ))}
-
-            <FooterLinkStyled href="/concepts">
-              {t('footer.nav.links.concepts.title')}
-            </FooterLinkStyled>
           </FooterColStyled>
           <FooterColStyled>
             <FooterTitleStyled>{t('footer.contact.title')}</FooterTitleStyled>

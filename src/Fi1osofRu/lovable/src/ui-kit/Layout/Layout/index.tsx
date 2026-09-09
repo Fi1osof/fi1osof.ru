@@ -26,10 +26,15 @@ export const Layout: React.FC<LayoutProps> = ({
   const { navItems, nav, resolvedBrandName, resolvedBrandTagline } =
     useMemo(() => {
       const nav: LayoutNavItem[] = [
+        // {
+        //   href: '/',
+        //   id: 'now',
+        //   label: t('nav.now'),
+        // },
         {
-          href: '/',
-          id: 'now',
-          label: t('nav.now'),
+          href: '/concepts',
+          id: 'concepts',
+          label: t('nav.concepts'),
         },
         {
           href: '/projects',

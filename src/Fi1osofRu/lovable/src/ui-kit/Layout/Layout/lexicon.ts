@@ -7,6 +7,7 @@ export const layoutLexicon: LexiconDict = {
       projects: 'Проекты',
       tasks: 'Задачи',
       worklogs: 'Журнал',
+      concepts: 'База знаний',
       about: 'Обо мне',
     },
     brand: {
@@ -21,6 +22,7 @@ export const layoutLexicon: LexiconDict = {
       projects: 'Projects',
       tasks: 'Tasks',
       worklogs: 'Journal',
+      concepts: 'Knowledge Base',
       about: 'About',
     },
     brand: {
@@ -35,6 +37,7 @@ export const layoutLexicon: LexiconDict = {
       projects: 'Dự án',
       tasks: 'Nhiệm vụ',
       worklogs: 'Nhật ký',
+      concepts: 'Cơ sở kiến thức',
       about: 'Về tôi',
     },
     brand: {
