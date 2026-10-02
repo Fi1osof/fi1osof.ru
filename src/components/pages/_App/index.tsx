@@ -18,6 +18,7 @@ import { useMeQuery } from 'src/gql/generated'
 import { AppContextProvider } from 'src/components/AppContext'
 import { SnackbarProvider, Snackbar } from 'src/ui-kit/Snackbar'
 import { getInitialProps } from './getInitialProps'
+import { useStatistics } from 'src/Custom/hooks/useStatistics'
 import { useScrollPage } from 'src/hooks/useScrollPage'
 import { Fi1osofRuLayout as Layout } from 'src/Fi1osofRu/Layout'
 import { ChatProvider } from 'src/components/Chat/ChatWidget/context'
@@ -47,6 +48,8 @@ export const App: MainApp<AppProps> = ({ Component, pageProps, locale }) => {
   })
 
   const user = data?.me
+
+  useStatistics(user?.id, userLoading)
 
   const { statusCode } = pageProps
 

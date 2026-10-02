@@ -1,3 +1,5 @@
+import { gql } from '@apollo/client'
+import { statisticsQuery } from 'src/Custom/hooks/useStatistics/transport'
 import { initializeApollo } from 'src/gql/apolloClient'
 import NextApp from 'next/app'
 
@@ -135,6 +137,38 @@ export const getInitialProps: MainApp['getInitialProps'] = async (
       const isError = statusCode && statusCode !== 200 ? true : false
       const siteOrigin = getSiteOrigin(req)
       const fullUrl = siteOrigin ? `${siteOrigin}${url}` : url
+
+      // Server requests are separate from browser page views (including bots).
+      void apolloClient
+        .mutate({
+          mutation: gql(statisticsQuery),
+          context: {
+            headers: {
+              ...req.headers,
+              'x-forwarded-for':
+                req.headers['x-forwarded-for'] || req.socket.remoteAddress,
+            },
+          },
+          variables: {
+            data: {
+              events: [
+                {
+                  eventId: 'page.requested',
+                  timestamp: Date.now(),
+                  url: siteOrigin
+                    ? fullUrl
+                    : `http://${req.headers.host || 'localhost'}${url}`,
+                  referrer: req.headers.referer || null,
+                  method: req.method,
+                  statusCode: statusCode ?? 200,
+                },
+              ],
+            },
+          },
+        })
+        .catch(() => {
+          /* Statistics must not delay or break SSR. */
+        })
 
       // eslint-disable-next-line @typescript-eslint/no-deprecated
       const response = await apolloClient.mutate<
