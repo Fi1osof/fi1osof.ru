@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react'
 import Router from 'next/router'
 import { createVisitorId, statisticsQuery, storedId } from './transport'
 
+import { STATISTICS_EVENT } from './events'
+
 type Event = Record<string, unknown>
 
 export function useStatistics(userId: string | undefined, loading: boolean) {
@@ -31,7 +33,18 @@ export function useStatistics(userId: string | undefined, loading: boolean) {
         return
       }
       sending = true
-      const events = queue.splice(0, 30)
+      // Split batches, never event text. Large individual events travel alone.
+      const events: Event[] = []
+      let batchBytes = 0
+      while (queue.length && events.length < 30) {
+        const eventBytes = new Blob([JSON.stringify(queue[0])]).size
+        if (events.length && batchBytes + eventBytes > 48_000) {
+          break
+        }
+        events.push(queue[0])
+        queue.shift()
+        batchBytes += eventBytes
+      }
       let acceptedEventCount = 0
       try {
         let token: string | null = null
@@ -40,18 +53,20 @@ export function useStatistics(userId: string | undefined, loading: boolean) {
         } catch {
           /* Storage may be blocked. */
         }
+        const requestBody = JSON.stringify({
+          query: statisticsQuery,
+          variables: { data: { visitorId, tabId, events } },
+        })
         const response = await fetch('/api/', {
           method: 'POST',
           credentials: 'same-origin',
-          keepalive: true,
+          // Fetch keepalive has a 64 KiB body budget; use normal fetch for long text.
+          keepalive: new Blob([requestBody]).size <= 48_000,
           headers: {
             'Content-Type': 'application/json',
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
-          body: JSON.stringify({
-            query: statisticsQuery,
-            variables: { data: { visitorId, tabId, events } },
-          }),
+          body: requestBody,
         })
         const body: unknown = await response.json()
         if (
@@ -190,6 +205,25 @@ export function useStatistics(userId: string | undefined, loading: boolean) {
         },
       )
     }
+    const onStatistics = (event: globalThis.Event) => {
+      if (!(event instanceof CustomEvent)) {
+        return
+      }
+      const detail: unknown = event.detail
+      if (
+        !detail ||
+        typeof detail !== 'object' ||
+        !('eventId' in detail) ||
+        typeof detail.eventId !== 'string' ||
+        !('data' in detail) ||
+        !detail.data ||
+        typeof detail.data !== 'object' ||
+        Array.isArray(detail.data)
+      ) {
+        return
+      }
+      record(detail.eventId, { ...detail.data })
+    }
     const onLeave = () => {
       finishScroll()
       void flush()
@@ -204,6 +238,7 @@ export function useStatistics(userId: string | undefined, loading: boolean) {
     }, 3000)
     Router.events.on('routeChangeComplete', onRoute)
     Router.events.on('hashChangeComplete', onRoute)
+    window.addEventListener(STATISTICS_EVENT, onStatistics)
     window.addEventListener('scroll', onScroll, { passive: true })
     document.addEventListener('click', onClick, true)
     window.addEventListener('pagehide', onLeave)
@@ -213,6 +248,7 @@ export function useStatistics(userId: string | undefined, loading: boolean) {
       clearInterval(timer)
       Router.events.off('routeChangeComplete', onRoute)
       Router.events.off('hashChangeComplete', onRoute)
+      window.removeEventListener(STATISTICS_EVENT, onStatistics)
       window.removeEventListener('scroll', onScroll)
       document.removeEventListener('click', onClick, true)
       window.removeEventListener('pagehide', onLeave)

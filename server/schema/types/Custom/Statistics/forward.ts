@@ -13,8 +13,7 @@ export async function forwardStatistics(
     !('events' in data) ||
     !Array.isArray(data.events) ||
     !data.events.length ||
-    data.events.length > 30 ||
-    JSON.stringify(data).length > 48_000
+    data.events.length > 100
   ) {
     throw new GraphQLError('Некорректный пакет событий статистики.')
   }

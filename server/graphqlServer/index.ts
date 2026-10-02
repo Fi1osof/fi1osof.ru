@@ -28,7 +28,7 @@ export async function setupGraphqlServer(): Promise<{
 
   const app = express()
 
-  app.use(express.json())
+  app.use(express.json({ limit: '10mb' }))
 
   const httpServer = createServer(app)
 
@@ -102,7 +102,7 @@ export async function setupGraphqlServer(): Promise<{
     '/api',
     cors<cors.CorsRequest>(),
     graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }),
-    express.json(),
+    express.json({ limit: '10mb' }),
     expressMiddleware(apolloServer, {
       context: ({ req }) =>
         createContext({ req, locale: getLocaleFromRequest(req) }),

@@ -10,7 +10,10 @@ const saved = {
   status: 'success',
   data: {},
 }
-afterEach(() => vi.unstubAllGlobals())
+afterEach(() => {
+  vi.unstubAllGlobals()
+  vi.unstubAllEnvs()
+})
 
 describe('forwarding statistics', () => {
   it('sends each event separately with shared metadata and UTC occurrence time', async () => {
@@ -76,6 +79,7 @@ describe('forwarding statistics', () => {
     expect(send).not.toHaveBeenCalled()
   })
   it('reports the saved prefix so retries can omit successful events', async () => {
+    vi.stubEnv('NODE_ENV', 'development')
     const send = vi
       .fn()
       .mockResolvedValueOnce(
@@ -99,4 +103,27 @@ describe('forwarding statistics', () => {
     ).rejects.toMatchObject({ extensions: { acceptedEventCount: 1 } })
     expect(send).toHaveBeenCalledTimes(2)
   })
+})
+
+it('forwards complete chat text beyond the former 48000 character limit', async () => {
+  const send = vi.fn<typeof fetch>(
+    async () =>
+      new Response(JSON.stringify({ data: { recordStatistic: saved } })),
+  )
+  vi.stubGlobal('fetch', send)
+  const response = 'Длинный ответ '.repeat(10000)
+  await forwardStatistics(
+    'https://example.test/api',
+    'test',
+    {
+      events: [
+        { eventId: 'chat.message.received', timestamp: Date.now(), response },
+      ],
+    },
+    {},
+  )
+  const options = send.mock.calls[0][1]
+  expect(JSON.parse(String(options?.body)).variables.data.response).toBe(
+    response,
+  )
 })

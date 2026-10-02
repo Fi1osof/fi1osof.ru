@@ -10,6 +10,7 @@ import React, {
 import { ChatMessage, CHAT_SESSION_STORAGE_KEY } from '../interfaces'
 import { useSnackbar } from 'src/ui-kit/Snackbar/context'
 import { sendMessageStream } from '../../lib/streamClient'
+import { recordStatistics } from 'src/Custom/hooks/useStatistics/events'
 import { useRouter } from 'next/router'
 import { useLexicon } from 'src/Fi1osofRu/Lexicon'
 import { chatLexicon } from '../lexicon'
@@ -147,26 +148,76 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
       }
 
       const messageText = text.trim()
+      const messageId = `user_${Date.now()}_${Math.random().toString(36).slice(2)}`
+      const statisticsData = {
+        messageId,
+        message: messageText,
+        messageLength: messageText.length,
+      }
+      let sessionId: string | undefined
+      let responseText = ''
+      let responseLength = 0
+      let finished = false
+      const handleError = (error: Error) => {
+        if (finished) {
+          return
+        }
+        finished = true
+        if (error.name !== 'AbortError') {
+          recordStatistics('chat.message.error', {
+            ...statisticsData,
+            sessionId,
+            error: { name: error.name, message: error.message },
+          })
+          snackbar?.addMessage(error.message, { variant: 'error' })
+          const failedMessageId = streamingMessageIdRef.current
+          const errorMessage: ChatMessage = {
+            id: failedMessageId || `${messageId}_error`,
+            text: 'Что-то пошло не так. Попробуйте ещё раз.',
+            isUser: false,
+          }
+          setMessages((prev) =>
+            failedMessageId
+              ? prev.map((msg) =>
+                  msg.id === failedMessageId ? errorMessage : msg,
+                )
+              : [...prev, errorMessage],
+          )
+        }
+        streamingMessageIdRef.current = null
+        abortControllerRef.current = null
+        setIsLoading(false)
+        clearTypingTimer()
+      }
 
       setMessages((prev) => [
         ...prev,
         {
-          id: Date.now().toString(),
+          id: messageId,
           text: messageText,
           isUser: true,
         },
       ])
       setIsLoading(true)
-      abortControllerRef.current = new AbortController()
+      const controller = new AbortController()
+      abortControllerRef.current = controller
       startTypingTimer()
       setIsExpanded(true)
 
       try {
+        sessionId = getSessionId()
+        Object.assign(statisticsData, { sessionId })
+        recordStatistics('chat.message.sent', statisticsData)
         await sendMessageStream(
           messageText,
-          getSessionId(),
+          sessionId,
           {
             onChunk: (chunk) => {
+              if (finished || controller.signal.aborted) {
+                return
+              }
+              responseLength += chunk.length
+              responseText += chunk
               resetTypingTimer()
               if (!streamingMessageIdRef.current) {
                 const botMessageId = Date.now().toString()
@@ -180,9 +231,10 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
                   },
                 ])
               } else {
+                const botMessageId = streamingMessageIdRef.current
                 setMessages((prev) =>
                   prev.map((msg) =>
-                    msg.id === streamingMessageIdRef.current
+                    msg.id === botMessageId
                       ? { ...msg, text: msg.text + chunk }
                       : msg,
                   ),
@@ -190,50 +242,29 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
               }
             },
             onDone: () => {
-              streamingMessageIdRef.current = null
-              abortControllerRef.current = null
-              setIsLoading(false)
-              clearTypingTimer()
-            },
-            onError: (error) => {
-              if (error.name !== 'AbortError') {
-                snackbar?.addMessage(error.message, { variant: 'error' })
-                if (streamingMessageIdRef.current) {
-                  setMessages((prev) =>
-                    prev.map((msg) =>
-                      msg.id === streamingMessageIdRef.current
-                        ? {
-                            ...msg,
-                            text: t('error.somethingWentWrong'),
-                          }
-                        : msg,
-                    ),
-                  )
-                } else {
-                  setMessages((prev) => [
-                    ...prev,
-                    {
-                      id: Date.now().toString(),
-                      text: t('error.somethingWentWrong'),
-                      isUser: false,
-                    },
-                  ])
-                }
+              if (finished || controller.signal.aborted) {
+                return
+              }
+              finished = true
+              if (responseLength > 0) {
+                recordStatistics('chat.message.received', {
+                  ...statisticsData,
+                  sessionId,
+                  response: responseText,
+                  responseLength,
+                })
               }
               streamingMessageIdRef.current = null
               abortControllerRef.current = null
               setIsLoading(false)
               clearTypingTimer()
             },
+            onError: handleError,
           },
-          abortControllerRef.current.signal,
+          controller.signal,
         )
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : t('error.unknown')
-        snackbar?.addMessage(errorMessage, { variant: 'error' })
-        setIsLoading(false)
-        clearTypingTimer()
+        handleError(error instanceof Error ? error : new Error(String(error)))
       }
     },
     [
@@ -243,7 +274,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
       startTypingTimer,
       resetTypingTimer,
       clearTypingTimer,
-      t,
     ],
   )
 

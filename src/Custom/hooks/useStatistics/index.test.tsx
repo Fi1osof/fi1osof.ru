@@ -1,6 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useStatistics } from '.'
+import { recordStatistics } from './events'
 
 const routes = vi.hoisted(() => new Map<string, () => void>())
 vi.mock('next/router', () => ({
@@ -44,6 +45,35 @@ afterEach(() => {
 })
 
 describe('visitor statistics', () => {
+  it('sends chat events through the existing queue with visitor metadata', async () => {
+    const hook = renderHook(() => useStatistics(undefined, false))
+    await act(async () => {
+      // Let the initial page event finish sending.
+    })
+    recordStatistics('chat.message.sent', { messageId: 'm1', sessionId: 's1' })
+    recordStatistics('chat.message.error', {
+      messageId: 'm1',
+      error: { message: 'offline' },
+    })
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(3000)
+    })
+    expect(batches()[1].events).toEqual([
+      expect.objectContaining({
+        eventId: 'chat.message.sent',
+        messageId: 'm1',
+        sessionId: 's1',
+        authenticated: false,
+      }),
+      expect.objectContaining({
+        eventId: 'chat.message.error',
+        messageId: 'm1',
+        error: { message: 'offline' },
+      }),
+    ])
+    hook.unmount()
+  })
+
   it('waits for user initialization and persists the anonymous identity', async () => {
     const hook = renderHook(
       ({ loading }) => useStatistics(undefined, loading),
@@ -135,4 +165,27 @@ describe('visitor statistics', () => {
     })
     expect(send).toHaveBeenCalledTimes(2)
   })
+})
+
+it('sends large chat events intact without keepalive and splits batches', async () => {
+  const hook = renderHook(() => useStatistics(undefined, false))
+  await act(async () => {
+    // Finish the initial page event.
+  })
+  const response = 'Ответ'.repeat(20000)
+  recordStatistics('chat.message.received', { response })
+  recordStatistics('chat.message.sent', { message: 'Следующий вопрос' })
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(3000)
+  })
+  expect(batches()[1].events).toEqual([expect.objectContaining({ response })])
+  const args: unknown[] = send.mock.calls[1]
+  expect(args[1]).toMatchObject({ keepalive: false })
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(3000)
+  })
+  expect(batches()[2].events).toEqual([
+    expect.objectContaining({ message: 'Следующий вопрос' }),
+  ])
+  hook.unmount()
 })
