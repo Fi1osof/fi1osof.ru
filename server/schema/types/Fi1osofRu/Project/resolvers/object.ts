@@ -21,18 +21,6 @@ builder.queryField('project', (t) =>
         },
       })
 
-      if (!project) {
-        return null
-      }
-
-      if (
-        ctx.currentUser &&
-        !ctx.currentUser.sudo &&
-        project.createdById !== ctx.currentUser.id
-      ) {
-        throw new Error('Доступ запрещен')
-      }
-
       return project
     },
   }),
