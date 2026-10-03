@@ -202,6 +202,8 @@ function createApolloClient({
   const secureUploadLink = new SetContextLink((prevContext, operation) => {
     const headers = {
       ...prevContext.headers,
+      accept: 'application/json',
+      'content-type': 'application/json',
       'x-apollo-operation-name': operation.operationName || 'Unknown',
       'apollo-require-preflight': 'true',
     }
@@ -218,7 +220,6 @@ function createApolloClient({
       if (!headers && appContext?.ctx.req?.headers) {
         headers = {
           ...appContext?.ctx.req?.headers,
-          accept: 'application/json',
         }
       }
 
