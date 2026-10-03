@@ -1,5 +1,5 @@
 import React from 'react'
-import { MessageStyled } from '../styles'
+import { MessageStyled } from './styles'
 import { Markdown } from 'src/components/Markdown'
 
 interface ChatMessageProps {

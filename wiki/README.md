@@ -14,6 +14,7 @@
 - [World3D](./world3d/README.md) — multiplayer 3D environment
 - [Local LLM Server](./llama-server/README.md) — llama.cpp with CUDA (requires NVIDIA GPU)
 - [LLM Client](./llm-client/README.md) — direct LLM access via GraphQL and TypeScript
+- [LLM Methods and Capabilities](./llm-client/methods.md) — text, vision, image generation, and speech synthesis (TTS)
 - [Skills](./skills/README.md) — file-based agent skills catalog with optional executables
 - [Computer Vision](./computer-vision/README.md) — image recognition with Qwen3.5 vision model
 - [Image Generation](./image-generation/README.md) — AI-powered image generation via LLM

@@ -1,0 +1,29 @@
+query redirectRules {
+  redirectRules {
+    ...RedirectRuleNoNesting
+  }
+}
+
+mutation createRedirectRule($data: CreateRedirectRuleInput!) {
+  response: createRedirectRule(data: $data) {
+    ...RedirectRule_
+  }
+}
+
+fragment RedirectRuleNoNesting on RedirectRule {
+  comment
+  createdAt
+  enabled
+  id
+  name
+  pattern
+  patternType
+  priority
+  replacement
+  statusCode
+  updatedAt
+}
+
+fragment RedirectRule_ on RedirectRule {
+  ...RedirectRuleNoNesting
+}

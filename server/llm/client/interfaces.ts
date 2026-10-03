@@ -308,3 +308,20 @@ export interface LLMResponse {
     code: number
   }
 }
+
+export interface LLMClientSpeechGenerationRequest {
+  text: string
+  prompt?: string
+  language?: string
+  voice?: string
+  responseFormat?: 'mp3' | 'pcm' | 'wav' | 'opus' | 'aac' | 'flac'
+  speed?: number
+  providerOptions?: unknown
+}
+
+export interface LLMSpeechResponse {
+  id?: string
+  audioUrl: string
+  mimeType: string
+  format: string
+}

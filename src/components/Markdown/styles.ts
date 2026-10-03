@@ -6,15 +6,11 @@ export const markdownStyles = css`
   h1 {
     font-size: 2em;
     margin: 1em 0;
-    border-bottom: 1px solid ${theme.colors.border};
-    padding-bottom: 0.3em;
   }
 
   h2 {
     font-size: 1.5em;
     margin: 1em 0;
-    border-bottom: 1px solid ${theme.colors.border};
-    padding-bottom: 0.3em;
   }
 
   h3 {
@@ -48,43 +44,53 @@ export const markdownStyles = css`
   /* Blockquotes */
   blockquote {
     margin: 1em 0;
-    padding-left: 1em;
-    border-left: 4px solid ${theme.colors.gray[300]};
-    color: ${theme.colors.text.secondary};
-    background: ${theme.colors.gray[50]};
+    padding-inline-start: 1em;
+    border-inline-start: 3px solid currentColor;
   }
 
   /* Inline and block code */
-  code {
-    background-color: ${theme.colors.gray[100]};
+  code,
+  kbd {
     padding: 0.2em 0.4em;
     font-family: monospace;
+    border: 1px solid currentColor;
     border-radius: 4px;
     font-size: 0.95em;
   }
 
   pre {
-    background-color: ${theme.colors.gray[100]};
+    border: 1px solid currentColor;
+    border-radius: 6px;
     padding: 1em;
     overflow-x: auto;
-    border-radius: 6px;
     margin: 1em 0;
   }
 
   pre code {
-    background: none;
+    border: 0;
     padding: 0;
     font-size: 0.95em;
+    white-space: pre-wrap;
+  }
+
+  /* Keep native highlighting readable on any parent background. */
+  mark {
+    color: inherit;
+    background: transparent;
+    font-weight: 600;
+    text-decoration: underline double;
+    text-underline-offset: 0.15em;
   }
 
   /* Links */
   a {
-    color: ${theme.colors.primary};
-    text-decoration: none;
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
   }
 
   a:hover {
-    text-decoration: underline;
+    text-decoration-thickness: 0.12em;
   }
 
   /* Images */
@@ -104,20 +110,16 @@ export const markdownStyles = css`
 
   th,
   td {
-    border: 1px solid ${theme.colors.gray[300]};
+    border: 1px solid currentColor;
     padding: 0.5em;
     text-align: left;
     vertical-align: top;
   }
 
-  thead {
-    background: ${theme.colors.gray[50]};
-  }
-
   /* Horizontal rules */
   hr {
     border: none;
-    border-top: 1px solid ${theme.colors.border};
+    border-top: 1px solid currentColor;
     margin: 2em 0;
   }
 
@@ -154,9 +156,7 @@ export const markdownStyles = css`
   .footnotes {
     margin-top: 2em;
     padding-top: 1em;
-    border-top: 1px solid ${theme.colors.border};
     font-size: 0.9em;
-    color: ${theme.colors.text.secondary};
   }
 
   .footnotes ol {

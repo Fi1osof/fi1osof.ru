@@ -178,11 +178,19 @@ export const ComplexExample: Story = {
 
 ## Text and formatting
 
-This is regular text with **bold** and *italic* formatting.
+This is regular text with **bold**, *italic* and \`inline code\` formatting.
 
 ~~Strikethrough text~~ and formula H<sub>2</sub>O with E = mc<sup>2</sup>
 
-> This is a quote with [link](https://example.com)
+<mark>Highlighted text</mark>, <kbd>Ctrl</kbd> + <kbd>Enter</kbd> and <small>small text</small>.
+
+## Links
+
+[External link](https://example.com), [internal link](/) and [email](mailto:hello@example.com).
+
+> This is a quote with **emphasis**, a [link](https://example.com) and \`inline code\`.
+>
+> Another paragraph to check the quote background and border.
 
 ---
 
@@ -194,13 +202,46 @@ This is regular text with **bold** and *italic* formatting.
 | Ivan | 30 | Saint Petersburg |
 | Maria | 27 | Kazan |
 
+| Element | Sample |
+| --- | --- |
+| Link | [Example](https://example.com) |
+| Code | \`const value = 42\` |
+| Emphasis | **Bold** and *italic* |
+
 ## Code
 
 \`\`\`javascript
+// Comments, keywords, strings and numbers should all remain readable.
+const count = 42;
+
 function hello() {
   console.log("Hello, world!");
 }
 \`\`\`
+
+### Code without syntax highlighting
+
+\`\`\`
+Plain code block without syntax highlighting.
+Check its text, background and border.
+\`\`\`
+
+## Lists
+
+- Bullet with **bold text**
+- Bullet with \`inline code\`
+  - Nested item with a [link](https://example.com)
+
+1. First numbered item
+2. Second numbered item
+
+## Math
+
+Inline math: $E = mc^2$.
+
+$$
+a^2 + b^2 = c^2
+$$
 
 ## Image
 
@@ -218,6 +259,29 @@ function hello() {
 LLAMA_MODEL=unsloth/Qwen3.5-4B-GGUF/Qwen3.5-4B-Q8_0.gguf
 LLAMA_MMPROJ=unsloth/Qwen3.5-4B-GGUF/mmproj-F16.gguf
 \`\`\`
+
+\`\`\`ts
+const jsxComponentDescriptors = useMemo<JsxComponentDescriptor[]>(() => {
+  return [
+    {
+      name: 'files-uploader looooooong loooooooooooooooong loooooooooooooooooooooong text',
+      kind: 'flow',
+      props: [],
+      hasChildren: true,
+      Editor: FilesUploaderEditor,
+    },
+    {
+      name: 'file',
+      kind: 'text',
+      props: [{ name: 'data-id', type: 'string' }],
+      hasChildren: true,
+      Editor: () => null,
+    },
+  ]
+}, [])
+\`\`\`
+
+
 `,
   },
 }

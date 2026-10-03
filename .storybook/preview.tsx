@@ -11,12 +11,14 @@ const WithProviders: Decorator = (Story) => {
   const apolloClient = useApollo(undefined, false, 'ru')
 
   return (
-    <ApolloProvider client={apolloClient}>
+    <>
       <ThemeProvider theme={theme}>
         <GlobalStyle />
-        <Story />
+        <ApolloProvider client={apolloClient}>
+          <Story />
+        </ApolloProvider>
       </ThemeProvider>
-    </ApolloProvider>
+    </>
   )
 }
 

@@ -33,3 +33,12 @@ fragment LLMResponse_ on LLMResponse {
     }
   }
 }
+
+mutation llmSpeechGeneration($input: LLMSpeechGenerationInput!) {
+  llmSpeechGeneration(input: $input) {
+    id
+    audioUrl
+    mimeType
+    format
+  }
+}

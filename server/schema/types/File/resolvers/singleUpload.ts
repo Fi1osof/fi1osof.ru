@@ -1,4 +1,5 @@
-import { builder } from 'server/schema/builder'
+import { File } from '@prisma/client'
+import { builder } from '../../../builder'
 import { saveFile } from '../helpers/saveFile'
 
 const SingleUploadInput = builder.inputType('SingleUploadInput', {
@@ -28,30 +29,55 @@ builder.mutationField('singleUpload', (t) =>
         throw new Error('Can not get file')
       }
 
-      const { filename, mimetype, encoding, path, size, hash } = await saveFile(
-        {
+      let uploadResult
+
+      try {
+        uploadResult = await saveFile({
           upload,
           directory,
           userId: currentUser.id,
-        },
-      )
+        })
+      } catch (error) {
+        // Drain request body to allow response to be sent
+        const req = ctx.req
+        if (req && 'socket' in req && req.socket) {
+          req.socket.resume()
+        }
+        throw error
+      }
 
-      return prisma.file.create({
-        data: {
-          filename,
-          mimetype,
-          encoding,
-          path,
-          size,
-          hash,
-          name: name ?? undefined,
-          CreatedBy: {
-            connect: {
-              id: currentUser.id,
+      const { filename, mimetype, encoding, path, size, hash } = uploadResult
+
+      let file: File | null | undefined
+
+      if (hash && typeof hash === 'string') {
+        file = await prisma.file.findUnique({
+          where: {
+            hash,
+          },
+        })
+      }
+
+      if (!file) {
+        file = await prisma.file.create({
+          data: {
+            filename,
+            mimetype,
+            encoding,
+            path,
+            size,
+            hash,
+            name: name ?? undefined,
+            CreatedBy: {
+              connect: {
+                id: currentUser.id,
+              },
             },
           },
-        },
-      })
+        })
+      }
+
+      return file
     },
   }),
 )

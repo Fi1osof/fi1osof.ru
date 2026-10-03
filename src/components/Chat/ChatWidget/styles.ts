@@ -209,31 +209,6 @@ export const ChatMessages = styled.div`
   }
 `
 
-export const MessageStyled = styled.div<{ $isUser?: boolean }>`
-  max-width: 85%;
-  padding: 14px 18px;
-  border-radius: 20px;
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  align-self: ${({ $isUser }) => ($isUser ? 'flex-end' : 'flex-start')};
-  background: ${({ $isUser }) => ($isUser ? '#3b82f6' : '#ffffff')};
-  color: ${({ $isUser }) => ($isUser ? '#fff' : '#1f2937')};
-  border-bottom-right-radius: ${({ $isUser }) => ($isUser ? '6px' : '20px')};
-  border-bottom-left-radius: ${({ $isUser }) => ($isUser ? '20px' : '6px')};
-  box-shadow: ${({ $isUser }) =>
-    $isUser
-      ? '0 2px 8px rgba(59, 130, 246, 0.25)'
-      : '0 1px 3px rgba(0, 0, 0, 0.08)'};
-
-  ${({ $isUser }) =>
-    $isUser &&
-    css`
-      a {
-        color: white;
-      }
-    `}
-`
-
 export const ChatInputContainer = styled.div`
   padding: 16px 24px 24px;
   background: transparent;

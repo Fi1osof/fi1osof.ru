@@ -1,249 +1,81 @@
 # LLM Client
 
-Direct access to LLM capabilities via GraphQL and TypeScript — no n8n workflows required.
+Direct access to text, vision, image generation, and speech synthesis through GraphQL or the server-side `llmClient`. No n8n workflow is required.
 
-## Overview
+## Methods
 
-The LLM Client provides two ways to interact with the local LLM server:
+See [Methods and capabilities](./methods.md) for resolver inputs, outputs, examples, and model-specific limitations.
 
-1. **GraphQL mutations** — for experimentation and testing in GraphQL Playground
-2. **Server-side `llmClient`** — for use in resolvers, middleware, and background jobs
+| GraphQL mutation | TypeScript method | Purpose |
+| --- | --- | --- |
+| `llmCompletion` | `completion` | Continue a text prompt using a local API |
+| `llmChatCompletion` | `chatCompletion` | Text conversations, image understanding, and tool-call history |
+| `llmImageGeneration` | `imageGeneration` | Generate images from a prompt |
+| `llmSpeechGeneration` | `speechGeneration` | Convert text to speech with voice and delivery controls |
+
+All four mutations require an authenticated user with status `active` (`isActive`). The `/admin/tts` page additionally requires `sudo`; this is a UI restriction, not the mutation's permission rule.
 
 ## Configuration
 
-Add to `docker/.env`:
+Configure the provider in the server environment (for Docker, `docker/.env`):
 
 ```env
-# LLM API endpoint (default: http://llama:8080/v1)
-LLM_API_URL=http://llama:8080/v1
+# Local OpenAI-compatible API; required when using provider Local
+LLM_LOCAL_API_URL=http://llama:8080/v1
+# Optional local API authentication
+LLM_LOCAL_API_KEY=
+
+# Required when using provider OpenRouter
+OPENROUTER_API_KEY=your-api-key
+# Optional; this is the default
+OPENROUTER_API_URL=https://openrouter.ai/api/v1
+
+# Optional: permit image models listed in LLM_TOP_MODELS
+LLM_ALLOW_TOP_MODELS=false
 ```
 
-## GraphQL API
+The selected API and model must support the requested operation. Configuring a local text model does not enable image generation or TTS automatically.
 
-### Mutations
+## Server-side usage
 
-Both mutations require `isSudo` permission.
-
-#### `llmCompletion`
-
-Raw text completion:
-
-```graphql
-mutation {
-  llmCompletion(
-    input: {
-      prompt: "The capital of France is"
-      maxTokens: 50
-      temperature: 0.7
-    }
-  ) {
-    text
-    finishReason
-    usage {
-      promptTokens
-      completionTokens
-      totalTokens
-    }
-  }
-}
-```
-
-#### `llmChatCompletion`
-
-Multi-turn chat completion with full OpenAI-compatible message format:
-
-```graphql
-mutation {
-  llmChatCompletion(
-    input: {
-      messages: [
-        { role: system, content: "You are a helpful assistant." }
-        { role: user, content: "Hello!" }
-      ]
-      temperature: 0.7
-      maxTokens: 500
-    }
-  ) {
-    text
-    finishReason
-    usage {
-      promptTokens
-      completionTokens
-      totalTokens
-    }
-  }
-}
-```
-
-### Message Roles
-
-- `system` — system prompt
-- `user` — user message
-- `assistant` — assistant response
-- `tool` — tool execution result
-
-### Vision Support
-
-Send images as base64 data URLs:
-
-```graphql
-mutation {
-  llmChatCompletion(
-    input: {
-      messages: [
-        {
-          role: user
-          content: [
-            { type: "image_url", imageUrl: { url: "data:image/png;base64,..." } }
-            { type: "text", text: "What is in this image?" }
-          ]
-        }
-      ]
-    }
-  ) {
-    text
-  }
-}
-```
-
-**Note:** Requires vision model (e.g., Qwen3.5 with mmproj). See [Computer Vision](../computer-vision/README.md).
-
-### Tool Calling History
-
-Include tool calls and responses in conversation history:
-
-```graphql
-mutation {
-  llmChatCompletion(
-    input: {
-      messages: [
-        { role: system, content: "You are a calculator." }
-        { role: user, content: "What is 25 * 4?" }
-        {
-          role: assistant
-          content: null
-          toolCalls: [
-            {
-              id: "call_123"
-              type: "function"
-              function: {
-                name: "calculate"
-                arguments: "{\"expression\": \"25 * 4\"}"
-              }
-            }
-          ]
-        }
-        {
-          role: tool
-          toolCallId: "call_123"
-          content: "100"
-        }
-      ]
-    }
-  ) {
-    text
-  }
-}
-```
-
-## Server-Side Usage
-
-The `llmClient` is available in the GraphQL context:
+The client is available as `ctx.llmClient` in resolvers, or as an exported singleton for server-side jobs. Every method takes `(provider, model, request)`:
 
 ```typescript
-import { LLMChatMessageRole } from 'server/llm/client/interfaces'
+import { llmClient } from 'server/llm/client'
+import {
+  LLMChatMessageRole,
+  LlmModel,
+  LlmProvider,
+} from 'server/llm/client/interfaces'
 
-async function myResolver(parent, args, ctx) {
-  const { llmClient } = ctx
-
-  const response = await llmClient.chatCompletion({
+const response = await llmClient.chatCompletion(
+  LlmProvider.OpenRouter,
+  LlmModel.Gemini2_5_Flash,
+  {
     messages: [
-      { role: LLMChatMessageRole.system, content: 'You are a helpful assistant.' },
-      { role: LLMChatMessageRole.user, content: 'Hello!' },
-    ],
-    max_tokens: 500,
-    temperature: 0.7,
-  })
-
-  return response.choices[0].message.content
-}
-```
-
-### Example: Auto-generate File Metadata
-
-```typescript
-async function processFile({ file, ctx }: ProcessFileProps) {
-  const { prisma, llmClient } = ctx
-
-  const imageBuffer = await readFile(join('uploads', file.path))
-  const base64 = imageBuffer.toString('base64')
-  const dataUrl = `data:${file.mimetype};base64,${base64}`
-
-  const response = await llmClient.chatCompletion({
-    messages: [
-      {
-        role: LLMChatMessageRole.user,
-        content: [
-          { type: 'image_url', image_url: { url: dataUrl } },
-          { type: 'text', text: 'Return JSON: { "name": "...", "description": "..." }' },
-        ],
-      },
+      { role: LLMChatMessageRole.user, content: 'Summarize this topic.' },
     ],
     max_tokens: 500,
     temperature: 0.3,
-  })
+  },
+)
 
-  const result = JSON.parse(response.choices[0].message.content)
-  
-  await prisma.file.update({
-    where: { id: file.id },
-    data: { name: result.name, description: result.description },
-  })
-}
+const text = response.choices[0]?.message.content
 ```
 
-### Example: Auto-tag Content
+GraphQL uses camelCase input names such as `maxTokens`; the text client methods use API-style names such as `max_tokens`. TTS uses camelCase in both interfaces. Check the request types before calling the client directly.
 
-```typescript
-async function autoTagConcept({ concept, ctx }: AutoTagProps) {
-  const { prisma, llmClient } = ctx
+## Implementation
 
-  const response = await llmClient.chatCompletion({
-    messages: [
-      { role: LLMChatMessageRole.system, content: 'Extract 3-5 tags. Return JSON: ["tag1", "tag2"]' },
-      { role: LLMChatMessageRole.user, content: concept.content },
-    ],
-    temperature: 0.2,
-  })
+- [Client and provider configuration](../../server/llm/client/index.ts)
+- [Request/response types and model enum](../../server/llm/client/interfaces.ts)
+- [GraphQL response types](../../server/schema/types/LLM/types.ts)
+- [Resolver registration](../../server/schema/types/LLM/index.ts)
+- [GraphQL operations](../../src/gql/src/LLM.graphql)
 
-  const tags = JSON.parse(response.choices[0].message.content)
-  
-  await prisma.kBConcept.update({
-    where: { id: concept.id },
-    data: { data: { tags } },
-  })
-}
-```
+## See also
 
-## Files
-
-```
-server/
-├── llm/
-│   └── client/
-│       ├── index.ts          # LLMClient class
-│       └── interfaces.ts     # Types and enums
-└── schema/types/
-    └── LLM/
-        ├── index.ts          # GraphQL type definition
-        ├── interfaces.ts     # Resolver interfaces
-        ├── types.ts          # LlamaUsage type
-        └── resolvers/
-            ├── chatCompletion.ts
-            └── completion.ts
-```
-
-## See Also
-
-- [Local LLM Server](../llama-server/README.md) — llama.cpp setup
-- [Computer Vision](../computer-vision/README.md) — image recognition
+- [Methods and capabilities](./methods.md)
+- [Local LLM Server](../llama-server/README.md) — local inference setup
+- [Computer Vision](../computer-vision/README.md) — local image recognition
+- [Image Generation](../image-generation/README.md) — generation and saving in FileUploader

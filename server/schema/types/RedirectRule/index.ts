@@ -3,6 +3,7 @@ import { builder } from 'server/schema/builder'
 import { RedirectPatternTypeEnum } from './types'
 
 import './resolvers/createRedirectRule'
+import './resolvers/list'
 
 builder.prismaObject('RedirectRule', {
   fields: (t) => ({

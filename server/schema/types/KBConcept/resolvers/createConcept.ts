@@ -26,6 +26,8 @@ builder.mutationField('createConcept', (t) =>
           visibility,
           uri,
           content,
+          rootId,
+          parentId,
           ...other
         },
       } = args
@@ -49,6 +51,22 @@ builder.mutationField('createConcept', (t) =>
             id: ctx.currentUser.id,
           },
         },
+      }
+
+      if (rootId) {
+        data.Root = {
+          connect: {
+            id: rootId,
+          },
+        }
+      }
+
+      if (parentId) {
+        data.Parent = {
+          connect: {
+            id: parentId,
+          },
+        }
       }
 
       if (content) {

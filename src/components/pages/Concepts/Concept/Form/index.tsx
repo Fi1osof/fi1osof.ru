@@ -24,18 +24,18 @@ import { Button } from 'src/ui-kit/Button'
 import { ComponentVariant } from 'src/ui-kit/interfaces'
 import { useRouter } from 'next/router'
 import {
-  CreateConceptMutationVariables,
   KbConceptFragment,
   KbConceptNoNestingFragment,
   KbConceptVisibility,
-  UpdateConceptMutationVariables,
   useCreateConceptMutation,
   useUpdateConceptMutation,
 } from 'src/gql/generated'
 import { createConceptLink } from 'src/components/Link/Concept'
 import { AppContextValue } from 'src/components/AppContext'
-import { FileUploader, FileUploaderProps } from 'src/components/FileUploader'
 import { Textarea } from 'src/ui-kit/controls/Textarea'
+import { ImageField } from './ImageField'
+
+import { ConceptFormData as FormData } from './interfaces'
 
 const MarkdownEditor = dynamic(
   () => import('src/components/Markdown/Editor').then((r) => r.MarkdownEditor),
@@ -43,10 +43,6 @@ const MarkdownEditor = dynamic(
     ssr: false,
   },
 )
-
-type FormData =
-  | UpdateConceptMutationVariables['data']
-  | CreateConceptMutationVariables['data']
 
 function getDefaultValues(concept: ConceptEditFormProps['concept']): FormData {
   return {
@@ -187,17 +183,6 @@ export const ConceptEditForm: React.FC<ConceptEditFormProps> = ({
     ],
   )
 
-  const onChangeImage = useCallback<NonNullable<FileUploaderProps['onChange']>>(
-    (file) => {
-      if (file?.path) {
-        form.setValue('image', file.path, {
-          shouldValidate: true,
-        })
-      }
-    },
-    [form],
-  )
-
   const fieldRenderer = useCallback<
     ControllerProps<
       FormData,
@@ -211,91 +196,79 @@ export const ConceptEditForm: React.FC<ConceptEditFormProps> = ({
       | 'uri'
       | 'visibility'
     >['render']
-  >(
-    ({ field: { name, value, onChange, onBlur }, fieldState: { error } }) => {
-      let label: string
-      const helperText = undefined
-      let EditorComponent:
-        | typeof TextField
-        | typeof MarkdownEditor
-        | React.FC<{
-            value: string
-          }> = TextField
+  >(({ field: { name, value, onChange, onBlur }, fieldState: { error } }) => {
+    let label: string
+    const helperText = undefined
+    let EditorComponent:
+      | typeof TextField
+      | typeof MarkdownEditor
+      | React.FC<{
+          value: string
+        }> = TextField
 
-      let otherInputProps: TextFieldProps = {}
+    let otherInputProps: TextFieldProps = {}
 
-      switch (name) {
-        case 'name':
-          label = 'Name'
-          break
-        case 'description':
-          label = 'Description'
-          EditorComponent = Textarea
-          break
-        case 'intro':
-          label = 'Intro'
-          EditorComponent = MarkdownEditor
-          break
-        case 'content':
-          label = 'Content'
-          EditorComponent = MarkdownEditor
-          break
-        case 'type':
-          label = 'Type'
-          break
+    switch (name) {
+      case 'name':
+        label = 'Name'
+        break
+      case 'description':
+        label = 'Description'
+        EditorComponent = Textarea
+        break
+      case 'intro':
+        label = 'Intro'
+        EditorComponent = MarkdownEditor
+        break
+      case 'content':
+        label = 'Content'
+        EditorComponent = MarkdownEditor
+        break
+      case 'type':
+        label = 'Type'
+        break
 
-        case 'quality':
-          label = 'Quality'
+      case 'quality':
+        label = 'Quality'
 
-          otherInputProps = {
-            type: 'number',
-            min: 0,
-            step: 0.0000000001,
-          }
-          break
+        otherInputProps = {
+          type: 'number',
+          min: 0,
+          step: 0.0000000001,
+        }
+        break
 
-        case 'uri':
-          label = 'Uri'
-          break
+      case 'uri':
+        label = 'Uri'
+        break
 
-        case 'visibility':
-          label = 'Visibility'
-          break
+      case 'visibility':
+        label = 'Visibility'
+        break
 
-        case 'image':
-          label = 'Image'
+      case 'image':
+        label = 'Image'
 
-          EditorComponent = ({ value }: { value: string }) => {
-            return (
-              <>
-                <FileUploader
-                  value={value ? `/images/resized/middle/${value}` : ''}
-                  onChange={onChangeImage}
-                />
-              </>
-            )
-          }
+        EditorComponent = ImageField
 
-          break
-      }
+        break
+    }
 
-      return (
-        <FormControl
-          label={label}
-          helperText={error ? error.message : helperText}
-          error={!!error}
-        >
-          <EditorComponent
-            {...otherInputProps}
-            value={(value as string) || ''}
-            onChange={onChange}
-            onBlur={onBlur}
-          />
-        </FormControl>
-      )
-    },
-    [onChangeImage],
-  )
+    return (
+      <FormControl
+        label={label}
+        helperText={error ? error.message : helperText}
+        error={!!error}
+      >
+        <EditorComponent
+          {...otherInputProps}
+          value={(value as string) || ''}
+          onChange={onChange}
+          onBlur={onBlur}
+        />
+      </FormControl>
+    )
+  }, [])
 
   return (
     <ConceptEditFormStyled>
