@@ -48,8 +48,8 @@ export const AboutPageCustom: Page = ({ siteOrigin }) => {
         <JsonLd
           data={createPerson({
             '@id': 'https://fi1osof.ru/about',
-            name: 'Nikolay Lanets',
-            alternateName: ['Николай Ланец', 'Fi1osof'],
+            name: 'Nikolai Lanets',
+            alternateName: ['Николай Ланец', 'Fi1osof', 'Nikolay Lanets'],
             url: pageUrl,
             image:
               'https://fi1osof.ru/images/resized/middle/cmkppub1z0002mu0z427kxsay/1788907935190-photo_2026-05-18_01-31-10.jpg',
